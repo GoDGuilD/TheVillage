@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://d5v2f8q4n1mxw"]
+
+[ext_resource type="Script" path="res://scenes/ui/HealthUI.gd" id="1_healthui"]
+
+[node name="HealthUI" type="CanvasLayer"]
+script = ExtResource("1_healthui")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_left = 8.0
+offset_top = 8.0
+theme_override_constants/separation = 4

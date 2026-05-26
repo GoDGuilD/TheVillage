@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://a1k7p9s3x6zbt"]
+
+[ext_resource type="Script" path="res://scenes/world/World.gd" id="1_world"]
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/Slime.tscn" id="3_slime"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HealthUI.tscn" id="4_ui"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_world")
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Slime" parent="Enemies" instance=ExtResource("3_slime")]
+position = Vector2(80.0, 60.0)
+
+[node name="Slime2" parent="Enemies" instance=ExtResource("3_slime")]
+position = Vector2(120.0, 90.0)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(0.0, 0.0)
+
+[node name="HealthUI" parent="." instance=ExtResource("4_ui")]
