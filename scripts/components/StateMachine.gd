@@ -18,10 +18,10 @@ var current_state: String = ""
 var _owner_node: Node
 var _states: Dictionary = {}
 
-func init(owner: Node, initial_state: String) -> void:
-	_owner_node = owner
+func init(host: Node, initial_state: String) -> void:
+	_owner_node = host
 	# Descubrimiento automático de estados por nombre de método
-	for method in owner.get_method_list():
+	for method in host.get_method_list():
 		var mname: String = method["name"]
 		if mname.begins_with("state_") and mname.ends_with("_update"):
 			var sname := mname.trim_prefix("state_").trim_suffix("_update")

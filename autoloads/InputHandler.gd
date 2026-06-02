@@ -64,10 +64,9 @@ func _input(event: InputEvent) -> void:
 
 func remap_action(action: StringName, new_event: InputEvent) -> void:
 	## Sustituye todos los eventos de una acción por uno nuevo.
-	## Útil para una pantalla de "Pulsa la tecla para..." en settings.
 	InputMap.action_erase_events(action)
 	InputMap.action_add_event(action, new_event)
 
-func reset_action_to_default(action: StringName) -> void:
+func reset_action_to_default(_action: StringName) -> void:
 	## Restaura los eventos de una acción a los definidos en project.godot.
 	InputMap.load_from_project_settings()

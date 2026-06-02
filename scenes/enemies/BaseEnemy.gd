@@ -15,6 +15,7 @@ var _state: State = State.IDLE
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 
 func _ready() -> void:
+	GameManager.register_enemy(self)
 	_hurt_box.hurt.connect(_on_hurt)
 	_health.died.connect(_on_died)
 
@@ -46,6 +47,7 @@ func _on_hurt(damage: int, _source_position: Vector2) -> void:
 func _on_died() -> void:
 	_state = State.DEAD
 	set_physics_process(false)
+	GameManager.unregister_enemy(self)
 	EventBus.enemy_died.emit(self)
 	_play_death_tween()
 

@@ -4,12 +4,12 @@ class_name Constants
 
 # ─── Jugador ──────────────────────────────────────────────────────────────────
 const PLAYER_SPEED           := 80.0
-const PLAYER_ACCELERATION    := 700.0   # px/s² — qué tan rápido alcanza la velocidad máx
-const PLAYER_FRICTION        := 600.0   # px/s² — qué tan rápido frena al soltar el stick
+const PLAYER_ACCELERATION    := 700.0
+const PLAYER_FRICTION        := 600.0
 const PLAYER_MAX_HEALTH      := 6
-const PLAYER_ATTACK_DURATION  := 0.3   # segundos que dura el swing
-const PLAYER_IFRAMES_DURATION := 1.0   # segundos de invencibilidad tras daño
-const PLAYER_SWORD_REACH     := 12.0   # pixels desde el centro al hitbox
+const PLAYER_ATTACK_DURATION  := 0.3
+const PLAYER_IFRAMES_DURATION := 1.0
+const PLAYER_SWORD_REACH     := 12.0
 
 # ─── Enemigos ─────────────────────────────────────────────────────────────────
 const SLIME_SPEED           := 35.0
@@ -42,3 +42,8 @@ const ANIM_ATTACK_FPS       := 12.0
 
 # ─── Transiciones ─────────────────────────────────────────────────────────────
 const FADE_DURATION         := 0.3
+
+# ─── Mundo ────────────────────────────────────────────────────────────────────
+const TILE_SIZE             := 16
+const WORLD_HALF_TILES_X    := 12   # tiles desde el centro al borde horizontal
+const WORLD_HALF_TILES_Y    := 8    # tiles desde el centro al borde vertical
