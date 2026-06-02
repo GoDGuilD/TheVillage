@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://bt1doortscn01"]
+
+[ext_resource type="Script" path="res://scenes/world/Door.gd" id="1_door"]
+
+[sub_resource type="RectangleShape2D" id="RectShape_door"]
+size = Vector2(32.0, 12.0)
+
+[node name="Door" type="Area2D"]
+collision_mask = 2
+script = ExtResource("1_door")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectShape_door")

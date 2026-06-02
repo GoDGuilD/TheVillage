@@ -82,8 +82,8 @@ TheVillage/
 │   ├── autoloads/      # EventBus, GameManager (singletons)
 │   └── combat/         # HealthComponent, HitBox, HurtBox
 └── assets/
-    ├── sprites/        # player/, enemies/, world/
-    └── audio/          # sfx/, music/
+	├── sprites/        # player/, enemies/, world/
+	└── audio/          # sfx/, music/
 ```
 
 ---

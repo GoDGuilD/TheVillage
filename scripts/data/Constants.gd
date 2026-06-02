@@ -43,7 +43,20 @@ const ANIM_ATTACK_FPS       := 12.0
 # ─── Transiciones ─────────────────────────────────────────────────────────────
 const FADE_DURATION         := 0.3
 
-# ─── Mundo ────────────────────────────────────────────────────────────────────
+# ─── Tile y mundo (escena World.tscn legacy) ──────────────────────────────────
 const TILE_SIZE             := 16
-const WORLD_HALF_TILES_X    := 12   # tiles desde el centro al borde horizontal
-const WORLD_HALF_TILES_Y    := 8    # tiles desde el centro al borde vertical
+const WORLD_HALF_TILES_X    := 12
+const WORLD_HALF_TILES_Y    := 8
+
+# ─── Sala (una pantalla = 320×180 px) ────────────────────────────────────────
+## Cada sala ocupa exactamente el viewport. La cámara se fija con límites.
+## Ancho: 10×2×16 = 320 px = viewport exacto.
+## Alto:  6×2×16 = 192 px (12 px de margen extra, ocultos por los límites de cámara).
+const ROOM_HALF_TILES_X     := 10
+const ROOM_HALF_TILES_Y     := 6
+const VIEWPORT_HALF_W       := 160   # 320 / 2
+const VIEWPORT_HALF_H       := 90    # 180 / 2
+
+# ─── Rutas de escenas ─────────────────────────────────────────────────────────
+const SCENE_SALA1 := "res://scenes/world/rooms/Sala1_Tutorial.tscn"
+const SCENE_SALA2 := "res://scenes/world/rooms/Sala2_Desafio.tscn"

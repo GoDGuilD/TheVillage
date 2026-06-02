@@ -63,9 +63,9 @@ TheVillage/
 │       └── slime_data.tres
 │
 └── assets/
-    ├── sprites/
-    ├── audio/
-    └── fonts/
+	├── sprites/
+	├── audio/
+	└── fonts/
 ```
 
 ---
@@ -140,8 +140,8 @@ Slime       → EventBus.enemy_died            → GameManager
 SceneManager → EventBus.room_entered         → HUD
 
 Regla: usa señal local si el emisor sabe exactamente quién escucha
-       y ambos viven en la misma escena raíz.
-       Usa EventBus si el emisor no sabe (ni le importa) quién escucha.
+	   y ambos viven en la misma escena raíz.
+	   Usa EventBus si el emisor no sabe (ni le importa) quién escucha.
 ```
 
 ---
@@ -176,12 +176,12 @@ Agregar enemigo = nuevo `.gd` + `.tscn`. Sin tocar archivos existentes.
 
 ```
 MENU ──play──→ PLAYING ──pause──→ PAUSED
-                  │                  │
-                  │←──────resume─────┘
-                  │
-              player_died
-                  │
-              GAME_OVER ──restart──→ PLAYING
+				  │                  │
+				  │←──────resume─────┘
+				  │
+			  player_died
+				  │
+			  GAME_OVER ──restart──→ PLAYING
 ```
 
 ---
@@ -208,11 +208,11 @@ MENU ──play──→ PLAYING ──pause──→ PAUSED
 ```
 Player recibe golpe
   → HurtBox.hurt(1)
-    → Player._on_hurt(1)
-      → HealthComponent.take_damage(1)
-        → HealthComponent.health_changed(5, 6)
-          → Player._on_health_changed(5, 6)
-            → EventBus.player_health_changed(5, 6)
-              → HUD._on_health_changed(5, 6)
-                → actualiza corazones en pantalla
+	→ Player._on_hurt(1)
+	  → HealthComponent.take_damage(1)
+		→ HealthComponent.health_changed(5, 6)
+		  → Player._on_health_changed(5, 6)
+			→ EventBus.player_health_changed(5, 6)
+			  → HUD._on_health_changed(5, 6)
+				→ actualiza corazones en pantalla
 ```

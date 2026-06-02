@@ -11,10 +11,10 @@ config_version=5
 [application]
 
 config/name="The Village"
-run/main_scene="uid://1k7qas3x60bt"
+run/main_scene="uid://ax8k2m5vj9rtp"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
-config/run/main_scene="res://scenes/world/World.tscn"
+config/run/main_scene="res://scenes/world/rooms/Sala1_Tutorial.tscn"
 
 [autoload]
 
@@ -22,6 +22,7 @@ EventBus="*res://autoloads/EventBus.gd"
 GameManager="*res://autoloads/GameManager.gd"
 SceneManager="*res://autoloads/SceneManager.gd"
 InputHandler="*res://autoloads/InputHandler.gd"
+MCPRuntimeProbe="*res://addons/godot_mcp/runtime/mcp_runtime_probe.gd"
 
 [display]
 

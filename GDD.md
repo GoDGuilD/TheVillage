@@ -140,11 +140,11 @@ En Godot: `Window > Stretch Mode = canvas_items`, `Aspect = keep`.
 
 El prototipo se considera completo cuando:
 
-- [ ] Un nuevo jugador puede mover al personaje en menos de 5 segundos
-- [ ] Un nuevo jugador entiende cómo atacar sin leer instrucciones
-- [ ] Es posible morir y saber por qué
-- [ ] Hay al menos 2 salas conectadas
-- [ ] El juego no crashea en una sesión de 5 minutos
+- [x] Un nuevo jugador puede mover al personaje en menos de 5 segundos
+- [x] Un nuevo jugador entiende cómo atacar sin leer instrucciones
+- [x] Es posible morir y saber por qué — pantalla de Game Over
+- [x] Hay al menos 2 salas conectadas — Sala1_Tutorial ↔ Sala2_Desafio (Fase 2)
+- [x] El juego no crashea en una sesión de 5 minutos
 
 ---
 

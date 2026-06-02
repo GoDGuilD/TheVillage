@@ -34,6 +34,14 @@ var _is_invincible: bool = false
 
 func _ready() -> void:
 	GameManager.register_player(self)
+	## Rehabilitar el input — puede estar desactivado si venimos de un Game Over
+	## (state_dead_enter lo apaga y InputHandler persiste entre escenas por ser autoload).
+	InputHandler.controller_enabled = true
+	## Restaurar vida si el jugador viene de otra sala.
+	## GameManager.player_health = -1 significa "usa max_health" (inicio de partida).
+	if GameManager.player_health >= 0:
+		_health.current_health = GameManager.player_health
+		GameManager.player_health = -1  # Limpiar para la próxima transición
 	_hurt_box.hurt.connect(_on_hurt)
 	_health.died.connect(_on_died)
 	_health.health_changed.connect(_on_health_changed)
@@ -41,7 +49,10 @@ func _ready() -> void:
 	_invincibility_timer.timeout.connect(_on_invincibility_done)
 	_knockback_timer.timeout.connect(_on_knockback_done)
 	InputHandler.attack_pressed.connect(_on_attack_pressed)
+	## monitoring=false: la espada no detecta otros. monitorable=false: nadie detecta la espada.
+	## Ambos se activan juntos en state_attack_enter() para evitar el bug de daño fantasma.
 	_sword_hit_box.monitoring = false
+	_sword_hit_box.monitorable = false
 	_fsm.init(self, "idle")
 	PlaceholderSprite.inject(_sprite, Color(0.259, 0.522, 0.957), Vector2i(12, 14))
 
@@ -78,7 +89,9 @@ func state_walk_update(delta: float) -> void:
 func state_attack_enter() -> void:
 	velocity = Vector2.ZERO
 	_position_sword()
+	## Activar ambos: la espada detecta y puede ser detectada (activa el hitbox completo).
 	_sword_hit_box.monitoring = true
+	_sword_hit_box.monitorable = true
 	_attack_timer.start(Constants.PLAYER_ATTACK_DURATION)
 	_play_anim("attack")
 
@@ -86,7 +99,9 @@ func state_attack_update(_delta: float) -> void:
 	move_and_slide()  # colisiona con el mundo pero sin input de movimiento
 
 func state_attack_exit() -> void:
+	## Desactivar ambos al salir del estado de ataque.
 	_sword_hit_box.monitoring = false
+	_sword_hit_box.monitorable = false
 
 # ─── KNOCKBACK ────────────────────────────────────────────────────────────────
 

@@ -1,11 +1,15 @@
 extends CanvasLayer
 ## HUD de vida. Muestra corazones como ColorRect (placeholders).
 ## Reemplazar los ColorRect por TextureRect cuando tengas sprites de corazones.
+## También es responsable de instanciar la pantalla de Game Over al morir.
 
 const HEART_SIZE := Vector2(14, 14)
 const HEART_SPACING := 2
 const COLOR_FULL  := Color(0.9, 0.15, 0.15)
 const COLOR_EMPTY := Color(0.25, 0.25, 0.25, 0.6)
+
+## Escena de Game Over — se carga una sola vez, se instancia cuando el jugador muere.
+const GAME_OVER_SCENE := preload("res://scenes/ui/GameOver.tscn")
 
 var _hearts: Array[ColorRect] = []
 
@@ -35,4 +39,8 @@ func _on_health_changed(current: int, maximum: int) -> void:
 		_hearts[i].color = COLOR_FULL if i < current else COLOR_EMPTY
 
 func _on_player_died() -> void:
-	pass  # TODO: mostrar pantalla de Game Over
+	## Instanciar la pantalla de Game Over y añadirla al root del árbol.
+	## Se añade al root (no a World) para garantizar que persiste durante el fade
+	## y que su layer esté por encima de todo lo que existe en la escena actual.
+	var game_over := GAME_OVER_SCENE.instantiate()
+	get_tree().root.add_child(game_over)
