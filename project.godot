@@ -11,10 +11,10 @@ config_version=5
 [application]
 
 config/name="The Village"
-run/main_scene="uid://ax8k2m5vj9rtp"
+run/main_scene="res://scenes/ui/MainMenu.tscn"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
-config/run/main_scene="res://scenes/world/rooms/Sala1_Tutorial.tscn"
+config/run/main_scene="res://scenes/ui/MainMenu.tscn"
 
 [autoload]
 
@@ -22,6 +22,7 @@ EventBus="*res://autoloads/EventBus.gd"
 GameManager="*res://autoloads/GameManager.gd"
 SceneManager="*res://autoloads/SceneManager.gd"
 InputHandler="*res://autoloads/InputHandler.gd"
+PauseMenu="*res://autoloads/PauseMenu.gd"
 
 [display]
 

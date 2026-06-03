@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bqf4x8m2c1wkp"]
+[gd_scene load_steps=12 format=3 uid="uid://bqf4x8m2c1wkp"]
 
 [ext_resource type="Script" path="res://scenes/player/Player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/combat/HealthComponent.gd" id="2_health"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/combat/HitBox.gd" id="4_hitbox"]
 [ext_resource type="Script" path="res://scripts/components/StateMachine.gd" id="5_fsm"]
 [ext_resource type="Script" path="res://scripts/components/PixelCamera.gd" id="6_camera"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/sword.png" id="7_sword_tex"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 5.0
@@ -109,6 +110,10 @@ script = ExtResource("3_hurtbox")
 shape = SubResource("CapsuleShape2D_hurtbox")
 
 [node name="SwordArea" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="SwordArea"]
+texture = ExtResource("7_sword_tex")
+visible = false
 
 [node name="HitBox" type="Area2D" parent="SwordArea"]
 collision_layer = 8

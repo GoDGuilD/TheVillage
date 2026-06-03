@@ -57,6 +57,12 @@ const ROOM_HALF_TILES_Y     := 6
 const VIEWPORT_HALF_W       := 160   # 320 / 2
 const VIEWPORT_HALF_H       := 90    # 180 / 2
 
+# ─── Objetos recogibles ───────────────────────────────────────────────────────
+## Probabilidad de que un slime suelte un medio corazón al morir.
+const HEART_DROP_CHANCE := 0.30
+
 # ─── Rutas de escenas ─────────────────────────────────────────────────────────
-const SCENE_SALA1 := "res://scenes/world/rooms/Sala1_Tutorial.tscn"
-const SCENE_SALA2 := "res://scenes/world/rooms/Sala2_Desafio.tscn"
+const SCENE_SALA1       := "res://scenes/world/rooms/Sala1_Tutorial.tscn"
+const SCENE_SALA2       := "res://scenes/world/rooms/Sala2_Desafio.tscn"
+const SCENE_HEART_PICKUP := "res://scenes/items/HeartPickup.tscn"
+const SCENE_MAIN_MENU   := "res://scenes/ui/MainMenu.tscn"

@@ -1,9 +1,30 @@
-[gd_scene load_steps=8 format=3 uid="uid://cn9j6r3t7ydhs"]
+[gd_scene load_steps=13 format=3 uid="uid://cn9j6r3t7ydhs"]
 
 [ext_resource type="Script" path="res://scenes/enemies/Slime.gd" id="1_slime"]
 [ext_resource type="Script" path="res://scripts/combat/HealthComponent.gd" id="2_health"]
 [ext_resource type="Script" path="res://scripts/combat/HurtBox.gd" id="3_hurtbox"]
 [ext_resource type="Script" path="res://scripts/combat/HitBox.gd" id="4_hitbox"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/slime.png" id="5_slime_tex"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_idle1"]
+atlas = ExtResource("5_slime_tex")
+region = Rect2(0, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_idle2"]
+atlas = ExtResource("5_slime_tex")
+region = Rect2(16, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk1"]
+atlas = ExtResource("5_slime_tex")
+region = Rect2(32, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_walk2"]
+atlas = ExtResource("5_slime_tex")
+region = Rect2(48, 0, 16, 16)
+filter_clip = true
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 5.0
@@ -18,15 +39,15 @@ radius = 5.5
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_slime"]
 animations = [{
-"frames": [],
+"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_idle1")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_idle2")}],
 "loop": true,
 "name": &"idle",
-"speed": 3.0
+"speed": 4.0
 }, {
-"frames": [],
+"frames": [{"duration": 1.0, "texture": SubResource("AtlasTexture_walk1")}, {"duration": 1.0, "texture": SubResource("AtlasTexture_walk2")}],
 "loop": true,
 "name": &"walk",
-"speed": 6.0
+"speed": 8.0
 }]
 
 [node name="Slime" type="CharacterBody2D"]

@@ -29,20 +29,12 @@ func _generate_floor() -> void:
 	## Si el TileMap ya tiene un tileset asignado en el editor, respetarlo.
 	if _tilemap.tile_set:
 		return
-	## Crear tile de pasto 16×16 con borde oscuro (placeholder remplazable con tileset real)
-	var img := Image.create_empty(Constants.TILE_SIZE, Constants.TILE_SIZE, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0.26, 0.52, 0.22))
-	var borde := Color(0.14, 0.30, 0.12)
-	for x in Constants.TILE_SIZE:
-		img.set_pixel(x, 0, borde)
-		img.set_pixel(x, Constants.TILE_SIZE - 1, borde)
-	for y in Constants.TILE_SIZE:
-		img.set_pixel(0, y, borde)
-		img.set_pixel(Constants.TILE_SIZE - 1, y, borde)
+	## Usar el tileset real. El tile de pasto ocupa la esquina superior-izquierda (atlas 0,0).
+	var tex := load("res://assets/sprites/world/tileset_forest.png") as Texture2D
 	var ts := TileSet.new()
 	ts.tile_size = Vector2i(Constants.TILE_SIZE, Constants.TILE_SIZE)
 	var src := TileSetAtlasSource.new()
-	src.texture = ImageTexture.create_from_image(img)
+	src.texture = tex
 	src.texture_region_size = Vector2i(Constants.TILE_SIZE, Constants.TILE_SIZE)
 	src.create_tile(Vector2i.ZERO)
 	var src_id := ts.add_source(src)

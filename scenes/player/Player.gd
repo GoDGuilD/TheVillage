@@ -19,6 +19,7 @@ class_name Player
 @onready var _health:            HealthComponent  = $HealthComponent
 @onready var _hurt_box:          HurtBox          = $HurtBox
 @onready var _sword_area:        Node2D           = $SwordArea
+@onready var _sword_sprite:      Sprite2D         = $SwordArea/Sprite2D
 @onready var _sword_hit_box:     HitBox           = $SwordArea/HitBox
 @onready var _attack_timer:      Timer            = $AttackTimer
 @onready var _invincibility_timer: Timer          = $InvincibilityTimer
@@ -89,6 +90,9 @@ func state_walk_update(delta: float) -> void:
 func state_attack_enter() -> void:
 	velocity = Vector2.ZERO
 	_position_sword()
+	## Rotar la espada hacia la dirección del ataque y hacerla visible.
+	_sword_area.rotation = _facing.angle()
+	_sword_sprite.visible = true
 	## Activar ambos: la espada detecta y puede ser detectada (activa el hitbox completo).
 	_sword_hit_box.monitoring = true
 	_sword_hit_box.monitorable = true
@@ -99,6 +103,8 @@ func state_attack_update(_delta: float) -> void:
 	move_and_slide()  # colisiona con el mundo pero sin input de movimiento
 
 func state_attack_exit() -> void:
+	_sword_sprite.visible = false
+	_sword_area.rotation = 0.0
 	## Desactivar ambos al salir del estado de ataque.
 	_sword_hit_box.monitoring = false
 	_sword_hit_box.monitorable = false
