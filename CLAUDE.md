@@ -58,7 +58,7 @@ MCP plugin (`addons/godot_mcp`) must be enabled for Claude Code integration.
 
 ### Important scene paths
 - Main scene: `res://scenes/ui/MainMenu.tscn`
-- `Constants.SCENE_SALA1` / `Constants.SCENE_SALA2` / `Constants.SCENE_MAIN_MENU` / `Constants.SCENE_HEART_PICKUP` — use these constants, never hardcoded strings
+- `Constants.SCENE_ROOM1` / `Constants.SCENE_ROOM2` / `Constants.SCENE_MAIN_MENU` / `Constants.SCENE_HEART_PICKUP` — use these constants, never hardcoded strings
 - `Constants.HEART_DROP_CHANCE = 0.30` — probability of a HeartPickup drop when a Slime dies
 
 ## Development philosophy
@@ -73,7 +73,7 @@ MCP plugin (`addons/godot_mcp`) must be enabled for Claude Code integration.
 | Phase | Feature | Status |
 |---|---|---|
 | 1 | Player movement, sword, enemy AI, transitions, pixel rendering, Game Over | ✅ Done |
-| 2 | Room system (Sala1↔Sala2, doors, spawn points, health persistence) | ✅ Done |
+| 2 | Room system (Room1↔Room2, doors, spawn points, health persistence) | ✅ Done |
 | 3 | Items — HeartPickup, 30% drop from slimes on death | ✅ Done |
 | 4 | Main menu — title screen, Play/Quit | ✅ Done |
 | 5 | Pause menu — ESC pauses, Continue/Exit | ✅ Done |
@@ -85,7 +85,7 @@ scenes/
   player/       → Player.tscn + Player.gd
   enemies/      → Slime.tscn, BaseEnemy.gd, Slime.gd
   world/        → Room.gd, Door.tscn, Door.gd
-    rooms/      → Sala1_Tutorial.tscn, Sala2_Desafio.tscn
+    rooms/      → Room1_Tutorial.tscn, Room2_Challenge.tscn
   items/        → HeartPickup.tscn, HeartPickup.gd
   ui/           → HealthUI.tscn, GameOver.tscn, MainMenu.tscn
 scripts/

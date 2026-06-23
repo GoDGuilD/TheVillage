@@ -3,16 +3,16 @@ extends CanvasLayer
 ##
 ## Responsibilities:
 ##   - Resets global state (unpauses the tree, MENU state).
-##   - "JUGAR" starts the game from Sala1 via SceneManager.
-##   - "SALIR" quits the application.
+##   - "PLAY" starts the game from Room1 via SceneManager.
+##   - "QUIT" quits the application.
 ##
 ## Hierarchy (built in code):
 ##   MainMenu (CanvasLayer, layer=0)
-##     └─ Fondo   (ColorRect, full screen)
-##     └─ Caja    (VBoxContainer, centered)
-##           └─ Titulo   (Label "THE VILLAGE")
-##           └─ BtnJugar (Button "JUGAR")
-##           └─ BtnSalir (Button "SALIR")
+##     └─ Background  (ColorRect, full screen)
+##     └─ Box         (VBoxContainer, centered)
+##           └─ Title       (Label "THE VILLAGE")
+##           └─ PlayButton  (Button "PLAY")
+##           └─ QuitButton  (Button "QUIT")
 
 func _ready() -> void:
 	layer = 0
@@ -20,55 +20,55 @@ func _ready() -> void:
 	## from a previous session (e.g. returning to the menu from the pause menu).
 	get_tree().paused = false
 	GameManager.set_state(GameManager.GameState.MENU)
-	_construir_ui()
+	_build_ui()
 
 # ─── UI construction ──────────────────────────────────────────────────────────
 
-func _construir_ui() -> void:
-	var fondo := ColorRect.new()
-	fondo.anchor_right  = 1.0
-	fondo.anchor_bottom = 1.0
-	fondo.color = Color(0.04, 0.07, 0.12)
-	add_child(fondo)
+func _build_ui() -> void:
+	var background := ColorRect.new()
+	background.anchor_right  = 1.0
+	background.anchor_bottom = 1.0
+	background.color = Color(0.04, 0.07, 0.12)
+	add_child(background)
 
-	var caja := VBoxContainer.new()
-	caja.anchor_left   = 0.5
-	caja.anchor_top    = 0.5
-	caja.anchor_right  = 0.5
-	caja.anchor_bottom = 0.5
-	caja.offset_left   = -60.0
-	caja.offset_top    = -40.0
-	caja.offset_right  =  60.0
-	caja.offset_bottom =  40.0
-	caja.alignment = BoxContainer.ALIGNMENT_CENTER
-	caja.add_theme_constant_override("separation", 10)
-	add_child(caja)
+	var box := VBoxContainer.new()
+	box.anchor_left   = 0.5
+	box.anchor_top    = 0.5
+	box.anchor_right  = 0.5
+	box.anchor_bottom = 0.5
+	box.offset_left   = -60.0
+	box.offset_top    = -40.0
+	box.offset_right  =  60.0
+	box.offset_bottom =  40.0
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 10)
+	add_child(box)
 
-	var titulo := Label.new()
-	titulo.text = "THE VILLAGE"
-	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	titulo.add_theme_font_size_override("font_size", 18)
-	caja.add_child(titulo)
+	var title := Label.new()
+	title.text = "THE VILLAGE"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 18)
+	box.add_child(title)
 
 	## Visual separator between title and buttons
-	var separador := Control.new()
-	separador.custom_minimum_size = Vector2(0.0, 8.0)
-	caja.add_child(separador)
+	var separator := Control.new()
+	separator.custom_minimum_size = Vector2(0.0, 8.0)
+	box.add_child(separator)
 
-	var btn_jugar := Button.new()
-	btn_jugar.text = "JUGAR"
-	btn_jugar.pressed.connect(_on_jugar_presionado)
-	caja.add_child(btn_jugar)
+	var play_button := Button.new()
+	play_button.text = "PLAY"
+	play_button.pressed.connect(_on_play_pressed)
+	box.add_child(play_button)
 
-	var btn_salir := Button.new()
-	btn_salir.text = "SALIR"
-	btn_salir.pressed.connect(_on_salir_presionado)
-	caja.add_child(btn_salir)
+	var quit_button := Button.new()
+	quit_button.text = "QUIT"
+	quit_button.pressed.connect(_on_quit_pressed)
+	box.add_child(quit_button)
 
 # ─── Signals ──────────────────────────────────────────────────────────────────
 
-func _on_jugar_presionado() -> void:
-	SceneManager.go_to_room(Constants.SCENE_SALA1)
+func _on_play_pressed() -> void:
+	SceneManager.go_to_room(Constants.SCENE_ROOM1)
 
-func _on_salir_presionado() -> void:
+func _on_quit_pressed() -> void:
 	get_tree().quit()

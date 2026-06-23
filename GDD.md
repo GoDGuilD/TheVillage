@@ -143,7 +143,7 @@ The prototype is considered complete when:
 - [x] A new player can move the character in under 5 seconds
 - [x] A new player understands how to attack without reading instructions
 - [x] It's possible to die and know why — Game Over screen
-- [x] There are at least 2 connected rooms — Sala1_Tutorial ↔ Sala2_Desafio (Phase 2)
+- [x] There are at least 2 connected rooms — Room1_Tutorial ↔ Room2_Challenge (Phase 2)
 - [x] The game doesn't crash during a 5-minute session
 
 ---

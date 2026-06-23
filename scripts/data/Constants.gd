@@ -62,7 +62,7 @@ const VIEWPORT_HALF_H       := 90    # 180 / 2
 const HEART_DROP_CHANCE := 0.30
 
 # ─── Scene paths ──────────────────────────────────────────────────────────────
-const SCENE_SALA1       := "res://scenes/world/rooms/Sala1_Tutorial.tscn"
-const SCENE_SALA2       := "res://scenes/world/rooms/Sala2_Desafio.tscn"
+const SCENE_ROOM1       := "res://scenes/world/rooms/Room1_Tutorial.tscn"
+const SCENE_ROOM2       := "res://scenes/world/rooms/Room2_Challenge.tscn"
 const SCENE_HEART_PICKUP := "res://scenes/items/HeartPickup.tscn"
 const SCENE_MAIN_MENU   := "res://scenes/ui/MainMenu.tscn"

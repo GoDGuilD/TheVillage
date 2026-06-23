@@ -4,16 +4,16 @@ extends Area2D
 ##
 ## Inspector configuration (@export properties):
 ##   target_scene — res:// path of the destination room
-##   spawn_id     — id of the spawn point in the destination room ("norte", "sur", etc.)
+##   spawn_id     — id of the spawn point in the destination room ("north", "south", etc.)
 ##
-## Example: Sala1's north door → target_scene=Sala2, spawn_id="sur"
-## (the player appears at the south of Sala2, as if having entered from above)
+## Example: Room1's north door → target_scene=Room2, spawn_id="south"
+## (the player appears at the south of Room2, as if having entered from above)
 
 ## Path of the scene this door leads to.
 @export var target_scene: String = ""
 
 ## ID of the spawn point in the destination room.
-## Must match a child node of PuntosSpawn named "Spawn" + spawn_id.capitalize().
+## Must match a child node of SpawnPoints named "Spawn" + spawn_id.capitalize().
 @export var spawn_id: String = ""
 
 func _ready() -> void:

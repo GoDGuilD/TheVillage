@@ -1,6 +1,6 @@
 extends CanvasLayer
 ## Manages transitions between rooms and scenes with fade.
-## Usage: SceneManager.go_to_room("res://scenes/world/rooms/Sala1.tscn", "south")
+## Usage: SceneManager.go_to_room("res://scenes/world/rooms/Room1_Tutorial.tscn", "south")
 ##
 ## Flow of a complete transition:
 ##   1. Fade to black
