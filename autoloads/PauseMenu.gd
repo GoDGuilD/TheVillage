@@ -1,22 +1,22 @@
 extends CanvasLayer
-## Menú de pausa. Autoload persistente — no se destruye al cambiar de sala.
+## Pause menu. Persistent autoload — not destroyed on room change.
 ##
-## Escucha InputHandler.pause_pressed y alterna entre PLAYING y PAUSED.
-## Solo se activa durante el estado PLAYING; se ignora en MENU y GAME_OVER.
+## Listens to InputHandler.pause_pressed and toggles between PLAYING and PAUSED.
+## Only active during the PLAYING state; ignored in MENU and GAME_OVER.
 ##
-## Jerarquía (construida en código):
+## Hierarchy (built in code):
 ##   PauseMenu (CanvasLayer, layer=125, PROCESS_MODE_ALWAYS)
-##     └─ Fondo        (ColorRect semi-transparente)
-##     └─ Caja         (VBoxContainer centrado)
+##     └─ Fondo        (semi-transparent ColorRect)
+##     └─ Caja         (centered VBoxContainer)
 ##           └─ Titulo (Label "PAUSA")
 ##           └─ BtnContinuar  (Button "CONTINUAR")
 ##           └─ BtnMenu       (Button "SALIR AL MENÚ")
 
-## Previene activar la pausa durante transiciones de sala.
+## Prevents toggling pause during room transitions.
 var _transitioning: bool = false
 
 func _ready() -> void:
-	layer = 125   ## Por debajo de GameOver (127) y SceneManager (128)
+	layer = 125   ## Below GameOver (127) and SceneManager (128)
 	visible = false
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_construir_ui()
@@ -24,7 +24,7 @@ func _ready() -> void:
 	SceneManager.transition_started.connect(_on_transition_started)
 	SceneManager.transition_finished.connect(_on_transition_finished)
 
-# ─── Construcción de la UI ────────────────────────────────────────────────────
+# ─── UI construction ──────────────────────────────────────────────────────────
 
 func _construir_ui() -> void:
 	var fondo := ColorRect.new()
@@ -63,10 +63,10 @@ func _construir_ui() -> void:
 	btn_menu.pressed.connect(_on_menu_presionado)
 	caja.add_child(btn_menu)
 
-# ─── Toggle de pausa ──────────────────────────────────────────────────────────
+# ─── Pause toggle ──────────────────────────────────────────────────────────────
 
 func _on_pause_pressed() -> void:
-	## Ignorar si hay una transición en curso o si el estado no es PLAYING/PAUSED.
+	## Ignore if a transition is in progress or the state isn't PLAYING/PAUSED.
 	if _transitioning:
 		return
 	match GameManager.state:
@@ -81,19 +81,19 @@ func _reanudar() -> void:
 	visible = false
 	GameManager.set_state(GameManager.GameState.PLAYING)
 
-# ─── Botones ──────────────────────────────────────────────────────────────────
+# ─── Buttons ───────────────────────────────────────────────────────────────────
 
 func _on_continuar_presionado() -> void:
 	_reanudar()
 
 func _on_menu_presionado() -> void:
 	visible = false
-	## Despausiamos el árbol ANTES de llamar a SceneManager:
-	## go_to_room usa await sobre tweens que no avanzan con paused=true.
+	## Unpause the tree BEFORE calling SceneManager:
+	## go_to_room awaits tweens that don't advance while paused=true.
 	get_tree().paused = false
 	SceneManager.go_to_room(Constants.SCENE_MAIN_MENU)
 
-# ─── Transiciones ─────────────────────────────────────────────────────────────
+# ─── Transitions ──────────────────────────────────────────────────────────────
 
 func _on_transition_started() -> void:
 	_transitioning = true

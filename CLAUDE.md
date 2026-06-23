@@ -1,6 +1,6 @@
 # The Village — Godot Project
 
-Action-RPG top-down 2D, inspired by Zelda: A Link to the Past. Engine: Godot 4.6.3.
+Top-down 2D action-RPG, inspired by Zelda: A Link to the Past. Engine: Godot 4.6.3.
 
 ## Running the project
 Open `D:\SOFTWARE\GoDot\Godot_v4.6.3-stable_win64.exe` → Open this project → F5 to run.
@@ -9,38 +9,38 @@ MCP plugin (`addons/godot_mcp`) must be enabled for Claude Code integration.
 ## Architecture
 
 ### Autoloads (load order matters)
-| Autoload | Responsabilidad |
+| Autoload | Responsibility |
 |---|---|
-| `EventBus` | Bus de señales. Solo señales, cero lógica. |
-| `GameManager` | Estado global (MENU/PLAYING/PAUSED/GAME_OVER), registro de entidades, persiste `player_health` entre salas. |
-| `SceneManager` | Fade + cambio de sala. Usar `go_to_room(path, spawn_id)`. CanvasLayer layer=128. |
-| `InputHandler` | Abstracción de input. Nunca usar `Input` directamente. Persiste entre escenas — Player._ready() siempre resetea `controller_enabled = true`. |
-| `PauseMenu` | Menú de pausa. CanvasLayer layer=125, PROCESS_MODE_ALWAYS. Escucha `InputHandler.pause_pressed`. Solo activo en estado PLAYING/PAUSED. |
+| `EventBus` | Signal bus. Signals only, zero logic. |
+| `GameManager` | Global state (MENU/PLAYING/PAUSED/GAME_OVER), entity registry, persists `player_health` between rooms. |
+| `SceneManager` | Fade + room change. Use `go_to_room(path, spawn_id)`. CanvasLayer layer=128. |
+| `InputHandler` | Input abstraction. Never use `Input` directly. Persists between scenes — Player._ready() always resets `controller_enabled = true`. |
+| `PauseMenu` | Pause menu. CanvasLayer layer=125, PROCESS_MODE_ALWAYS. Listens to `InputHandler.pause_pressed`. Only active in PLAYING/PAUSED state. |
 
 ### Key systems
 - **Combat**: `HitBox` (Area2D, layer) + `HurtBox` (Area2D, mask + signal `hurt`)
-  - ⚠️ Sword HitBox requiere toggling de AMBOS `monitoring` Y `monitorable` — solo `monitoring` causa daño fantasma a enemigos cercanos
+  - ⚠️ Sword HitBox requires toggling BOTH `monitoring` AND `monitorable` — `monitoring` alone causes phantom damage to nearby enemies
 - **Player FSM**: states defined as `state_X_enter/update/exit()` methods, driven by `StateMachine.gd`
 - **Enemies**: extend `BaseEnemy` → override `_update_idle()` and `_update_chase()`
 - **Health**: `HealthComponent` node (composable), emits `health_changed` / `died`
-- **Room system**: `Room.gd` base script — genera suelo, paredes, bloquea cámara al viewport, maneja spawn via `EventBus.room_entered`
-- **Doors**: `Door.tscn` (Area2D trigger) — exports `target_scene` + `spawn_id`, detecta Player body (mask=2)
-- **Game Over**: `GameOver.tscn` instanciado por `HealthUI` y añadido a root al morir. Se libera con `queue_free()` al reintentar.
-- **Main Menu**: `MainMenu.tscn` es la main_scene. CanvasLayer layer=0. Resetea pausa y estado MENU en `_ready()`.
-- **Pause Menu**: autoload `PauseMenu.gd`. ESC toggle PLAYING↔PAUSED. "SALIR AL MENÚ" despausa antes de `go_to_room()` — los tweens del SceneManager no avanzan con `paused=true`.
+- **Room system**: `Room.gd` base script — generates floor, walls, locks camera to viewport, handles spawn via `EventBus.room_entered`
+- **Doors**: `Door.tscn` (Area2D trigger) — exports `target_scene` + `spawn_id`, detects Player body (mask=2)
+- **Game Over**: `GameOver.tscn` instantiated by `HealthUI` and added to root on death. Freed with `queue_free()` on retry.
+- **Main Menu**: `MainMenu.tscn` is the main_scene. CanvasLayer layer=0. Resets pause and MENU state in `_ready()`.
+- **Pause Menu**: autoload `PauseMenu.gd`. ESC toggles PLAYING↔PAUSED. "EXIT TO MENU" unpauses before `go_to_room()` — SceneManager tweens don't advance while `paused=true`.
 - **Sprites**: `PlaceholderSprite.inject()` auto-skips if SpriteFrames already have frames — real sprites in Slime.tscn and sword in Player.tscn/Player.gd. Player body stays placeholder (no player.png provided).
 
-### Gotchas conocidos (bugs ya resueltos — no repetir)
-| Problema | Causa | Solución |
+### Known gotchas (bugs already fixed — don't repeat)
+| Problem | Cause | Solution |
 |---|---|---|
-| Slimes mueren al tocar al jugador | `monitorable=true` en sword HitBox activa HurtBox enemigo | Toggling de `monitorable` junto con `monitoring` |
-| GameOver no aparecía | Se conectaba a `player_died` pero la señal ya había sido emitida | Llamar `_on_jugador_muerto()` directamente en `_ready()` |
-| Health bar vacía al reintentar | `save_player_health()` guardaba 0 (jugador muerto) sobre el -1 | No guardar si `current_health <= 0` |
-| GameOver persiste tras reintentar | Añadido a root, no se destruye con el cambio de escena | `queue_free()` antes de `go_to_room()` |
-| Input bloqueado tras reintentar | `InputHandler.controller_enabled=false` persiste entre escenas | `Player._ready()` siempre resetea a `true` |
+| Slimes die when touching the player | `monitorable=true` on sword HitBox activates enemy HurtBox | Toggle `monitorable` together with `monitoring` |
+| GameOver didn't appear | Connected to `player_died` but the signal had already been emitted | Call `_on_jugador_muerto()` directly in `_ready()` |
+| Health bar empty on retry | `save_player_health()` saved 0 (player dead) over the -1 | Don't save if `current_health <= 0` |
+| GameOver persists after retry | Added to root, not destroyed on scene change | `queue_free()` before `go_to_room()` |
+| Input blocked after retry | `InputHandler.controller_enabled=false` persists between scenes | `Player._ready()` always resets it to `true` |
 
 ### Collision layers (project.godot)
-| Layer | Nombre | Valor bitmask |
+| Layer | Name | Bitmask value |
 |---|---|---|
 | 1 | World | 1 |
 | 2 | Player | 2 |
@@ -53,19 +53,20 @@ MCP plugin (`addons/godot_mcp`) must be enabled for Claude Code integration.
 ### Display
 - Viewport: 320×180 px, stretch=canvas_items, scale=integer
 - Texture filter: nearest (pixel-perfect)
-- Camera: `PixelCamera.gd` en Camera2D hijo del Player (redondea posición a enteros)
-- Camera limits: Room.gd los fija al viewport para sala de una pantalla (sin scroll)
+- Camera: `PixelCamera.gd` on a Camera2D child of Player (rounds position to integers)
+- Camera limits: Room.gd fixes them to the viewport for a single-screen room (no scroll)
 
-### Scene paths importantes
+### Important scene paths
 - Main scene: `res://scenes/ui/MainMenu.tscn`
-- `Constants.SCENE_SALA1` / `Constants.SCENE_SALA2` / `Constants.SCENE_MAIN_MENU` / `Constants.SCENE_HEART_PICKUP` — usar estas constantes, nunca strings hardcodeados
-- `Constants.HEART_DROP_CHANCE = 0.30` — probabilidad de drop de HeartPickup al morir un Slime
+- `Constants.SCENE_SALA1` / `Constants.SCENE_SALA2` / `Constants.SCENE_MAIN_MENU` / `Constants.SCENE_HEART_PICKUP` — use these constants, never hardcoded strings
+- `Constants.HEART_DROP_CHANCE = 0.30` — probability of a HeartPickup drop when a Slime dies
 
 ## Development philosophy
 - **Only implement what's requested.** No preemptive systems.
-- **Comments in Spanish.** Variable/method names in English (GDScript convention).
+- **Comments in English.** Variable/method names in English (GDScript convention).
 - **Prototype is complete.** All 6 phases done. Real sprites wired. Player body stays placeholder — no player.png provided.
 - **Modular, composable.** Prefer small focused scripts over large managers.
+- This is a real project being actively developed toward a shipped product, not a learning exercise.
 - See `GDD.md` for full design decisions and prototype success criteria.
 
 ## Development phases
@@ -93,6 +94,6 @@ scripts/
   data/         → Constants.gd
 autoloads/      → EventBus.gd, GameManager.gd, SceneManager.gd, InputHandler.gd, PauseMenu.gd
 assets/
-  sprites/      → player/sword.png (wired), enemies/slime.png (wired), world/tileset_forest.png (wired), world/bush.png (no usado aún)
+  sprites/      → player/sword.png (wired), enemies/slime.png (wired), world/tileset_forest.png (wired), world/bush.png (not used yet)
 Tools/          → gen_sprites.py
 ```

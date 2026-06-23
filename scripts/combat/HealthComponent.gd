@@ -1,7 +1,7 @@
 extends Node
 class_name HealthComponent
-## Componente reutilizable de vida. Se agrega como nodo hijo a cualquier entidad.
-## Emite señales en lugar de modificar el nodo padre directamente (bajo acoplamiento).
+## Reusable health component. Added as a child node to any entity.
+## Emits signals instead of modifying the parent node directly (low coupling).
 
 signal health_changed(current: int, maximum: int)
 signal died()

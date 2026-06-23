@@ -1,12 +1,12 @@
 extends Area2D
 class_name HeartPickup
-## Objeto recogible: medio corazón. Cura 1 punto de vida al jugador al tocarlo.
-## Spawneado por Slime._on_died() con probabilidad Constants.HEART_DROP_CHANCE.
+## Collectible item: half heart. Heals 1 health point on the player when touched.
+## Spawned by Slime._on_died() with probability Constants.HEART_DROP_CHANCE.
 ##
-## Arquitectura:
-##   - Area2D con collision_mask=2 (capa Player) para detectar al jugador por body_entered.
-##   - collision_layer=0: el pickup no necesita ser detectado por nadie más.
-##   - PlaceholderSprite rojo 8×8 hasta la fase de sprites reales.
+## Architecture:
+##   - Area2D with collision_mask=2 (Player layer) to detect the player via body_entered.
+##   - collision_layer=0: the pickup doesn't need to be detected by anyone else.
+##   - Red 8×8 PlaceholderSprite until the real-sprites phase.
 
 @onready var _sprite: AnimatedSprite2D = $AnimatedSprite2D
 

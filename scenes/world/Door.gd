@@ -1,39 +1,39 @@
 extends Area2D
-## Puerta: trigger de transición entre salas.
-## Cuando el jugador entra en el área, llama a SceneManager.go_to_room().
+## Door: transition trigger between rooms.
+## When the player enters the area, it calls SceneManager.go_to_room().
 ##
-## Configuración en el inspector (propiedades @export):
-##   target_scene — ruta res:// de la sala destino
-##   spawn_id     — id del punto de spawn en la sala destino ("norte", "sur", etc.)
+## Inspector configuration (@export properties):
+##   target_scene — res:// path of the destination room
+##   spawn_id     — id of the spawn point in the destination room ("norte", "sur", etc.)
 ##
-## Ejemplo: puerta norte de Sala1 → target_scene=Sala2, spawn_id="sur"
-## (el jugador aparece en el sur de Sala2, como si hubiera entrado por arriba)
+## Example: Sala1's north door → target_scene=Sala2, spawn_id="sur"
+## (the player appears at the south of Sala2, as if having entered from above)
 
-## Ruta de la escena a la que lleva esta puerta.
+## Path of the scene this door leads to.
 @export var target_scene: String = ""
 
-## ID del punto de spawn en la sala destino.
-## Debe coincidir con un nodo hijo de PuntosSpawn llamado "Spawn" + spawn_id.capitalize().
+## ID of the spawn point in the destination room.
+## Must match a child node of PuntosSpawn named "Spawn" + spawn_id.capitalize().
 @export var spawn_id: String = ""
 
 func _ready() -> void:
-	## Detectar cuando un cuerpo físico entra en el área (CharacterBody2D del jugador).
+	## Detect when a physics body enters the area (the player's CharacterBody2D).
 	body_entered.connect(_on_body_entered)
-	## Dibujar el indicador visual amarillo una vez al inicializar.
+	## Draw the yellow visual indicator once on init.
 	queue_redraw()
 
 func _draw() -> void:
-	## Indicador visual: franja amarilla de 32×8 px centrada en el nodo.
-	## Se verá en el juego como un destello en el borde de la sala.
-	## Reemplazar con un sprite real cuando haya assets.
+	## Visual indicator: 32×8 px yellow stripe centered on the node.
+	## Shows up in-game as a flash at the room's edge.
+	## Replace with a real sprite once assets exist.
 	draw_rect(Rect2(-16.0, -4.0, 32.0, 8.0), Color(1.0, 0.85, 0.0, 0.9))
 
 func _on_body_entered(body: Node) -> void:
-	## Solo el jugador activa la puerta (comparar clase, no nombre).
+	## Only the player triggers the door (compare class, not name).
 	if not body is Player:
 		return
 	if target_scene.is_empty():
-		push_warning("Door: target_scene no configurado en '%s'." % name)
+		push_warning("Door: target_scene not configured on '%s'." % name)
 		return
-	## SceneManager maneja el fade, el cambio de escena y el spawn del jugador.
+	## SceneManager handles the fade, the scene change and the player's spawn.
 	SceneManager.go_to_room(target_scene, spawn_id)

@@ -1,8 +1,8 @@
 class_name Constants
-## Fuente única de verdad para todos los valores configurables del juego.
-## Se usa como Constants.PLAYER_SPEED — sin instanciar, sin autoload.
+## Single source of truth for all configurable game values.
+## Used as Constants.PLAYER_SPEED — no instantiation, no autoload.
 
-# ─── Jugador ──────────────────────────────────────────────────────────────────
+# ─── Player ───────────────────────────────────────────────────────────────────
 const PLAYER_SPEED           := 80.0
 const PLAYER_ACCELERATION    := 700.0
 const PLAYER_FRICTION        := 600.0
@@ -11,7 +11,7 @@ const PLAYER_ATTACK_DURATION  := 0.3
 const PLAYER_IFRAMES_DURATION := 1.0
 const PLAYER_SWORD_REACH     := 12.0
 
-# ─── Enemigos ─────────────────────────────────────────────────────────────────
+# ─── Enemies ──────────────────────────────────────────────────────────────────
 const SLIME_SPEED           := 35.0
 const SLIME_MAX_HEALTH      := 2
 const SLIME_DETECTION_RADIUS := 80.0
@@ -21,12 +21,12 @@ const BAT_SPEED             := 55.0
 const BAT_MAX_HEALTH        := 1
 const BAT_DETECTION_RADIUS  := 100.0
 
-# ─── Combate ──────────────────────────────────────────────────────────────────
+# ─── Combat ───────────────────────────────────────────────────────────────────
 const SWORD_DAMAGE          := 1
 const KNOCKBACK_FORCE       := 120.0
 const KNOCKBACK_DURATION    := 0.15
 
-# ─── Capas de colisión (bitmasks) ────────────────────────────────────────────
+# ─── Collision layers (bitmasks) ─────────────────────────────────────────────
 const LAYER_WORLD           := 1
 const LAYER_PLAYER          := 2
 const LAYER_ENEMIES         := 4
@@ -35,33 +35,33 @@ const LAYER_ENEMY_HITBOX    := 16
 const LAYER_PLAYER_HURTBOX  := 32
 const LAYER_ENEMY_HURTBOX   := 64
 
-# ─── Animaciones ──────────────────────────────────────────────────────────────
+# ─── Animations ───────────────────────────────────────────────────────────────
 const ANIM_IDLE_FPS         := 5.0
 const ANIM_WALK_FPS         := 8.0
 const ANIM_ATTACK_FPS       := 12.0
 
-# ─── Transiciones ─────────────────────────────────────────────────────────────
+# ─── Transitions ──────────────────────────────────────────────────────────────
 const FADE_DURATION         := 0.3
 
-# ─── Tile y mundo (escena World.tscn legacy) ──────────────────────────────────
+# ─── Tile and world (legacy World.tscn scene) ────────────────────────────────
 const TILE_SIZE             := 16
 const WORLD_HALF_TILES_X    := 12
 const WORLD_HALF_TILES_Y    := 8
 
-# ─── Sala (una pantalla = 320×180 px) ────────────────────────────────────────
-## Cada sala ocupa exactamente el viewport. La cámara se fija con límites.
-## Ancho: 10×2×16 = 320 px = viewport exacto.
-## Alto:  6×2×16 = 192 px (12 px de margen extra, ocultos por los límites de cámara).
+# ─── Room (one screen = 320×180 px) ──────────────────────────────────────────
+## Each room occupies exactly the viewport. The camera is fixed with limits.
+## Width: 10×2×16 = 320 px = exact viewport.
+## Height: 6×2×16 = 192 px (12 px extra margin, hidden by camera limits).
 const ROOM_HALF_TILES_X     := 10
 const ROOM_HALF_TILES_Y     := 6
 const VIEWPORT_HALF_W       := 160   # 320 / 2
 const VIEWPORT_HALF_H       := 90    # 180 / 2
 
-# ─── Objetos recogibles ───────────────────────────────────────────────────────
-## Probabilidad de que un slime suelte un medio corazón al morir.
+# ─── Collectible items ────────────────────────────────────────────────────────
+## Probability that a slime drops a half heart on death.
 const HEART_DROP_CHANCE := 0.30
 
-# ─── Rutas de escenas ─────────────────────────────────────────────────────────
+# ─── Scene paths ──────────────────────────────────────────────────────────────
 const SCENE_SALA1       := "res://scenes/world/rooms/Sala1_Tutorial.tscn"
 const SCENE_SALA2       := "res://scenes/world/rooms/Sala2_Desafio.tscn"
 const SCENE_HEART_PICKUP := "res://scenes/items/HeartPickup.tscn"

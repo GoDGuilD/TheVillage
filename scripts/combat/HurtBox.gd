@@ -1,9 +1,9 @@
 extends Area2D
 class_name HurtBox
-## Marca un área que RECIBE daño. Monitorea colisiones con HitBox.
+## Marks an area that RECEIVES damage. Monitors collisions with HitBox.
 ##
-## La señal 'hurt' pasa tanto el daño como la posición global del HitBox.
-## Esto permite calcular dirección de knockback sin acoplar al atacante.
+## The 'hurt' signal passes both the damage and the HitBox's global position.
+## This allows computing knockback direction without coupling to the attacker.
 
 signal hurt(damage: int, source_position: Vector2)
 

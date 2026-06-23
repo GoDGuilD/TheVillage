@@ -1,10 +1,10 @@
 extends Area2D
 class_name HitBox
-## Marca un área que INFLIGE daño. No detecta nada por sí sola.
-## El HurtBox del objetivo la detecta y lee su propiedad 'damage'.
+## Marks an area that DEALS damage. Detects nothing on its own.
+## The target's HurtBox detects it and reads its 'damage' property.
 ##
-## Capas de colisión:
-##   - Espada jugador: Layer 4 (valor 8)
-##   - Contacto enemigo: Layer 5 (valor 16)
+## Collision layers:
+##   - Player sword: Layer 4 (value 8)
+##   - Enemy contact: Layer 5 (value 16)
 
 @export var damage: int = 1

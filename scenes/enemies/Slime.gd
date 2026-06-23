@@ -1,7 +1,7 @@
 extends BaseEnemy
-## Slime: enemigo básico. Patrulla al azar en idle, persigue al jugador en chase.
-## Daño por contacto: su HitBox siempre activa inflige daño cuando toca al jugador.
-## Al morir tiene 30% de probabilidad de soltar un HeartPickup.
+## Slime: basic enemy. Patrols randomly while idle, chases the player in chase state.
+## Contact damage: its always-active HitBox deals damage when it touches the player.
+## Has a 30% chance to drop a HeartPickup on death.
 
 const IDLE_MOVE_INTERVAL_MIN := 1.5
 const IDLE_MOVE_INTERVAL_MAX := 3.0
@@ -42,7 +42,7 @@ func _update_chase() -> void:
 
 func _new_idle_direction() -> void:
 	_idle_timer = randf_range(IDLE_MOVE_INTERVAL_MIN, IDLE_MOVE_INTERVAL_MAX)
-	# 40% de probabilidad de quedarse quieto
+	# 40% chance of staying still
 	if randf() < 0.4:
 		_idle_direction = Vector2.ZERO
 	else:
@@ -50,7 +50,7 @@ func _new_idle_direction() -> void:
 		_idle_direction = Vector2(cos(angle), sin(angle))
 
 func _on_died() -> void:
-	## Spawnear pickup ANTES de la animación de muerte para que aparezca en la posición correcta.
+	## Spawn the pickup BEFORE the death animation so it appears at the correct position.
 	if randf() < Constants.HEART_DROP_CHANCE:
 		var pickup := HEART_PICKUP_SCENE.instantiate()
 		pickup.global_position = global_position

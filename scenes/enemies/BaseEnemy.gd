@@ -1,7 +1,7 @@
 extends CharacterBody2D
 class_name BaseEnemy
-## Clase base para todos los enemigos. Define la máquina de estados y comportamientos comunes.
-## Subclases solo sobreescriben _update_idle() y _update_chase().
+## Base class for all enemies. Defines the state machine and shared behaviors.
+## Subclasses only override _update_idle() and _update_chase().
 
 enum State { IDLE, CHASE, DEAD }
 
@@ -24,11 +24,11 @@ func _physics_process(_delta: float) -> void:
 		State.IDLE:  _update_idle()
 		State.CHASE: _update_chase()
 
-## Sobreescribir en la subclase
+## Override in the subclass
 func _update_idle() -> void:
 	pass
 
-## Sobreescribir en la subclase
+## Override in the subclass
 func _update_chase() -> void:
 	pass
 

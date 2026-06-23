@@ -1,16 +1,16 @@
 extends CanvasLayer
-## Gestiona transiciones entre salas y escenas con fade.
-## Uso: SceneManager.go_to_room("res://scenes/world/rooms/Sala1.tscn", "sur")
+## Manages transitions between rooms and scenes with fade.
+## Usage: SceneManager.go_to_room("res://scenes/world/rooms/Sala1.tscn", "south")
 ##
-## Flujo de una transición completa:
-##   1. Fade a negro
-##   2. Guardar vida del jugador en GameManager (antes de destruir la escena)
-##   3. Cambiar escena (la escena anterior se libera, la nueva se inicializa)
-##   4. Esperar un frame (todos los _ready() de la nueva escena se ejecutan)
-##   5. Emitir room_entered → la sala mueve al jugador al spawn (aún en negro)
-##   6. Fade desde negro hasta visible
+## Flow of a complete transition:
+##   1. Fade to black
+##   2. Save the player's health in GameManager (before destroying the scene)
+##   3. Change scene (the previous scene is freed, the new one is initialized)
+##   4. Wait one frame (all _ready() calls of the new scene run)
+##   5. Emit room_entered → the room moves the player to the spawn (still black)
+##   6. Fade from black to visible
 ##
-## El paso 5 ocurre con pantalla negra para evitar el "pop" visual del teletransporte.
+## Step 5 happens with a black screen to avoid the visual "pop" of teleporting.
 
 signal transition_started()
 signal transition_finished()
@@ -19,7 +19,7 @@ var _is_transitioning: bool = false
 var _fade: ColorRect
 
 func _ready() -> void:
-	## Capa 128: por encima de todo, incluida la pantalla de Game Over (capa 127).
+	## Layer 128: above everything, including the Game Over screen (layer 127).
 	layer = 128
 	_fade = ColorRect.new()
 	_fade.name = "FadeRect"
@@ -34,12 +34,12 @@ func go_to_room(scene_path: String, spawn_id: String = "") -> void:
 	_is_transitioning = true
 	transition_started.emit()
 	await _fade_out()
-	## Guardar vida ANTES de liberar la escena actual (el nodo Player se destruirá enseguida)
+	## Save health BEFORE freeing the current scene (the Player node will be destroyed soon)
 	GameManager.save_player_health()
 	get_tree().change_scene_to_file(scene_path)
-	## Esperar un frame para que todos los _ready() de la nueva escena se completen
+	## Wait one frame so all _ready() calls of the new scene complete
 	await get_tree().process_frame
-	## Posicionar al jugador en el spawn con pantalla aún negra — sin pop visual
+	## Position the player at the spawn while the screen is still black — no visual pop
 	if spawn_id:
 		EventBus.room_entered.emit(spawn_id)
 	await _fade_in()

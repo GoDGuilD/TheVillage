@@ -1,7 +1,7 @@
 extends RefCounted
 class_name PlaceholderSprite
-## Utilidad estática. Llama PlaceholderSprite.inject() desde _ready() de cada personaje.
-## Si el AnimatedSprite2D ya tiene frames reales, no hace nada.
+## Static utility. Call PlaceholderSprite.inject() from each character's _ready().
+## Does nothing if the AnimatedSprite2D already has real frames.
 
 static func inject(sprite: AnimatedSprite2D, color: Color, size: Vector2i) -> void:
 	if not sprite or not sprite.sprite_frames:

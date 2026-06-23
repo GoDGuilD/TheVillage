@@ -1,13 +1,13 @@
 extends Node
 class_name StateMachine
-## Máquina de estados genérica basada en convención de nombres.
+## Generic state machine based on naming convention.
 ##
-## El nodo padre define estados como métodos:
-##   state_NOMBRE_enter()        — al entrar (opcional)
-##   state_NOMBRE_update(delta)  — cada physics frame
-##   state_NOMBRE_exit()         — al salir (opcional)
+## The parent node defines states as methods:
+##   state_NAME_enter()        — on enter (optional)
+##   state_NAME_update(delta)  — every physics frame
+##   state_NAME_exit()         — on exit (optional)
 ##
-## Inicialización en el _ready() del padre:
+## Initialization in the parent's _ready():
 ##   @onready var _fsm: StateMachine = $StateMachine
 ##   func _ready(): _fsm.init(self, "idle")
 
@@ -20,7 +20,7 @@ var _states: Dictionary = {}
 
 func init(host: Node, initial_state: String) -> void:
 	_owner_node = host
-	# Descubrimiento automático de estados por nombre de método
+	# Automatic state discovery by method name
 	for method in host.get_method_list():
 		var mname: String = method["name"]
 		if mname.begins_with("state_") and mname.ends_with("_update"):
@@ -32,7 +32,7 @@ func transition_to(new_state: String) -> void:
 	if new_state == current_state:
 		return
 	if not _states.has(new_state):
-		push_error("StateMachine: estado '%s' no existe en %s" % [new_state, _owner_node.name])
+		push_error("StateMachine: state '%s' does not exist on %s" % [new_state, _owner_node.name])
 		return
 
 	var old_state := current_state
@@ -48,7 +48,7 @@ func transition_to(new_state: String) -> void:
 	state_changed.emit(old_state, new_state)
 
 func _physics_process(delta: float) -> void:
-	## Usa physics_process (no process) porque el dueño usa move_and_slide().
+	## Uses physics_process (not process) because the owner uses move_and_slide().
 	if current_state.is_empty() or not is_instance_valid(_owner_node):
 		return
 	_owner_node.call("state_%s_update" % current_state, delta)

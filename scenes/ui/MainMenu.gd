@@ -1,28 +1,28 @@
 extends CanvasLayer
-## Pantalla de título del juego. Primera escena visible al iniciar.
+## Game title screen. First scene visible on startup.
 ##
-## Responsabilidades:
-##   - Resetea el estado global (despausa árbol, estado MENU).
-##   - "JUGAR" inicia el juego desde Sala1 via SceneManager.
-##   - "SALIR" cierra la aplicación.
+## Responsibilities:
+##   - Resets global state (unpauses the tree, MENU state).
+##   - "JUGAR" starts the game from Sala1 via SceneManager.
+##   - "SALIR" quits the application.
 ##
-## Jerarquía (construida en código):
+## Hierarchy (built in code):
 ##   MainMenu (CanvasLayer, layer=0)
-##     └─ Fondo   (ColorRect, pantalla completa)
-##     └─ Caja    (VBoxContainer, centrado)
+##     └─ Fondo   (ColorRect, full screen)
+##     └─ Caja    (VBoxContainer, centered)
 ##           └─ Titulo   (Label "THE VILLAGE")
 ##           └─ BtnJugar (Button "JUGAR")
 ##           └─ BtnSalir (Button "SALIR")
 
 func _ready() -> void:
 	layer = 0
-	## Resetear estado global: garantiza que no quede ninguna pausa residual
-	## de una sesión anterior (ej: volver al menú desde el menú de pausa).
+	## Reset global state: guarantees no leftover pause
+	## from a previous session (e.g. returning to the menu from the pause menu).
 	get_tree().paused = false
 	GameManager.set_state(GameManager.GameState.MENU)
 	_construir_ui()
 
-# ─── Construcción de la UI ────────────────────────────────────────────────────
+# ─── UI construction ──────────────────────────────────────────────────────────
 
 func _construir_ui() -> void:
 	var fondo := ColorRect.new()
@@ -50,7 +50,7 @@ func _construir_ui() -> void:
 	titulo.add_theme_font_size_override("font_size", 18)
 	caja.add_child(titulo)
 
-	## Separador visual entre título y botones
+	## Visual separator between title and buttons
 	var separador := Control.new()
 	separador.custom_minimum_size = Vector2(0.0, 8.0)
 	caja.add_child(separador)
@@ -65,7 +65,7 @@ func _construir_ui() -> void:
 	btn_salir.pressed.connect(_on_salir_presionado)
 	caja.add_child(btn_salir)
 
-# ─── Señales ──────────────────────────────────────────────────────────────────
+# ─── Signals ──────────────────────────────────────────────────────────────────
 
 func _on_jugar_presionado() -> void:
 	SceneManager.go_to_room(Constants.SCENE_SALA1)

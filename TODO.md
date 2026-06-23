@@ -1,116 +1,116 @@
 # TODO — The Village
 
-> Prioridad: 🔴 Crítica · 🟠 Alta · 🟡 Media · 🟢 Baja  
-> Dificultad: ⬛ 1–5 estrellas
+> Priority: 🔴 Critical · 🟠 High · 🟡 Medium · 🟢 Low
+> Difficulty: ⬛ 1–5 stars
 
 ---
 
-## Fase 0 — Fundación ✅
+## Phase 0 — Foundation ✅
 
-- [x] 🔴 Estructura de carpetas y `project.godot`
+- [x] 🔴 Folder structure and `project.godot`
 - [x] 🔴 `EventBus` + `GameManager` (autoloads)
-- [x] 🔴 `HealthComponent` reutilizable
-- [x] 🔴 `HitBox` / `HurtBox` con capas de colisión
-- [x] 🔴 Player: movimiento 8 dirs + teclado/gamepad
-- [x] 🔴 Player: ataque espada + iFrames (invencibilidad)
-- [x] 🔴 Player: máquina de estados (IDLE / WALK / ATTACK)
-- [x] 🔴 `BaseEnemy` + `Slime` con IA básica (patrulla + persecución)
-- [x] 🔴 `HealthUI` con ColorRect placeholders
-- [x] 🔴 `Camera2D` siguiendo al jugador
+- [x] 🔴 Reusable `HealthComponent`
+- [x] 🔴 `HitBox` / `HurtBox` with collision layers
+- [x] 🔴 Player: 8-direction movement + keyboard/gamepad
+- [x] 🔴 Player: sword attack + iFrames (invincibility)
+- [x] 🔴 Player: state machine (IDLE / WALK / ATTACK)
+- [x] 🔴 `BaseEnemy` + `Slime` with basic AI (patrol + chase)
+- [x] 🔴 `HealthUI` with ColorRect placeholders
+- [x] 🔴 `Camera2D` following the player
 
 ---
 
-## Fase 1 — Visibilidad ⬛⬛⬛⬜⬜
+## Phase 1 — Visibility ⬛⬛⬛⬜⬜
 
-> Desbloquea todo lo demás. Prioridad máxima.
+> Unblocks everything else. Top priority.
 
-- [x] 🔴 Sprite placeholder 16×16 para Player (`PlaceholderSprite.gd`, azul 12×14)
-- [x] 🔴 Sprite placeholder 12×12 para Slime (`PlaceholderSprite.gd`, verde 10×10)
-- [x] 🔴 TileMap con tileset de colores sólidos (`World.gd → _generate_floor()`)
-- [ ] 🔴 Verificar que Player y Slimes son visibles en runtime
-- [ ] 🟠 Ajustar límites de `Camera2D` al tamaño del mapa
-- [ ] 🟠 Confirmar que HitBox/HurtBox funcionan (Debug > Visible Collision Shapes)
+- [x] 🔴 16×16 placeholder sprite for Player (`PlaceholderSprite.gd`, blue 12×14)
+- [x] 🔴 12×12 placeholder sprite for Slime (`PlaceholderSprite.gd`, green 10×10)
+- [x] 🔴 TileMap with solid-color tileset (`World.gd → _generate_floor()`)
+- [ ] 🔴 Verify Player and Slimes are visible at runtime
+- [ ] 🟠 Adjust `Camera2D` limits to map size
+- [ ] 🟠 Confirm HitBox/HurtBox work (Debug > Visible Collision Shapes)
 
 ---
 
-## Fase 2 — Arte e integración ⬛⬛⬜⬜⬜
+## Phase 2 — Art and integration ⬛⬛⬜⬜⬜
 
-- [ ] 🟠 Importar spritesheet de jugador (Kenney.nl o itch.io, 16×16)
-- [ ] 🟠 Configurar las 12 animaciones en `AnimatedSprite2D` del Player
+- [ ] 🟠 Import player spritesheet (Kenney.nl or itch.io, 16×16)
+- [ ] 🟠 Set up the 12 animations on Player's `AnimatedSprite2D`
   - idle_down / idle_up / idle_left / idle_right
   - walk_down / walk_up / walk_left / walk_right
   - attack_down / attack_up / attack_left / attack_right
-- [ ] 🟠 Importar spritesheet de Slime (idle + walk)
-- [ ] 🟠 Importar tileset con colisiones correctas (TileMapLayer)
-- [ ] 🟡 Sprites de corazón para reemplazar ColorRect en el HUD
-- [ ] 🟠 Ajustar `CollisionShape2D` al tamaño real de los sprites
+- [ ] 🟠 Import Slime spritesheet (idle + walk)
+- [ ] 🟠 Import tileset with correct collisions (TileMapLayer)
+- [ ] 🟡 Heart sprites to replace ColorRect in the HUD
+- [ ] 🟠 Adjust `CollisionShape2D` to the sprites' real size
 
 ---
 
-## Fase 3 — Audio ⬛⬛⬜⬜⬜
+## Phase 3 — Audio ⬛⬛⬜⬜⬜
 
-- [ ] 🟡 Crear `AudioManager` autoload (`scripts/autoloads/AudioManager.gd`)
-- [ ] 🟠 SFX: ataque de espada
-- [ ] 🟠 SFX: jugador recibe daño
-- [ ] 🟡 SFX: muerte de Slime
-- [ ] 🟢 SFX: pasos del jugador (según tipo de suelo)
-- [ ] 🟡 Música ambiente en loop (`AudioStreamPlayer`)
-
----
-
-## Fase 4 — Level Design ⬛⬛⬛⬜⬜
-
-- [ ] 🟠 Sala 1: diseño completo con obstáculos y enemigos
-- [ ] 🟡 Sala 2: layout diferente, más enemigos
-- [ ] 🟠 Puertas como `Area2D` que triggean transición
-- [ ] 🟠 Sistema de transición de escena (fade + `change_scene_to_file`)
-- [ ] 🟠 Spawn de enemigos correctamente posicionado por sala
+- [ ] 🟡 Create `AudioManager` autoload (`scripts/autoloads/AudioManager.gd`)
+- [ ] 🟠 SFX: sword attack
+- [ ] 🟠 SFX: player takes damage
+- [ ] 🟡 SFX: Slime death
+- [ ] 🟢 SFX: player footsteps (by floor type)
+- [ ] 🟡 Looping ambient music (`AudioStreamPlayer`)
 
 ---
 
-## Fase 5 — Combate ampliado ⬛⬛⬜⬜⬜
+## Phase 4 — Level design ⬛⬛⬛⬜⬜
 
-- [ ] 🟠 Knockback al recibir daño (jugador y enemigo)
-- [ ] 🟡 Flash rojo en sprite al recibir daño (`modulate` + tween)
-- [ ] 🟡 Drop de corazón al matar Slime (probabilidad configurable)
-- [ ] 🟡 Item corazón recolectable que llama `HealthComponent.heal()`
-- [ ] 🟢 Efecto de muerte del Slime (partículas o tween de escala)
-
----
-
-## Fase 6 — Segundo enemigo ⬛⬛⬛⬜⬜
-
-- [ ] 🟡 `Bat.gd` — extiende `BaseEnemy`, vuela (sin colisión con TileMap)
-- [ ] 🟡 Movimiento sinusoidal para Bat
-- [ ] 🟢 `Archer.gd` — dispara `Projectile.tscn` hacia el jugador
-- [ ] 🟢 `Projectile.gd` — se mueve en dirección fija, tiene HitBox, se destruye al chocar
+- [ ] 🟠 Room 1: full design with obstacles and enemies
+- [ ] 🟡 Room 2: different layout, more enemies
+- [ ] 🟠 Doors as `Area2D` triggering a transition
+- [ ] 🟠 Scene transition system (fade + `change_scene_to_file`)
+- [ ] 🟠 Enemy spawns correctly positioned per room
 
 ---
 
-## Fase 7 — Sistemas de juego ⬛⬛⬜⬜⬜
+## Phase 5 — Extended combat ⬛⬛⬜⬜⬜
 
-- [ ] 🟠 Pantalla Game Over con botón Reiniciar
-- [ ] 🟡 Menú principal (Play, Quit)
-- [ ] 🟢 Persistencia con `FileAccess` (mejor sala alcanzada)
-
----
-
-## Fase 8 — Polish ⬛⬛⬜⬜⬜
-
-- [ ] 🟢 Camera shake al recibir daño
-- [ ] 🟢 Squash & stretch en Slime (tween de escala)
-- [ ] 🟡 Fade negro en transición entre salas
-- [ ] 🟢 Sombra circular bajo jugador y enemigos (`Sprite2D` semitransparente)
-- [ ] 🟢 Corazones animados en el HUD
+- [ ] 🟠 Knockback on taking damage (player and enemy)
+- [ ] 🟡 Red flash on sprite when taking damage (`modulate` + tween)
+- [ ] 🟡 Heart drop on killing a Slime (configurable probability)
+- [ ] 🟡 Collectible heart item that calls `HealthComponent.heal()`
+- [ ] 🟢 Slime death effect (particles or scale tween)
 
 ---
 
-## Backlog — ideas para versiones futuras
+## Phase 6 — Second enemy ⬛⬛⬛⬜⬜
 
-- [ ] Segundo tipo de arma (arco con flechas)
-- [ ] Sistema de llaves y puertas cerradas
-- [ ] Minimapa
-- [ ] Diálogos con NPC usando `RichTextLabel`
-- [ ] Boss con múltiples fases
-- [ ] Sistema de guardado completo
-- [ ] Mobile build con controles táctiles
+- [ ] 🟡 `Bat.gd` — extends `BaseEnemy`, flies (no TileMap collision)
+- [ ] 🟡 Sinusoidal movement for Bat
+- [ ] 🟢 `Archer.gd` — fires `Projectile.tscn` at the player
+- [ ] 🟢 `Projectile.gd` — moves in a fixed direction, has a HitBox, destroys itself on impact
+
+---
+
+## Phase 7 — Game systems ⬛⬛⬜⬜⬜
+
+- [ ] 🟠 Game Over screen with Restart button
+- [ ] 🟡 Main menu (Play, Quit)
+- [ ] 🟢 Persistence with `FileAccess` (furthest room reached)
+
+---
+
+## Phase 8 — Polish ⬛⬛⬜⬜⬜
+
+- [ ] 🟢 Camera shake on taking damage
+- [ ] 🟢 Squash & stretch on Slime (scale tween)
+- [ ] 🟡 Black fade on room transition
+- [ ] 🟢 Circular shadow under player and enemies (semi-transparent `Sprite2D`)
+- [ ] 🟢 Animated hearts in the HUD
+
+---
+
+## Backlog — ideas for future versions
+
+- [ ] Second weapon type (bow and arrows)
+- [ ] Keys and locked doors system
+- [ ] Minimap
+- [ ] NPC dialogue using `RichTextLabel`
+- [ ] Multi-phase boss
+- [ ] Full save system
+- [ ] Mobile build with touch controls

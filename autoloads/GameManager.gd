@@ -1,6 +1,6 @@
 extends Node
-## Estado global del juego. Orquesta transiciones entre estados de alto nivel.
-## No contiene lógica de gameplay — solo coordina qué sistema está activo.
+## Global game state. Orchestrates transitions between high-level states.
+## Contains no gameplay logic — only coordinates which system is active.
 
 enum GameState { MENU, PLAYING, PAUSED, GAME_OVER }
 
@@ -8,11 +8,11 @@ var state: GameState = GameState.MENU
 var player: CharacterBody2D = null
 var active_enemies: Array[Node] = []
 
-## Vida del jugador guardada entre salas.
-## -1 = sin datos previos → el jugador usa su max_health al nacer en la nueva sala.
+## Player health saved between rooms.
+## -1 = no previous data → the player uses their max_health when spawning in the new room.
 var player_health: int = -1
 
-# ─── Jugador ──────────────────────────────────────────────────────────────────
+# ─── Player ───────────────────────────────────────────────────────────────────
 
 func register_player(p: CharacterBody2D) -> void:
 	player = p
@@ -21,18 +21,18 @@ func register_player(p: CharacterBody2D) -> void:
 func get_player() -> CharacterBody2D:
 	return player
 
-## Guarda la vida actual del jugador antes de un cambio de sala.
-## Llamado por SceneManager justo antes de liberar la escena actual.
+## Saves the player's current health before a room change.
+## Called by SceneManager right before freeing the current scene.
 func save_player_health() -> void:
 	if not player:
 		return
 	var health := player.get_node_or_null("HealthComponent") as HealthComponent
-	## Solo guardar si el jugador está vivo — si está muerto (0 HP) no sobreescribir
-	## el -1 que _on_player_died() ya estableció para forzar max_health al renacer.
+	## Only save if the player is alive — if dead (0 HP), don't overwrite
+	## the -1 that _on_player_died() already set to force max_health on respawn.
 	if health and health.current_health > 0:
 		player_health = health.current_health
 
-# ─── Enemigos ─────────────────────────────────────────────────────────────────
+# ─── Enemies ──────────────────────────────────────────────────────────────────
 
 func register_enemy(enemy: Node) -> void:
 	if not active_enemies.has(enemy):
@@ -44,7 +44,7 @@ func unregister_enemy(enemy: Node) -> void:
 func get_enemy_count() -> int:
 	return active_enemies.size()
 
-# ─── Estado ───────────────────────────────────────────────────────────────────
+# ─── State ────────────────────────────────────────────────────────────────────
 
 func set_state(new_state: GameState) -> void:
 	if state == new_state:
@@ -61,8 +61,8 @@ func _ready() -> void:
 
 func _on_player_died() -> void:
 	set_state(GameState.GAME_OVER)
-	## Resetear la vida guardada para que el próximo spawn use max_health.
-	## Sin esto, save_player_health() guardaría 0 (muerto) y el jugador renacería sin vida.
+	## Reset the saved health so the next spawn uses max_health.
+	## Without this, save_player_health() would save 0 (dead) and the player would respawn with no health.
 	player_health = -1
 
 func _on_enemy_died(enemy: Node2D) -> void:

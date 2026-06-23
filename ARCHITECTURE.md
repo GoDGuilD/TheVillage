@@ -1,64 +1,64 @@
-# Arquitectura técnica — The Village
+# Technical Architecture — The Village
 
-Documento de referencia para decisiones de diseño. Se actualiza cuando se introduce un patrón nuevo o se cambia uno existente.
-
----
-
-## Principios guía
-
-1. **Bajo acoplamiento** — los sistemas no se conocen entre sí directamente; se comunican via señales.
-2. **Composición sobre herencia** — la lógica reutilizable va en nodos hijo, no en clases base largas.
-3. **Una responsabilidad por script** — cada `.gd` hace una cosa y la hace bien.
-4. **Fuente única de verdad** — valores numéricos viven en `Constants.gd`, nunca dispersos.
-5. **Sin código monolítico** — si un script supera ~150 líneas, dividirlo.
+Reference document for design decisions. Updated whenever a new pattern is introduced or an existing one changes.
 
 ---
 
-## Estructura de carpetas
+## Guiding principles
+
+1. **Low coupling** — systems don't know about each other directly; they communicate via signals.
+2. **Composition over inheritance** — reusable logic lives in child nodes, not long base classes.
+3. **One responsibility per script** — each `.gd` does one thing and does it well.
+4. **Single source of truth** — numeric values live in `Constants.gd`, never scattered around.
+5. **No monolithic code** — if a script exceeds ~150 lines, split it.
+
+---
+
+## Folder structure
 
 ```
 TheVillage/
 │
-├── autoloads/              ← singletons al nivel raíz, visibilidad inmediata
+├── autoloads/              ← root-level singletons, immediate visibility
 │   ├── EventBus.gd
 │   ├── GameManager.gd
 │   ├── SceneManager.gd
-│   └── AudioManager.gd    (Fase 3)
+│   └── AudioManager.gd    (Phase 3)
 │
 ├── scenes/
 │   ├── world/
-│   │   ├── rooms/          ← una .tscn por sala (Fase 4)
+│   │   ├── rooms/          ← one .tscn per room (Phase 4)
 │   │   │   ├── Room_Forest_01.tscn
 │   │   │   └── Room_Forest_02.tscn
-│   │   └── World.tscn      ← orquestador, no contiene geometría
+│   │   └── World.tscn      ← orchestrator, contains no geometry
 │   ├── player/
 │   │   └── Player.tscn
 │   ├── enemies/
 │   │   ├── Slime.tscn
-│   │   └── Bat.tscn        (Fase 6)
+│   │   └── Bat.tscn        (Phase 6)
 │   ├── ui/
-│   │   ├── HUD.tscn        ← renombrar HealthUI → HUD (Fase 4)
+│   │   ├── HUD.tscn        ← rename HealthUI → HUD (Phase 4)
 │   │   └── menus/
 │   │       ├── MainMenu.tscn
 │   │       └── GameOver.tscn
-│   └── shared/             ← escenas reutilizables (puertas, items)
+│   └── shared/             ← reusable scenes (doors, items)
 │       ├── Door.tscn
 │       ├── HeartDrop.tscn
-│       └── Projectile.tscn (Fase 6)
+│       └── Projectile.tscn (Phase 6)
 │
 ├── scripts/
 │   ├── combat/
 │   │   ├── HitBox.gd
 │   │   ├── HurtBox.gd
 │   │   └── HealthComponent.gd
-│   ├── components/         ← Node scripts reutilizables
+│   ├── components/         ← reusable Node scripts
 │   │   ├── StateMachine.gd
-│   │   ├── KnockbackComponent.gd  (Fase 5)
-│   │   └── FlashComponent.gd      (Fase 5)
+│   │   ├── KnockbackComponent.gd  (Phase 5)
+│   │   └── FlashComponent.gd      (Phase 5)
 │   └── data/
-│       └── Constants.gd    ← fuente única de valores configurables
+│       └── Constants.gd    ← single source of configurable values
 │
-├── resources/              ← Godot .tres: datos sin código
+├── resources/              ← Godot .tres: data without code
 │   └── enemies/
 │       └── slime_data.tres
 │
@@ -70,143 +70,143 @@ TheVillage/
 
 ---
 
-## Autoloads — responsabilidades
+## Autoloads — responsibilities
 
-| Autoload | Responsabilidad | Estado |
+| Autoload | Responsibility | Status |
 |----------|-----------------|--------|
-| `EventBus` | Bus de señales. Solo señales, cero lógica. | ✅ |
-| `GameManager` | Estado global (enum GameState) + referencias globales | ✅ |
-| `SceneManager` | Transiciones de sala con fade | ✅ |
-| `AudioManager` | Pool de AudioStreamPlayer, SFX y música | Fase 3 |
-| `SaveManager` | Persistencia con FileAccess | Fase 7 |
+| `EventBus` | Signal bus. Signals only, zero logic. | ✅ |
+| `GameManager` | Global state (enum GameState) + global references | ✅ |
+| `SceneManager` | Room transitions with fade | ✅ |
+| `AudioManager` | AudioStreamPlayer pool, SFX and music | Phase 3 |
+| `SaveManager` | Persistence with FileAccess | Phase 7 |
 
-**Regla de oro:** ningún autoload llama a otro autoload directamente.
-Si necesitan comunicarse, lo hacen a través de `EventBus`.
-
----
-
-## Sistema de daño: HitBox / HurtBox
-
-Dos tipos de `Area2D` con responsabilidades opuestas:
-
-- **`HitBox`** — área que *inflige* daño. Solo tiene `damage: int`. No detecta nada.
-- **`HurtBox`** — área que *recibe* daño. Monitorea HitBoxes y emite `hurt(damage)`.
-
-### Capas de colisión 2D
-
-```
-Layer 1  (bitmask  1)  — World:         TileMapLayer y estáticos
-Layer 2  (bitmask  2)  — Player:        CharacterBody2D del jugador
-Layer 3  (bitmask  4)  — Enemies:       CharacterBody2D de enemigos
-Layer 4  (bitmask  8)  — PlayerHitBox:  Espada del jugador
-Layer 5  (bitmask 16)  — EnemyHitBox:   Contacto de enemigos
-Layer 6  (bitmask 32)  — PlayerHurtBox: Zona de daño del jugador
-Layer 7  (bitmask 64)  — EnemyHurtBox:  Zona de daño de enemigos
-```
-
-Regla: el `HurtBox` tiene `monitoring=true` y su mask apunta al layer del `HitBox` que debe detectar.
+**Golden rule:** no autoload calls another autoload directly.
+If they need to communicate, they do so through `EventBus`.
 
 ---
 
-## StateMachine — componente reutilizable
+## Damage system: HitBox / HurtBox
 
-`StateMachine.gd` es un `Node` hijo que descubre automáticamente los estados del padre por convención de nombres:
+Two `Area2D` types with opposite responsibilities:
+
+- **`HitBox`** — area that *deals* damage. Only has `damage: int`. Detects nothing.
+- **`HurtBox`** — area that *receives* damage. Monitors HitBoxes and emits `hurt(damage)`.
+
+### 2D collision layers
+
+```
+Layer 1  (bitmask  1)  — World:         TileMapLayer and static bodies
+Layer 2  (bitmask  2)  — Player:        Player's CharacterBody2D
+Layer 3  (bitmask  4)  — Enemies:       Enemies' CharacterBody2D
+Layer 4  (bitmask  8)  — PlayerHitBox:  Player's sword
+Layer 5  (bitmask 16)  — EnemyHitBox:   Enemy contact
+Layer 6  (bitmask 32)  — PlayerHurtBox: Player's damage zone
+Layer 7  (bitmask 64)  — EnemyHurtBox:  Enemies' damage zone
+```
+
+Rule: the `HurtBox` has `monitoring=true` and its mask points to the layer of the `HitBox` it should detect.
+
+---
+
+## StateMachine — reusable component
+
+`StateMachine.gd` is a child `Node` that automatically discovers its parent's states by naming convention:
 
 ```gdscript
-func state_idle_enter() -> void:   # llamado al entrar
-func state_idle_update(delta) -> void:  # llamado cada frame
-func state_idle_exit() -> void:    # llamado al salir
+func state_idle_enter() -> void:   # called on enter
+func state_idle_update(delta) -> void:  # called every frame
+func state_idle_exit() -> void:    # called on exit
 ```
 
-`_fsm.transition_to("walk")` maneja el ciclo enter/exit/update automáticamente.
-Se usará en Player y en todos los enemigos para eliminar los `match` manuales.
+`_fsm.transition_to("walk")` handles the enter/exit/update cycle automatically.
+Used in Player and all enemies to eliminate manual `match` statements.
 
 ---
 
-## Estrategia de señales — dos niveles
+## Signal strategy — two levels
 
 ```
-NIVEL 1 — Señales locales (misma escena)
+LEVEL 1 — Local signals (same scene)
 ────────────────────────────────────────
-HurtBox.hurt          → entidad._on_hurt()
-HealthComponent.died  → entidad._on_died()
-Timer.timeout         → entidad._on_attack_finished()
+HurtBox.hurt          → entity._on_hurt()
+HealthComponent.died  → entity._on_died()
+Timer.timeout         → entity._on_attack_finished()
 
-NIVEL 2 — EventBus (entre escenas distintas)
+LEVEL 2 — EventBus (across different scenes)
 ────────────────────────────────────────
 Player      → EventBus.player_health_changed → HUD
 Player      → EventBus.player_died           → GameManager → GameOver
 Slime       → EventBus.enemy_died            → GameManager
 SceneManager → EventBus.room_entered         → HUD
 
-Regla: usa señal local si el emisor sabe exactamente quién escucha
-	   y ambos viven en la misma escena raíz.
-	   Usa EventBus si el emisor no sabe (ni le importa) quién escucha.
+Rule: use a local signal if the emitter knows exactly who's listening
+	   and both live in the same root scene.
+	   Use EventBus if the emitter doesn't know (or care) who's listening.
 ```
 
 ---
 
 ## HealthComponent
 
-`Node` hijo que encapsula vida. Emite señales, no toca al padre directamente.
+Child `Node` that encapsulates health. Emits signals, doesn't touch the parent directly.
 
 ```
-entidad/
-└── HealthComponent   ← max_health configurable por @export
+entity/
+└── HealthComponent   ← max_health configurable via @export
 ```
 
-Señales: `health_changed(current, max)` y `died()`.
-Compatible con cualquier nodo — jugador, enemigo, barril, boss.
+Signals: `health_changed(current, max)` and `died()`.
+Compatible with any node — player, enemy, barrel, boss.
 
 ---
 
-## BaseEnemy / Herencia de enemigos
+## BaseEnemy / Enemy inheritance
 
 ```
-BaseEnemy (CharacterBody2D)  ← define estructura y ciclo de vida
-└── Slime extends BaseEnemy  ← sobreescribe _update_idle/_update_chase
-└── Bat   extends BaseEnemy  ← sobreescribe con movimiento sinusoidal
+BaseEnemy (CharacterBody2D)  ← defines structure and lifecycle
+└── Slime extends BaseEnemy  ← overrides _update_idle/_update_chase
+└── Bat   extends BaseEnemy  ← overrides with sinusoidal movement
 ```
 
-Agregar enemigo = nuevo `.gd` + `.tscn`. Sin tocar archivos existentes.
+Adding an enemy = new `.gd` + `.tscn`. No changes to existing files.
 
 ---
 
-## GameManager — estados del juego
+## GameManager — game states
 
 ```
 MENU ──play──→ PLAYING ──pause──→ PAUSED
-				  │                  │
-				  │←──────resume─────┘
-				  │
-			  player_died
-				  │
-			  GAME_OVER ──restart──→ PLAYING
+					  │                  │
+					  │←──────resume─────┘
+					  │
+				  player_died
+					  │
+				  GAME_OVER ──restart──→ PLAYING
 ```
 
 ---
 
-## Convenciones de nombres
+## Naming conventions
 
-| Elemento | Convención | Ejemplo |
+| Element | Convention | Example |
 |----------|------------|---------|
-| Clases / escenas | PascalCase | `Player`, `HealthComponent` |
-| Variables privadas | `_snake_case` | `_state`, `_facing` |
-| Variables exportadas | `snake_case` | `move_speed`, `max_health` |
-| Constantes | `SCREAMING_SNAKE` | `PLAYER_SPEED`, `SWORD_DAMAGE` |
-| Señales | snake_case, pasado | `player_died`, `health_changed` |
-| Métodos públicos | `verb_noun()` | `take_damage()`, `register_player()` |
-| Métodos privados | `_verb_noun()` | `_handle_movement()` |
-| Callbacks de señal | `_on_source_event()` | `_on_hurt()`, `_on_attack_finished()` |
-| Salas | `Room_Bioma_NN.tscn` | `Room_Forest_01.tscn` |
-| Recursos | `snake_case.tres` | `slime_data.tres` |
+| Classes / scenes | PascalCase | `Player`, `HealthComponent` |
+| Private variables | `_snake_case` | `_state`, `_facing` |
+| Exported variables | `snake_case` | `move_speed`, `max_health` |
+| Constants | `SCREAMING_SNAKE` | `PLAYER_SPEED`, `SWORD_DAMAGE` |
+| Signals | snake_case, past tense | `player_died`, `health_changed` |
+| Public methods | `verb_noun()` | `take_damage()`, `register_player()` |
+| Private methods | `_verb_noun()` | `_handle_movement()` |
+| Signal callbacks | `_on_source_event()` | `_on_hurt()`, `_on_attack_finished()` |
+| Rooms | `Room_Biome_NN.tscn` | `Room_Forest_01.tscn` |
+| Resources | `snake_case.tres` | `slime_data.tres` |
 
 ---
 
-## Flujo de señales de vida (referencia)
+## Health signal flow (reference)
 
 ```
-Player recibe golpe
+Player takes a hit
   → HurtBox.hurt(1)
 	→ Player._on_hurt(1)
 	  → HealthComponent.take_damage(1)
@@ -214,5 +214,5 @@ Player recibe golpe
 		  → Player._on_health_changed(5, 6)
 			→ EventBus.player_health_changed(5, 6)
 			  → HUD._on_health_changed(5, 6)
-				→ actualiza corazones en pantalla
+				→ updates hearts on screen
 ```

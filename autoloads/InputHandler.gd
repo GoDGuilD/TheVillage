@@ -1,16 +1,16 @@
 extends Node
-## Capa de abstracción de input. El único archivo que conoce nombres de acciones.
+## Input abstraction layer. The only file that knows action names.
 ##
-## Jugador, enemigos y UI leen de aquí — no de Input directamente.
-## Esto permite remapping, cutscenas sin input y testing sin hardware.
+## Player, enemies and UI read from here — not from Input directly.
+## This enables remapping, input-free cutscenes and testing without hardware.
 ##
-## Patrón de uso:
-##   - Movimiento continuo → InputHandler.get_move_vector()
-##   - Acciones discretas → conectar a InputHandler.attack_pressed, etc.
+## Usage pattern:
+##   - Continuous movement → InputHandler.get_move_vector()
+##   - Discrete actions → connect to InputHandler.attack_pressed, etc.
 
-# ─── Constantes de acción ────────────────────────────────────────────────────
-## Nombres canónicos de las acciones. Si renombras una acción en el InputMap,
-## solo cambia aquí — el resto del código no se entera.
+# ─── Action constants ────────────────────────────────────────────────────────
+## Canonical action names. If you rename an action in the InputMap,
+## only change it here — the rest of the code doesn't need to know.
 const MOVE_LEFT  := &"move_left"
 const MOVE_RIGHT := &"move_right"
 const MOVE_UP    := &"move_up"
@@ -19,20 +19,20 @@ const ATTACK     := &"attack"
 const INTERACT   := &"interact"
 const PAUSE_GAME := &"pause_game"
 
-# ─── Señales (acciones discretas — se emiten una vez por pulsación) ──────────
+# ─── Signals (discrete actions — emitted once per press) ────────────────────
 signal attack_pressed()
 signal interact_pressed()
 signal pause_pressed()
 
-# ─── Estado ──────────────────────────────────────────────────────────────────
-## Desactiva TODO el input del jugador. Úsalo en cutscenas, game over, menús.
+# ─── State ───────────────────────────────────────────────────────────────────
+## Disables ALL player input. Use during cutscenes, game over, menus.
 var controller_enabled: bool = true
 
-# ─── Polling (movimiento continuo) ───────────────────────────────────────────
+# ─── Polling (continuous movement) ───────────────────────────────────────────
 
 func get_move_vector() -> Vector2:
-	## Devuelve vector de movimiento normalizado.
-	## Funciona con teclado, flechas, D-pad y stick analógico sin código extra.
+	## Returns a normalized movement vector.
+	## Works with keyboard, arrows, D-pad and analog stick with no extra code.
 	if not controller_enabled:
 		return Vector2.ZERO
 	return Input.get_vector(MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN)
@@ -40,15 +40,15 @@ func get_move_vector() -> Vector2:
 func is_moving() -> bool:
 	return get_move_vector() != Vector2.ZERO
 
-# ─── Input event (acciones discretas) ────────────────────────────────────────
+# ─── Input event (discrete actions) ──────────────────────────────────────────
 
 func _input(event: InputEvent) -> void:
-	## _input() en lugar de _process() para no emitir señales cada frame.
-	## Se llama solo cuando hay un evento real de input.
+	## _input() instead of _process() to avoid emitting signals every frame.
+	## Only called when there's an actual input event.
 	if not controller_enabled:
 		return
 
-	if event.is_action_pressed(ATTACK, false):   # false = no repetición al mantener
+	if event.is_action_pressed(ATTACK, false):   # false = no repeat while held
 		attack_pressed.emit()
 		get_viewport().set_input_as_handled()
 
@@ -60,13 +60,13 @@ func _input(event: InputEvent) -> void:
 		pause_pressed.emit()
 		get_viewport().set_input_as_handled()
 
-# ─── Remapping (API para futura pantalla de configuración) ───────────────────
+# ─── Remapping (API for a future settings screen) ────────────────────────────
 
 func remap_action(action: StringName, new_event: InputEvent) -> void:
-	## Sustituye todos los eventos de una acción por uno nuevo.
+	## Replaces all events of an action with a new one.
 	InputMap.action_erase_events(action)
 	InputMap.action_add_event(action, new_event)
 
 func reset_action_to_default(_action: StringName) -> void:
-	## Restaura los eventos de una acción a los definidos en project.godot.
+	## Restores an action's events to those defined in project.godot.
 	InputMap.load_from_project_settings()
