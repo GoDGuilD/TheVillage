@@ -1,105 +1,106 @@
+<!--
+File: TODO.md
+Description: Development backlog for The Village, organized on the same phase numbering as CLAUDE.md.
+Author: Jose-Jorge HERNANDEZ
+Company: Parlee Conseiller, Inc.
+Date: 2026-05-26
+Last edit date: 2026-09-07
+Version: 2.0.0
+-->
+
 # TODO — The Village
 
 > Priority: 🔴 Critical · 🟠 High · 🟡 Medium · 🟢 Low
 > Difficulty: ⬛ 1–5 stars
+>
+> Phase numbers match `CLAUDE.md`'s "Development phases" table — the two
+> documents share one scheme now so they can't drift apart the way this file
+> previously did (it used to track an older 0–8 scheme that never got
+> updated after Phases 1–6 actually shipped; see
+> `technical_memory/technical_memory.ipynb` for that reconciliation).
 
 ---
 
-## Phase 0 — Foundation ✅
+## Phase 1 — Core prototype ✅
 
 - [x] 🔴 Folder structure and `project.godot`
 - [x] 🔴 `EventBus` + `GameManager` (autoloads)
 - [x] 🔴 Reusable `HealthComponent`
 - [x] 🔴 `HitBox` / `HurtBox` with collision layers
-- [x] 🔴 Player: 8-direction movement + keyboard/gamepad
+- [x] 🔴 Player: 8-direction movement + keyboard/gamepad (`InputHandler`)
 - [x] 🔴 Player: sword attack + iFrames (invincibility)
-- [x] 🔴 Player: state machine (IDLE / WALK / ATTACK)
+- [x] 🔴 Player: state machine (IDLE / WALK / ATTACK / KNOCKBACK)
 - [x] 🔴 `BaseEnemy` + `Slime` with basic AI (patrol + chase)
-- [x] 🔴 `HealthUI` with ColorRect placeholders
-- [x] 🔴 `Camera2D` following the player
+- [x] 🔴 `HealthUI` reactive heart HUD via `EventBus`
+- [x] 🔴 `PixelCamera` following the player, pixel-perfect
+- [x] 🔴 Game Over screen
+
+## Phase 2 — Room system ✅
+
+- [x] 🔴 `Room.gd` base script — floor generation, camera lock, spawn handling
+- [x] 🔴 `Door.tscn` — `Area2D` trigger, `target_scene` + `spawn_id`
+- [x] 🔴 Room 1 (`Room1_Tutorial.tscn`) ↔ Room 2 (`Room2_Challenge.tscn`)
+- [x] 🔴 `player_health` persists between rooms (`GameManager`)
+
+## Phase 3 — Items ✅
+
+- [x] 🟠 `HeartPickup.tscn` / `.gd`
+- [x] 🟠 30% drop chance from Slime death (`Constants.HEART_DROP_CHANCE`)
+
+## Phase 4 — Main menu ✅
+
+- [x] 🟠 `MainMenu.tscn` — title screen, Play/Quit
+
+## Phase 5 — Pause menu ✅
+
+- [x] 🟠 `PauseMenu.gd` autoload — ESC toggles PLAYING↔PAUSED
+- [x] 🟡 "EXIT TO MENU" unpauses before `go_to_room()`
+
+## Phase 6 — Real sprites ✅
+
+- [x] 🟠 `tileset_forest.png` wired into `World.gd` tilemap generation
+- [x] 🟠 `slime.png` wired into `Slime.tscn`
+- [x] 🟠 `sword.png` wired into `Player.tscn` / `Player.gd`
+- [ ] 🟢 `bush.png` — imported but not placed in any room yet
+- [ ] 🟡 Player body sprite — still `PlaceholderSprite.gd` (no `player.png`
+      provided); `assets/reference/joe/` now has 8 pixel-art frames from the
+      2024 character design coursework that could seed a real one
 
 ---
 
-## Phase 1 — Visibility ⬛⬛⬛⬜⬜
+## Phase 7 — Audio ⬛⬛⬜⬜⬜ (not started)
 
-> Unblocks everything else. Top priority.
+`assets/audio/` now has candidate clips recovered from the 2024 Unreal
+Engine 5 prototype (bg music, button click, forest ambience, footsteps,
+jump SFX) — **verify licensing before shipping any of them** (see
+`technical_memory/technical_memory.ipynb`).
 
-- [x] 🔴 16×16 placeholder sprite for Player (`PlaceholderSprite.gd`, blue 12×14)
-- [x] 🔴 12×12 placeholder sprite for Slime (`PlaceholderSprite.gd`, green 10×10)
-- [x] 🔴 TileMap with solid-color tileset (`World.gd → _generate_floor()`)
-- [ ] 🔴 Verify Player and Slimes are visible at runtime
-- [ ] 🟠 Adjust `Camera2D` limits to map size
-- [ ] 🟠 Confirm HitBox/HurtBox work (Debug > Visible Collision Shapes)
-
----
-
-## Phase 2 — Art and integration ⬛⬛⬜⬜⬜
-
-- [ ] 🟠 Import player spritesheet (Kenney.nl or itch.io, 16×16)
-- [ ] 🟠 Set up the 12 animations on Player's `AnimatedSprite2D`
-  - idle_down / idle_up / idle_left / idle_right
-  - walk_down / walk_up / walk_left / walk_right
-  - attack_down / attack_up / attack_left / attack_right
-- [ ] 🟠 Import Slime spritesheet (idle + walk)
-- [ ] 🟠 Import tileset with correct collisions (TileMapLayer)
-- [ ] 🟡 Heart sprites to replace ColorRect in the HUD
-- [ ] 🟠 Adjust `CollisionShape2D` to the sprites' real size
-
----
-
-## Phase 3 — Audio ⬛⬛⬜⬜⬜
-
-- [ ] 🟡 Create `AudioManager` autoload (`scripts/autoloads/AudioManager.gd`)
+- [ ] 🟡 `AudioManager` autoload (`AudioStreamPlayer` pool for SFX + music)
 - [ ] 🟠 SFX: sword attack
 - [ ] 🟠 SFX: player takes damage
 - [ ] 🟡 SFX: Slime death
 - [ ] 🟢 SFX: player footsteps (by floor type)
-- [ ] 🟡 Looping ambient music (`AudioStreamPlayer`)
+- [ ] 🟡 Looping ambient music per room
 
----
+## Phase 8 — Second enemy & extended combat ⬛⬛⬛⬜⬜ (not started)
 
-## Phase 4 — Level design ⬛⬛⬛⬜⬜
-
-- [ ] 🟠 Room 1: full design with obstacles and enemies
-- [ ] 🟡 Room 2: different layout, more enemies
-- [ ] 🟠 Doors as `Area2D` triggering a transition
-- [ ] 🟠 Scene transition system (fade + `change_scene_to_file`)
-- [ ] 🟠 Enemy spawns correctly positioned per room
-
----
-
-## Phase 5 — Extended combat ⬛⬛⬜⬜⬜
-
-- [ ] 🟠 Knockback on taking damage (player and enemy)
+- [ ] 🟡 `Bat.gd` — extends `BaseEnemy`, flies (no TileMap collision),
+      sinusoidal movement
+- [ ] 🟢 `Archer.gd` — fires `Projectile.tscn` at the player
+- [ ] 🟢 `Projectile.gd` — moves in a fixed direction, has a HitBox, destroys
+      itself on impact
+- [ ] 🟡 Enemy knockback on taking damage (player already has a KNOCKBACK
+      state; enemies don't yet)
 - [ ] 🟡 Red flash on sprite when taking damage (`modulate` + tween)
-- [ ] 🟡 Heart drop on killing a Slime (configurable probability)
-- [ ] 🟡 Collectible heart item that calls `HealthComponent.heal()`
 - [ ] 🟢 Slime death effect (particles or scale tween)
 
----
+## Phase 9 — Save system & polish ⬛⬛⬜⬜⬜ (not started)
 
-## Phase 6 — Second enemy ⬛⬛⬛⬜⬜
-
-- [ ] 🟡 `Bat.gd` — extends `BaseEnemy`, flies (no TileMap collision)
-- [ ] 🟡 Sinusoidal movement for Bat
-- [ ] 🟢 `Archer.gd` — fires `Projectile.tscn` at the player
-- [ ] 🟢 `Projectile.gd` — moves in a fixed direction, has a HitBox, destroys itself on impact
-
----
-
-## Phase 7 — Game systems ⬛⬛⬜⬜⬜
-
-- [ ] 🟠 Game Over screen with Restart button
-- [ ] 🟡 Main menu (Play, Quit)
 - [ ] 🟢 Persistence with `FileAccess` (furthest room reached)
-
----
-
-## Phase 8 — Polish ⬛⬛⬜⬜⬜
-
 - [ ] 🟢 Camera shake on taking damage
 - [ ] 🟢 Squash & stretch on Slime (scale tween)
-- [ ] 🟡 Black fade on room transition
+- [ ] 🟡 Black fade on room transition (`SceneManager` already fades —
+      confirm it reads as a full black frame, not just a cut)
 - [ ] 🟢 Circular shadow under player and enemies (semi-transparent `Sprite2D`)
 - [ ] 🟢 Animated hearts in the HUD
 
@@ -114,3 +115,5 @@
 - [ ] Multi-phase boss
 - [ ] Full save system
 - [ ] Mobile build with touch controls
+- [ ] Revisit `LORE.md` — the original narrative (Joe/Caver/Tato/Boni/Janga,
+      four dimensions) if the project ever grows beyond prototype scope

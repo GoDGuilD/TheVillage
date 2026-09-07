@@ -1,0 +1,6 @@
+# .assetignore — asset-pipeline exclusions for The Village
+# Godot itself doesn't read this file; it documents intent for any future
+# asset-processing/optimization tooling (e.g. successors to Tools/gen_sprites.py).
+
+assets/reference/   # reference-only art (character design sheets, pixel-art frames) recovered from school coursework — never imported into the game, not real game assets
+assets/audio/*.wav  # uncompressed masters kept alongside their .mp3 counterparts for reference; neither format is cleared to ship yet — licenses unverified, see technical_memory/technical_memory.ipynb

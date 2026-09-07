@@ -1,6 +1,22 @@
+<!--
+File: GDD.md
+Description: Game design document for The Village prototype — concept, mechanics, and scope for the current Godot build.
+Author: Jose-Jorge HERNANDEZ
+Company: Parlee Conseiller, Inc.
+Date: 2026-05-26
+Last edit date: 2026-09-07
+Version: 1.1.0
+-->
+
 # Game Design Document — The Village
 
 Living document. Updated with every relevant design decision.
+
+> **Note:** this document describes the current, deliberately lean
+> prototype. The original 2024 concept for The Village had a full story and
+> named cast — see `LORE.md` for that recovered narrative, kept as dormant
+> reference material and explicitly out of scope here (see "Out of scope"
+> below).
 
 ---
 

@@ -1,6 +1,22 @@
+<!--
+File: ARCHITECTURE.md
+Description: Technical architecture reference for The Village — current structure and design patterns, with planned/future items clearly marked as not yet built.
+Author: Jose-Jorge HERNANDEZ
+Company: Parlee Conseiller, Inc.
+Date: 2026-05-26
+Last edit date: 2026-09-07
+Version: 2.0.0
+-->
+
 # Technical Architecture — The Village
 
-Reference document for design decisions. Updated whenever a new pattern is introduced or an existing one changes.
+Reference document for design decisions. Updated whenever a new pattern is
+introduced or an existing one changes.
+
+> This version separates **current** (what's actually on disk today) from
+> **planned** (aspirational, not built yet) — a previous revision blurred the
+> two, which contributed to `TODO.md` going stale. See
+> `technical_memory/technical_memory.ipynb` for that history.
 
 ---
 
@@ -14,58 +30,98 @@ Reference document for design decisions. Updated whenever a new pattern is intro
 
 ---
 
-## Folder structure
+## Folder structure (current)
 
 ```
 TheVillage/
 │
-├── autoloads/              ← root-level singletons, immediate visibility
+├── autoloads/               ← root-level singletons, immediate visibility
 │   ├── EventBus.gd
 │   ├── GameManager.gd
 │   ├── SceneManager.gd
-│   └── AudioManager.gd    (Phase 3)
+│   ├── InputHandler.gd
+│   └── PauseMenu.gd
 │
 ├── scenes/
 │   ├── world/
-│   │   ├── rooms/          ← one .tscn per room (Phase 4)
-│   │   │   ├── Room_Forest_01.tscn
-│   │   │   └── Room_Forest_02.tscn
-│   │   └── World.tscn      ← orchestrator, contains no geometry
+│   │   ├── rooms/
+│   │   │   ├── Room1_Tutorial.tscn
+│   │   │   └── Room2_Challenge.tscn
+│   │   ├── World.gd / .tscn   ← orchestrator
+│   │   ├── Room.gd            ← base room script
+│   │   └── Door.gd / .tscn    ← room-to-room transition trigger
 │   ├── player/
-│   │   └── Player.tscn
+│   │   └── Player.gd / .tscn
 │   ├── enemies/
-│   │   ├── Slime.tscn
-│   │   └── Bat.tscn        (Phase 6)
-│   ├── ui/
-│   │   ├── HUD.tscn        ← rename HealthUI → HUD (Phase 4)
-│   │   └── menus/
-│   │       ├── MainMenu.tscn
-│   │       └── GameOver.tscn
-│   └── shared/             ← reusable scenes (doors, items)
-│       ├── Door.tscn
-│       ├── HeartDrop.tscn
-│       └── Projectile.tscn (Phase 6)
+│   │   ├── BaseEnemy.gd
+│   │   └── Slime.gd / .tscn
+│   ├── items/
+│   │   └── HeartPickup.gd / .tscn
+│   └── ui/
+│       ├── HealthUI.gd / .tscn
+│       ├── GameOver.gd / .tscn
+│       └── MainMenu.gd / .tscn
 │
 ├── scripts/
 │   ├── combat/
 │   │   ├── HitBox.gd
 │   │   ├── HurtBox.gd
 │   │   └── HealthComponent.gd
-│   ├── components/         ← reusable Node scripts
+│   ├── components/
 │   │   ├── StateMachine.gd
-│   │   ├── KnockbackComponent.gd  (Phase 5)
-│   │   └── FlashComponent.gd      (Phase 5)
+│   │   ├── PixelCamera.gd
+│   │   └── PlaceholderSprite.gd
 │   └── data/
-│       └── Constants.gd    ← single source of configurable values
+│       └── Constants.gd       ← single source of configurable values
 │
-├── resources/              ← Godot .tres: data without code
+├── resources/                 ← Godot .tres: data without code (empty so far)
 │   └── enemies/
-│       └── slime_data.tres
 │
-└── assets/
-	├── sprites/
-	├── audio/
-	└── fonts/
+├── assets/
+│   ├── sprites/
+│   │   ├── player/             → sword.png (wired)
+│   │   ├── enemies/            → slime.png (wired)
+│   │   └── world/              → tileset_forest.png (wired), bush.png (imported, not placed)
+│   ├── audio/                  → clips recovered from the 2024 UE5 prototype,
+│   │                              not yet wired, licenses unverified (Phase 7)
+│   ├── branding/                → thevillage.png/.ico icon + splash art,
+│   │                              recovered from the 2024 UE5 prototype
+│   └── reference/joe/           → character design reference art (not
+│                                   imported as game assets — reference only)
+│
+├── addons/godot_mcp/           ← Godot MCP plugin, editor/Claude Code integration
+├── Tools/
+│   └── gen_sprites.py
+├── technical_memory/
+│   └── technical_memory.ipynb
+└── LORE.md                     ← original, richer narrative (dormant, out of
+                                   current scope — see GDD.md's "Out of scope")
+```
+
+## Folder structure (planned — not built yet)
+
+These items appear in earlier drafts of this document as if already in
+place; they are not. Listed here so the intent isn't lost, without
+misrepresenting current state:
+
+```
+autoloads/
+  └── AudioManager.gd          (Phase 7)
+  └── SaveManager.gd           (Phase 9)
+
+scenes/
+  ├── enemies/
+  │   └── Bat.tscn             (Phase 8)
+  ├── shared/                  ← reusable scenes; Door.tscn currently lives
+  │   │                          in scenes/world/ instead — revisit if a
+  │   │                          second reusable "shared" scene shows up
+  │   └── Projectile.tscn      (Phase 8)
+  └── ui/
+      └── HUD.tscn             ← proposed rename of HealthUI.tscn, not done
+
+resources/enemies/
+  └── slime_data.tres          ← Slime's stats are still hardcoded in
+                                   Slime.gd / Constants.gd, not data-driven yet
 ```
 
 ---
@@ -75,10 +131,12 @@ TheVillage/
 | Autoload | Responsibility | Status |
 |----------|-----------------|--------|
 | `EventBus` | Signal bus. Signals only, zero logic. | ✅ |
-| `GameManager` | Global state (enum GameState) + global references | ✅ |
-| `SceneManager` | Room transitions with fade | ✅ |
-| `AudioManager` | AudioStreamPlayer pool, SFX and music | Phase 3 |
-| `SaveManager` | Persistence with FileAccess | Phase 7 |
+| `GameManager` | Global state (`GameState` enum), entity registry, persists `player_health` between rooms | ✅ |
+| `SceneManager` | Room transitions with fade — `go_to_room(path, spawn_id)` | ✅ |
+| `InputHandler` | Input abstraction. Never use `Input` directly. Persists between scenes. | ✅ |
+| `PauseMenu` | Pause menu. ESC toggles PLAYING↔PAUSED. | ✅ |
+| `AudioManager` | `AudioStreamPlayer` pool, SFX and music | Phase 7 |
+| `SaveManager` | Persistence with `FileAccess` | Phase 9 |
 
 **Golden rule:** no autoload calls another autoload directly.
 If they need to communicate, they do so through `EventBus`.
@@ -90,7 +148,7 @@ If they need to communicate, they do so through `EventBus`.
 Two `Area2D` types with opposite responsibilities:
 
 - **`HitBox`** — area that *deals* damage. Only has `damage: int`. Detects nothing.
-- **`HurtBox`** — area that *receives* damage. Monitors HitBoxes and emits `hurt(damage)`.
+- **`HurtBox`** — area that *receives* damage. Monitors HitBoxes and emits `hurt(damage, source_position)`.
 
 ### 2D collision layers
 
@@ -106,6 +164,11 @@ Layer 7  (bitmask 64)  — EnemyHurtBox:  Enemies' damage zone
 
 Rule: the `HurtBox` has `monitoring=true` and its mask points to the layer of the `HitBox` it should detect.
 
+⚠️ **Gotcha:** the sword `HitBox` requires toggling BOTH `monitoring` AND
+`monitorable` — `monitoring` alone causes phantom damage to nearby enemies
+(the `monitorable=true` flag alone activates enemy HurtBoxes). See
+`CLAUDE.md`'s "Known gotchas" table for this and other fixed bugs.
+
 ---
 
 ## StateMachine — reusable component
@@ -119,7 +182,7 @@ func state_idle_exit() -> void:    # called on exit
 ```
 
 `_fsm.transition_to("walk")` handles the enter/exit/update cycle automatically.
-Used in Player and all enemies to eliminate manual `match` statements.
+Used in Player (IDLE / WALK / ATTACK / KNOCKBACK) and all enemies to eliminate manual `match` statements.
 
 ---
 
@@ -163,9 +226,9 @@ Compatible with any node — player, enemy, barrel, boss.
 ## BaseEnemy / Enemy inheritance
 
 ```
-BaseEnemy (CharacterBody2D)  ← defines structure and lifecycle
+BaseEnemy (CharacterBody2D)  ← defines structure and lifecycle (IDLE / CHASE / DEAD)
 └── Slime extends BaseEnemy  ← overrides _update_idle/_update_chase
-└── Bat   extends BaseEnemy  ← overrides with sinusoidal movement
+└── Bat   extends BaseEnemy  ← Phase 8, not built — sinusoidal movement, ignores TileMap collisions
 ```
 
 Adding an enemy = new `.gd` + `.tscn`. No changes to existing files.
@@ -198,8 +261,8 @@ MENU ──play──→ PLAYING ──pause──→ PAUSED
 | Public methods | `verb_noun()` | `take_damage()`, `register_player()` |
 | Private methods | `_verb_noun()` | `_handle_movement()` |
 | Signal callbacks | `_on_source_event()` | `_on_hurt()`, `_on_attack_finished()` |
-| Rooms | `Room_Biome_NN.tscn` | `Room_Forest_01.tscn` |
-| Resources | `snake_case.tres` | `slime_data.tres` |
+| Rooms | `RoomN_Name.tscn` | `Room1_Tutorial.tscn`, `Room2_Challenge.tscn` |
+| Resources | `snake_case.tres` | `slime_data.tres` (planned) |
 
 ---
 
@@ -207,7 +270,7 @@ MENU ──play──→ PLAYING ──pause──→ PAUSED
 
 ```
 Player takes a hit
-  → HurtBox.hurt(1)
+  → HurtBox.hurt(1, source_position)
 	→ Player._on_hurt(1)
 	  → HealthComponent.take_damage(1)
 		→ HealthComponent.health_changed(5, 6)

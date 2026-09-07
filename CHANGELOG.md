@@ -1,53 +1,147 @@
+<!--
+File: CHANGELOG.md
+Description: Dated record of all relevant changes to The Village, reconstructed from git history and pre-repo project history.
+Author: Jose-Jorge HERNANDEZ
+Company: Parlee Conseiller, Inc.
+Date: 2026-05-26
+Last edit date: 2026-09-07
+Version: 2.0.0
+-->
+
 # Changelog — The Village
 
 All relevant project changes are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+> **Before this repo existed:** The Village began as a school project at UVM in
+> February 2024 — a much larger narrative concept, built up across four
+> different courses and finished as a working Unreal Engine 5 prototype in
+> December 2024. This repo is a from-scratch reboot in Godot, deliberately
+> scoped down to a lean prototype. See `LORE.md` for the original narrative
+> and `technical_memory/technical_memory.ipynb` for the full recovered
+> timeline and the reasoning behind this changelog's structure.
 
 ---
 
 ## [Unreleased]
 
 ### Added
-- `scripts/components/PixelCamera.gd` — Camera2D with snapping to integer pixels (anti-shimmer)
-- `scenes/player/Player.gd` — complete PlayerController with StateMachine, smooth acceleration and KNOCKBACK state
-- `scenes/player/Player.tscn` — adds StateMachine, KnockbackTimer nodes and PixelCamera script
-- `autoloads/InputHandler.gd` — input abstraction layer with discrete signals and movement polling
-- `autoloads/SceneManager.gd` — room transitions with fade
-- `autoloads/GameManager.gd` — rewritten with `GameState` enum and enemy registry
-- `autoloads/EventBus.gd` — expanded with game, audio and room signals
-- `scripts/data/Constants.gd` — single source of configurable values (`class_name Constants`)
-- `scripts/components/StateMachine.gd` — reusable FSM driven by naming convention
-- Input actions `move_left/right/up/down`, `interact`, `pause_game` in `project.godot`
-- Full analog stick and D-pad support via `InputEventJoypadMotion` in InputMap
-- `Player.gd` migrated: reads from `InputHandler`, uses `Constants`, no direct `Input` calls
+- `LORE.md` — the original, richer narrative concept (protagonist Joe,
+  antagonist Caver, four dimensions) recovered from 2024 coursework,
+  preserved as dormant future-vision material
+- `assets/branding/` — `thevillage.png/.ico` icon and splash art from the
+  2024 Unreal Engine 5 prototype
+- `assets/reference/joe/` — Joe's character sheet and 8-frame pixel sprite
+  reference art from the 2024 character design coursework
+- `assets/audio/` — music and SFX clips from the 2024 Unreal Engine 5
+  prototype (⚠️ licenses not yet verified — do not ship before confirming,
+  see `technical_memory/technical_memory.ipynb`)
+- `technical_memory/technical_memory.ipynb` — running technical decision log
 
 ### Changed
-- `scripts/combat/HurtBox.gd` — `hurt` signal now passes `source_position: Vector2` for precise knockback
-- `scenes/enemies/BaseEnemy.gd` — `_on_hurt` updated to match HurtBox's new signature
-- `scripts/components/StateMachine.gd` — migrated from `_process` to `_physics_process`
-- `scripts/data/Constants.gd` — added `PLAYER_ACCELERATION` and `PLAYER_FRICTION`
-- `project.godot` — 320×180 window with `canvas_items` stretch + `integer` scale for pixel-perfect rendering
-- Autoloads moved from `scripts/autoloads/` → `autoloads/` (root level)
-- `project.godot` updated with new autoload paths
-
-### Structure
-- Complete project folder structure
-- `EventBus` — global signal bus for decoupled communication
-- `GameManager` — singleton with a reference to the player
-- `HealthComponent` — reusable health component (child Node)
-- `HitBox` / `HurtBox` — layer-based damage system (7 layers)
-- `Player.tscn` — player with 8-direction movement, sword attack and iFrames
-- `BaseEnemy.gd` — base class with state machine (IDLE / CHASE / DEAD)
-- `Slime.tscn` — enemy with random patrol and radius-based chase
-- `HealthUI.tscn` — reactive heart HUD via EventBus
-- `World.tscn` — root scene with TileMapLayer, player and 2 Slimes
-- `attack` input action mapped to Space and the gamepad's South button
-- 2D collision layer names in `project.godot`
+- `README.md`, `TODO.md`, `ARCHITECTURE.md`, `GDD.md` — reconciled against
+  the actual codebase and rewritten where stale (see
+  `technical_memory/technical_memory.ipynb` for the TODO.md vs CLAUDE.md
+  phase-completion discrepancy this resolved)
 
 ---
+
+## [1.0.0] — 2026-09-07
+
+Documentation overhaul: recovered and documented the project's full
+pre-repo history (2024 UVM coursework → Unreal Engine 5 prototype → this
+Godot reboot), reconciled the docs against the actual codebase, and
+established a permanent technical memory log. First release considered
+fully and accurately documented.
+
+---
+
+## [0.5.2] — 2026-07-28
+
+### Added
+- `.claude/settings.local.json` — local Claude Code permissions
+
+## [0.5.1] — 2026-07-08
+
+### Security
+- Patched `.gitignore` / `.assetignore` against secret exposure
+
+## [0.5.0] — 2026-06-23
+
+### Changed
+- Full codebase and docs translation pass from Spanish to English
+- Renamed `Sala1_Tutorial.tscn` → `Room1_Tutorial.tscn` and
+  `Sala2_Desafio.tscn` → `Room2_Challenge.tscn` for naming consistency
+
+## [0.4.0] — 2026-06-03
+
+### Added
+- `autoloads/PauseMenu.gd` — pause menu (ESC toggles PLAYING↔PAUSED)
+- `scenes/ui/MainMenu.gd` / `.tscn` — title screen (Play/Quit)
+- `scenes/items/HeartPickup.gd` / `.tscn` — collectible heart, drop chance
+  configured in `Constants.gd`
+
+### Changed
+- `scenes/enemies/Slime.gd` / `.tscn` — heart drop on death
+- `scenes/player/Player.gd` — movement tuning
+- `scenes/world/Room.gd` — adjustments to support new menus
+
+## [0.3.1] — 2026-06-02
+
+### Changed
+- `project.godot` — minor correction
+
+## [0.3.0] — 2026-06-02
+
+### Added
+- `scenes/ui/GameOver.gd` / `.tscn` — Game Over screen
+- `scenes/world/Door.gd` / `.tscn` — room-to-room transition trigger
+- `scenes/world/Room.gd` — base room script (floor generation, camera lock,
+  spawn handling)
+- `scenes/world/rooms/Sala1_Tutorial.tscn`, `Sala2_Desafio.tscn` — first two
+  rooms (renamed to English in `[0.5.0]`)
+
+### Changed
+- `autoloads/GameManager.gd` — persists `player_health` between rooms
+- `autoloads/SceneManager.gd` — fade + room change via `go_to_room()`
+- `ARCHITECTURE.md`, `CLAUDE.md`, `GDD.md`, `README.md` — updated for the
+  new room system
+
+## [0.2.0] — 2026-06-01
+
+### Added
+- `addons/godot_mcp/` — Godot MCP plugin, enables Claude Code / editor
+  integration
+- `CLAUDE.md` — project reference doc for AI-assisted development
+
+### Changed
+- Corrected basic player/enemy mechanics
+- `autoloads/EventBus.gd`, `InputHandler.gd`, `SceneManager.gd` — signal and
+  input handling fixes
+- `scenes/world/World.gd` — world generation adjustments
+
+## [0.1.0] — 2026-05-26
+
+### Added
+- Initial project scaffold: `project.godot`, folder structure,
+  `README.md`, `GDD.md`, `ARCHITECTURE.md`, `TODO.md`
+- `autoloads/EventBus.gd`, `GameManager.gd`, `SceneManager.gd`,
+  `InputHandler.gd` — core singletons
+- `scripts/combat/HealthComponent.gd`, `HitBox.gd`, `HurtBox.gd` —
+  layer-based damage system
+- `scripts/components/StateMachine.gd`, `PixelCamera.gd`,
+  `PlaceholderSprite.gd`
+- `scripts/data/Constants.gd` — single source of configurable values
+- `scenes/player/Player.gd` / `.tscn` — 8-direction movement, sword attack,
+  iFrames
+- `scenes/enemies/BaseEnemy.gd`, `Slime.gd` / `.tscn` — patrol/chase AI
+- `scenes/ui/HealthUI.gd` / `.tscn` — reactive heart HUD
+- `scenes/world/World.gd` / `.tscn` — root scene, tilemap generation
+- `assets/sprites/` — `tileset_forest.png`, `slime.png`, `sword.png`,
+  `bush.png` (real sprites, wired from day one)
+- `Tools/gen_sprites.py` — placeholder sprite generation script
 
 ## [0.0.1] — 2026-05-25
 
 ### Added
 - Initial repository with `.gitignore` for Godot 4
-- `project.godot` named "The Village", Mobile/D3D12 renderer

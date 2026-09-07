@@ -1,6 +1,22 @@
+<!--
+File: CLAUDE.md
+Description: Project-specific reference for AI-assisted development on The Village (architecture cheat-sheet, gotchas, phase status).
+Author: Jose-Jorge HERNANDEZ
+Company: Parlee Conseiller, Inc.
+Date: 2026-06-01
+Last edit date: 2026-09-07
+Version: 1.1.0
+-->
+
 # The Village — Godot Project
 
 Top-down 2D action-RPG, inspired by Zelda: A Link to the Past. Engine: Godot 4.6.3.
+
+> This is a from-scratch reboot of a much older school project (2024 UVM
+> coursework → Unreal Engine 5 prototype) — see `README.md`'s "Project
+> history" and `LORE.md` for the original narrative. `TODO.md` now shares
+> this file's phase numbering (it previously used an older, unmaintained
+> scheme — see `technical_memory/technical_memory.ipynb`).
 
 ## Running the project
 Open `D:\SOFTWARE\GoDot\Godot_v4.6.3-stable_win64.exe` → Open this project → F5 to run.
