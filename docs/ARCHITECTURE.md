@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 4.0.0
+Version: 5.0.0
 -->
 
 # Architecture
@@ -21,11 +21,13 @@ src/
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
   enemies/   BaseEnemy, Slime, Guard, Spitter, EnemyRock
-  world/     TestField (ASCII layout -> TileMapLayer + actors + HUD), Bush, Pot, Thrown, Pickup
+  world/     World (main scene: areas, camera, scrolls, doors, HUD, respawn), AreaBuilder (ASCII rows -> tiles +
+             actors), TestField (test arenas), Bush, Pot, Thrown, Pickup
+    areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
   ui/        Hud (hearts + gem counter)
-tools/       palette.py, sprite_lib.py, gen_joe.py, gen_tiles.py, gen_enemies.py, gen_props.py, gen_sfx.py,
-             capture_field.gd
-tests/       test_player.gd, test_combat.gd
+tools/       palette.py, sprite_lib.py, terrain_art.py, gen_joe.py, gen_tiles.py, gen_enemies.py, gen_props.py,
+             gen_sfx.py, gen_areas.py (areas + lint + preview), capture_field.gd, capture_world.gd
+tests/       test_player.gd, test_combat.gd, test_world.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -38,7 +40,14 @@ tests/       test_player.gd, test_combat.gd
 ## Key ideas
 - **Generated art and sound.** `tools/gen_*.py` draw every sprite/tile from `tools/palette.py` and synthesise every
   sound; each writes a manifest the game reads at runtime.
-- **Runtime TileSet** from `overworld_light.json`; solid cells get a full-square polygon.
+- **Runtime TileSet** (`AreaBuilder.tileset()`) from `overworld_light.json`: solid cells get a full-square polygon;
+  `ledge`/`door`/`exit` flags become custom-data layers that Joe and the World query (`AreaBuilder.flag_at`).
+- **One global coordinate system.** Every overworld area sits at its `origin_tiles` on a grid of 24x14-tile screens,
+  so neighbouring areas share edges. Only the current area exists in the tree; crossing an edge builds the
+  neighbour, slides the camera for 0.6 s while Joe steps 14 px in, then frees the old area. Interiors sit far away
+  (tile 1000+) and are reached by fading through doors / exit mats.
+- **Camera.** A World-owned Camera2D follows Joe's chest, clamped to the area; an area smaller than the view (house
+  interiors) is centred.
 - **Feet origin.** Actors' node origin is under their feet; only a small feet box collides with the world. The
   `Actors` node is y-sorted.
 - **Combat contract.** A `HitBox` only hurts while `monitorable` (`set_active`). A `HurtBox` emits
@@ -54,6 +63,7 @@ tests/       test_player.gd, test_combat.gd
 ## Player state machine
 `idle` / `walk` → `attack` (sword live on the manifest's hit window; a press buffers a chained slash; holding
 continues into) → `charge` (shuffle, facing locked, glint when charged) → `spin` (circle hit box) → `idle`.
+`walk` → `hop` (walking south into a ledge: a 0.35 s arc to the first open cell past it, no collision).
 `idle` / `walk` → `lift` (interact on a liftable) → `carry` → `throw` → `idle`. Any state → `hurt` on a hit
 (knockback, then `idle`; i-frames and blinking run outside the state machine) or → `dead` at zero health (the
 field revives Joe at its spawn). A hit-stop pauses the state machine and the animation for a few frames.
@@ -72,5 +82,5 @@ field revives Joe at its spawn). A hit-stop pauses the state machine and the ani
 
 ## Display
 384×216 viewport, `canvas_items` stretch, integer scale, nearest filter, pixel-snapped transforms,
-`gl_compatibility`. The camera is a child of Joe limited to the field (screen-edge scrolling comes in Phase 3);
-the HUD is a CanvasLayer (layer 10).
+`gl_compatibility`. The World's camera follows Joe inside the area and slides between areas; test arenas keep a
+camera on Joe limited to the field. HUD: CanvasLayer 10; door fade: CanvasLayer 20.

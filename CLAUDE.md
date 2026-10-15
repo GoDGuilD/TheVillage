@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
 Last edit date: 2026-10-15
-Version: 2.1.0
+Version: 2.2.0
 -->
 
 # The Village
@@ -44,3 +44,9 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
 - Contracts: liftable (`can_lift()`, `lift() -> {kind, texture}`, group `liftable`), pickup (`collect(kind)`),
   blockable projectile (`HitBox.blockable` + a `deflect()` on its parent). Physics layer 8 is `Props` (bushes, pots).
 - Windowed captures switch Joe's hurt box off so patrolling enemies cannot spoil a scripted shot.
+- Phase 3: the main scene is `World` (areas from `src/world/areas/*.json`, written by `tools/gen_areas.py` - must
+  print `0 lint problems`; never edit the JSON). Glyphs live in `AreaBuilder.gd` and `docs/LEVEL_DESIGN.md`.
+  Three suites now (122 checks). After adding a `class_name` run `--import`, and always wrap Godot runs in `timeout`
+  (a compile failure hangs a headless `-s` run). World tests move Joe with `world._enter(area, world.cell_feet(...))`.
+- Terrain flags (`ledge`, `door`, `exit`) are TileSet custom data read with `AreaBuilder.flag_at`; nine-slices treat
+  off-area cells as the same terrain (seamless edges).

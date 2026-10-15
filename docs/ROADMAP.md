@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.1.0
+Version: 1.2.0
 -->
 
 # Roadmap
@@ -18,8 +18,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 0 | Rebuild scaffolding | Godot 4.7.2 project at 384×216, full folder/doc structure, master palette, sprite toolkit, prototype code retired (kept in git history) | Done |
 | 1 | Movement & sword | Generated Joe (idle/walk/slash/hurt in 4 facings), 8-way walking, ALttP facing rule, corner nudge, sword slash with hit window + chained slashes, hurt knockback + i-frames, generated Light World tiles, cuttable bushes, 2×2-screen test meadow | Done (36 checks pass) |
 | 2 | Combat core & game feel | Spin attack (hold to charge), shield blocking, first enemies (Caver's guard, rock-spitter, slime), enemy knockback + hit flash + death puff, heart/gem drops, lift-and-throw pots and bushes, hit-stop and screen shake, `Audio` autoload with 15 generated SFX, minimal HUD (hearts + gems), respawn on death | Done (56 combat checks pass) |
-| 3 | Overworld engine | Data-driven areas from a generator + lint (like Chapel's `gen_rooms.py`), autotiled terrain (paths, cliffs, water edges), ALttP screen-edge scrolling between areas, doors into interiors, El Pueblo first draft | Next |
-| 4 | HUD, menus, saves, dialogue | Full HUD (item box, magic meter, keys), item menu, title + pause menus, save/load, NPC dialogue boxes (Tato, Boni, Janga), signs | Planned |
+| 3 | Overworld engine | Areas from `tools/gen_areas.py` + lint, autotiled paths/water/ledges/cliffs/walls, ALttP screen-edge scrolling, house doors and exit mats, ledge hops, El Pueblo + four neighbouring areas + four house interiors, `World` as the main scene | Done (30 world checks pass) |
+| 4 | HUD, menus, saves, dialogue | Full HUD (item box, magic meter, keys), area-name captions, item menu, title + pause menus, save/load, NPCs with dialogue boxes (Tato, Boni, Janga), readable signs, Game Over screen | Next |
 | 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers | Planned |
 | 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal | Planned |
 | 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, power glove, Caver's keep, Act 1 ending | Planned |
@@ -49,3 +49,12 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] Minimal HUD (hearts with halves, 3-digit gem counter); Joe respawns at the field spawn 1.5 s after dying
 - [x] `tests/test_combat.gd`: 56 checks
 - [ ] Owner playtest: enemy aggression, spin charge time, throw distance, sound mix (nothing auditioned by ear yet)
+
+## Phase 3 detail
+- [x] `tools/terrain_art.py` + `gen_tiles.py` v2: 83-cell atlas - water and path nine-slices, south ledges (4 pieces), cliffs, fence, sign, red and blue 5x4 cottages (walkable door cell), interior floor/walls/shelf/exit mat/table/bed; manifest flags `ledge`, `door`, `exit`
+- [x] `AreaBuilder`: one painter for test arenas and real areas (glyph table in its header); TileSet custom-data flags; seamless terrain across area edges
+- [x] `tools/gen_areas.py`: 5 overworld areas (El Pueblo 2x2 screens, North Meadow, West Woods, East Lake, South Road) and 4 interiors (Joe, Tato, Boni's shop, Janga); lint = sizes, glyphs, multi-cell coverage, ledge landings, edge openings that continue into a neighbour, door/exit pairing, reachability (one-way ledges understood), exactly one spawn; world/interior preview PNGs
+- [x] `World`: global tile coordinates, clamped camera (small rooms centred), 0.6 s screen scroll with Joe stepping in, door/mat fades, enemies respawn on re-entry, death respawn at the area entry, HUD
+- [x] Joe hops down south ledges (0.35 s arc, `ledge_hop`/`land` sounds); `door` sound
+- [x] `tests/test_world.gd`: 30 checks; `tools/capture_world.gd`
+- [ ] Owner playtest: scroll speed, village layout, how the double tree belts between areas read

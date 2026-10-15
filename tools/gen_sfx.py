@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -235,13 +235,32 @@ def spit():
     return pulse(sweep(220, 600, 0.12), 0.25) * decay(n, 0.06) + 0.4 * lowpass(noise(n), 2000) * decay(n, 0.02)
 
 
+def ledge_hop():
+    n = int(0.16 * SR)
+    return pulse(sweep(300, 900, 0.16, 0.7), 0.25) * decay(n, 0.1)
+
+
+def land():
+    n = int(0.1 * SR)
+    return tri(sweep(140, 50, 0.1)) * decay(n, 0.04) + 0.5 * lowpass(noise(n), 1500) * decay(n, 0.025)
+
+
+def door():
+    # Wooden door: a soft knock followed by a short creak.
+    n = int(0.3 * SR)
+    knock = tri(sweep(180, 90, 0.3)) * decay(n, 0.03)
+    creak = pulse(sweep(140, 210, 0.3), 0.18) * np.sin(np.pi * np.arange(n) / n) ** 2 * 0.4
+    return knock + creak
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
     "enemy_hit": (enemy_hit, -3.5), "enemy_die": (enemy_die, -4.0), "hurt": (hurt, -3.5),
     "player_die": (player_die, -3.5), "bush_cut": (bush_cut, -5.0), "lift": (lift, -5.5), "throw": (throw, -5.5),
     "shatter": (shatter, -4.0), "pickup_heart": (pickup_heart, -5.5), "pickup_gem": (pickup_gem, -6.0),
-    "shield_block": (shield_block, -5.0), "spit": (spit, -5.5),
+    "shield_block": (shield_block, -5.0), "spit": (spit, -5.5), "ledge_hop": (ledge_hop, -5.5),
+    "land": (land, -5.0), "door": (door, -5.0),
 }
 
 

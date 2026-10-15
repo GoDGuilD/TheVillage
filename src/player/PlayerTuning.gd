@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.0.0
+# Version: 2.1.0
 class_name PlayerTuning
 extends RefCounted
 
@@ -24,6 +24,14 @@ const SWORD_BOX_FRONT := 9.0          # px from the body centre to the box centr
 const SWORD_BOX_DEPTH := 18.0         # box size along the facing
 const SWORD_BOX_WIDTH := 30.0         # box size across the facing
 const BODY_CENTER := Vector2(0, -9)   # Joe's chest relative to his feet (the node origin)
+
+# --- Ledge hop (walk south into a ledge to jump down it) -------------------------------------------
+const LEDGE_PROBE := 4.0              # px below the feet where a ledge cell is looked for
+const HOP_MAX_SIDEWAYS := 0.3         # the stick must point (almost) straight down to hop
+const HOP_TIME := 0.35
+const HOP_HEIGHT := 10.0              # arc of the sprite during the hop (px)
+const HOP_LAND_INSET := 12.0          # feet land this far into the first cell past the ledge
+const HOP_MAX_CELLS := 6              # safety cap on how many ledge cells a hop may cross
 
 # --- Spin attack (hold the sword button after a slash, release when the blade glints) -----------
 const CHARGE_TIME := 0.8              # seconds of holding before the spin is ready

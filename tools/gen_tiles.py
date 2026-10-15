@@ -1,15 +1,16 @@
 # File: gen_tiles.py
-# Description: Generates the Light World overworld tile atlas (grass, flowers, dirt path nine-slice, rock, 2x2 tree) and the bush/leaf sprites.
+# Description: Generates the Light World tile atlas (grass, path, water, ledges, cliffs, trees, houses, fence, sign, interiors) with a flag manifest, plus bush/leaf sprites.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 2.0.0
 #
 # Run:  python -I tools/gen_tiles.py   (writes assets/tiles/overworld_light.png + .json, assets/sprites/world/, tmp/tiles_preview.png)
 #
-# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and says whether it is solid,
+# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and flags it (solid, ledge, door, exit),
 # so the game builds its TileSet from the manifest at runtime (no hand-made .tres to keep in sync).
+# Multi-cell pieces (2x2 tree, 5x4 houses) are named <piece>_<x>_<y>; the area painter places them by anchor.
 import json
 import os
 import random
@@ -22,6 +23,7 @@ from palette import (BARK_DARK, BARK_LIGHT, BARK_MID, BUSH_DARK, BUSH_LIGHT, BUS
                      GRASS_MID, LEAF_DARK, LEAF_HILITE, LEAF_LIGHT, LEAF_MID, OUTLINE, ROCK_DARK, ROCK_LIGHT,
                      ROCK_MID, SHADOW)
 from sprite_lib import Canvas, upscale
+import terrain_art as ta
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TILE_DIR = os.path.join(ROOT, "assets", "tiles")
@@ -29,7 +31,7 @@ SPRITE_DIR = os.path.join(ROOT, "assets", "sprites", "world")
 PREVIEW = os.path.join(ROOT, "tmp", "tiles_preview.png")
 
 T = 16                      # tile size in pixels
-COLS, ROWS = 8, 4           # atlas grid
+COLS, ROWS = 16, 9          # atlas grid
 SEED = 1986                 # fixed seed so regenerating gives identical art
 EDGE = 3                    # width (px) of the grassy lip around a dirt path
 
@@ -123,8 +125,9 @@ def make_atlas():
     c = Canvas(COLS * T, ROWS * T)
     cells = {}
 
-    def put(name, col, row, solid=False):
+    def put(name, col, row, solid=False, **flags):
         cells[name] = {"cell": [col, row], "solid": solid}
+        cells[name].update(flags)
 
     _grass(c, 0, 0, rng); put("grass_a", 0, 0)
     _grass(c, T, 0, rng, tufts=8); put("grass_b", 1, 0)
@@ -140,6 +143,38 @@ def make_atlas():
     for ty in range(2):
         for tx in range(2):
             put("tree_%d_%d" % (tx, ty), 4 + tx, ty, solid=True)
+    # Houses: 5x4 cells each, red roof at column 6, blue roof at column 11; the door cell is walkable.
+    for style, col0 in (("red", 6), ("blue", 11)):
+        ta.house(c, col0 * T, 0, rng, style)
+        for ty in range(ta.HOUSE_H):
+            for tx in range(ta.HOUSE_W):
+                is_door = (tx, ty) == ta.HOUSE_DOOR
+                put("house_%s_%d_%d" % (style, tx, ty), col0 + tx, ty, solid=not is_door, door=is_door)
+    # Water nine-slice in columns 0-2, rows 4-6 (same dx/dy naming as the path; all solid until flippers).
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            col, row = 1 + dx, 5 + dy
+            ta.water(c, col * T, row * T, rng, dy == -1, dy == 1, dx == -1, dx == 1)
+            put("water_%d_%d" % (dx, dy), col, row, solid=True)
+    # Ledges (hop down southward): left end, middle, right end, single.
+    for i, (name, cl, cr) in enumerate((("ledge_l", True, False), ("ledge_m", False, False),
+                                        ("ledge_r", False, True), ("ledge_s", True, True))):
+        ta.ledge(c, (3 + i) * T, 4 * T, rng, cl, cr)
+        put(name, 3 + i, 4, solid=True, ledge=True)
+    ta.cliff(c, 3 * T, 5 * T, rng, True); put("cliff_top", 3, 5, solid=True)
+    ta.cliff(c, 4 * T, 5 * T, rng, False); put("cliff", 4, 5, solid=True)
+    ta.fence(c, 5 * T, 5 * T, rng); put("fence", 5, 5, solid=True)
+    ta.sign(c, 6 * T, 5 * T, rng); put("sign", 6, 5, solid=True)
+    # Interiors (row 7-8).
+    ta.floor(c, 0, 7 * T, rng); put("floor", 0, 7)
+    ta.wall_face(c, 1 * T, 7 * T); put("wall_face", 1, 7, solid=True)
+    ta.wall_face(c, 2 * T, 7 * T, shelf=True); put("wall_shelf", 2, 7, solid=True)
+    ta.wall_top(c, 3 * T, 7 * T); put("wall_top", 3, 7, solid=True)
+    ta.mat(c, 4 * T, 7 * T, rng); put("mat", 4, 7, exit=True)
+    ta.table(c, 5 * T, 7 * T, rng, 0); put("table_l", 5, 7, solid=True)
+    ta.table(c, 6 * T, 7 * T, rng, 1); put("table_r", 6, 7, solid=True)
+    ta.bed(c, 7 * T, 7 * T, rng, 0); put("bed_t", 7, 7, solid=True)
+    ta.bed(c, 7 * T, 8 * T, rng, 1); put("bed_b", 7, 8, solid=True)
     return c, cells
 
 

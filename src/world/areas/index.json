@@ -1,0 +1,18 @@
+{
+ "screen": [
+  24,
+  14
+ ],
+ "start": "joe_house",
+ "areas": [
+  "meadow_north",
+  "el_pueblo",
+  "west_woods",
+  "east_lake",
+  "south_road",
+  "joe_house",
+  "tato_house",
+  "boni_shop",
+  "janga_house"
+ ]
+}

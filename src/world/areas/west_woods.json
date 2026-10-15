@@ -1,0 +1,45 @@
+{
+ "id": "west_woods",
+ "name": "West Woods",
+ "kind": "overworld",
+ "size_screens": [
+  1,
+  2
+ ],
+ "origin_tiles": [
+  -24,
+  14
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "Tx..Tx..Tx..Tx..Tx....Tx",
+  "xx..xx..xx.,xx..xx,..,xx",
+  "Tx..,..........,..R...Tx",
+  "xx.......BB...,,......xx",
+  "Tx..Tx..........Tx....Tx",
+  "xx..xx..........xx....xx",
+  "Tx,........,..........Tx",
+  "xx....vvvvvvvvvv..,,..xx",
+  "Tx....................Tx",
+  "xx............,.......xx",
+  "Tx.,..,,,,##############",
+  "xx.....G..##############",
+  "Tx........##############",
+  "xx....B...##############",
+  "Tx,.........,.........Tx",
+  "xx.,.........,........xx",
+  "Tx..Tx..,...BB....Tx,.Tx",
+  "xx..xx.......,,...xx,.xx",
+  "Tx..........Q.........Tx",
+  "xx.,.....,............xx",
+  "Tx......Tx,.,.Tx....,.Tx",
+  "xx......xx....xx.,....xx",
+  "Tx....................Tx",
+  "xx....................xx",
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [],
+ "exits": []
+}

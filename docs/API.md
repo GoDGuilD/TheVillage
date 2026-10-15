@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.1.0
+Version: 1.2.0
 -->
 
 # API
@@ -15,9 +15,9 @@ The game has no network API; this is the internal API other scripts and tests re
 ## Player (`src/player/Player.gd`)
 - Signals: `health_changed(current, maximum)`, `died`.
 - Properties: `facing: Vector2i`, `health`, `sprite`, `sword: HitBox`, `spin_box: HitBox`, `hurt_box`, `fsm`
-  (states `idle walk attack charge spin lift carry throw hurt dead`), `charged`, `carrying` (`""`, `"pot"`, `"bush"`),
+  (states `idle walk hop attack charge spin lift carry throw hurt dead`), `charged`, `carrying` (`""`, `"pot"`, `"bush"`),
   `_input_override` (tests).
-- Calls: `is_invincible()`, `is_dead()`, `freeze(seconds)`, `blocks_from(source_position)`, `liftable_in_front()`,
+- Calls: `is_invincible()`, `is_dead()`, `is_hopping()`, `freeze(seconds)`, `unfreeze()`, `blocks_from(source_position)`, `liftable_in_front()`,
   `revive(at)`, `collect(kind)`.
 
 ## Enemies (`src/enemies/`)
@@ -25,7 +25,19 @@ The game has no network API; this is the internal API other scripts and tests re
   static `spawn_drop(parent, at)`.
 - `Guard.chasing`, `Spitter.spit()` / `shots`, `EnemyRock.deflect()` / `deflected`.
 
-## World (`src/world/`)
+## World (`src/world/World.gd`, main scene)
+- Signal `area_entered(area_id)`. Properties: `areas` (id -> data), `start_area`, `current` (`{id, data, tiles,
+  actors, rect, bushes, pots, enemies}`), `player`, `camera`, `hud`, `transitioning`, `transitions`, `entry_point`,
+  `deaths`.
+- Calls: `start_at(area_id, feet)` (before entering the tree), `current_id()`, `origin_of(id)`, `rect_of(id)`,
+  `cell_feet(id, [x, y])`, `overworld_at(point)`, `camera_target(point, rect)`; `_enter(id, feet, facing)` is the
+  instant (test) move.
+
+## AreaBuilder (`src/world/AreaBuilder.gd`, static)
+- `tileset()`, `build(rows, actors, indoor, with_enemies, origin) -> {tiles, bushes, pots, enemies, spawn, doors,
+  exits}`, `glyph(rows, x, y)`, `flag_at(tree, world_pos, flag)`.
+
+## Other world nodes (`src/world/`)
 - `TestField`: `layout`, `spawn_enemies`, `player`, `hud`, `bushes`, `pots`, `enemies`, `spawn_point`, `deaths`,
   `field_size()`.
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.

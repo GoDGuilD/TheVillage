@@ -1,17 +1,17 @@
 # File: Player.gd
-# Description: Top-down Joe: ALttP walking (facing rule, corner nudge), slash, charge + spin attack, shield block, lift/carry/throw, pickups, hurt and death.
+# Description: Top-down Joe: ALttP walking (facing rule, corner nudge, ledge hops), slash, charge + spin attack, shield block, lift/carry/throw, pickups, hurt and death.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.0.0
+# Version: 2.1.0
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
 ## so his head can overlap the tile above a wall. Children are built in code in _ready() so the scene file
 ## stays a one-liner and every number comes from PlayerTuning.
 ##
-## States: idle, walk, attack, charge, spin, lift, carry, throw, hurt, dead.
+## States: idle, walk, hop, attack, charge, spin, lift, carry, throw, hurt, dead.
 
 signal health_changed(current: int, maximum: int)
 signal died
@@ -54,6 +54,8 @@ var _glint_t := 0.0
 var _timer := 0.0                         # generic countdown for timed states (spin, lift, throw)
 var _carried_tex: Texture2D
 var _knockback := Vector2.ZERO
+var _hop_from := Vector2.ZERO
+var _hop_to := Vector2.ZERO
 var _input_override = null                # tests may set a Vector2 here instead of reading the keyboard
 
 
@@ -297,6 +299,46 @@ func state_walk_update(delta: float) -> void:
 	_update_facing(dir)
 	_play("walk")
 	_walk(dir, delta)
+	# Walking south into a ledge hops down it (ALttP); ledges are solid from every other side.
+	if dir.y > 0.0 and absf(dir.x) < PlayerTuning.HOP_MAX_SIDEWAYS and get_slide_collision_count() > 0 			and AreaBuilder.flag_at(get_tree(), global_position + Vector2(0, PlayerTuning.LEDGE_PROBE), "ledge"):
+		fsm.transition_to("hop")
+
+
+# Hop down a ledge: fly over its cells (no collision) to the first open cell below, in a little arc.
+func state_hop_enter() -> void:
+	facing = Vector2i.DOWN
+	_hop_from = global_position
+	var y := global_position.y + PlayerTuning.LEDGE_PROBE
+	var guard := 0
+	while AreaBuilder.flag_at(get_tree(), Vector2(global_position.x, y), "ledge") and guard < PlayerTuning.HOP_MAX_CELLS:
+		y += AreaBuilder.TILE
+		guard += 1
+	var cell_top := floorf(y / AreaBuilder.TILE) * AreaBuilder.TILE
+	_hop_to = Vector2(global_position.x, cell_top + PlayerTuning.HOP_LAND_INSET)
+	_timer = PlayerTuning.HOP_TIME
+	velocity = Vector2.ZERO
+	_play("walk")
+	sprite.pause()
+	Audio.sfx("ledge_hop")
+
+
+func state_hop_update(delta: float) -> void:
+	_timer -= delta
+	var t := clampf(1.0 - _timer / PlayerTuning.HOP_TIME, 0.0, 1.0)
+	global_position = _hop_from.lerp(_hop_to, t)
+	sprite.position.y = -PlayerTuning.HOP_HEIGHT * 4.0 * t * (1.0 - t)
+	if _timer <= 0.0:
+		fsm.transition_to("idle")
+
+
+func state_hop_exit() -> void:
+	sprite.position.y = 0.0
+	global_position = _hop_to
+	Audio.sfx("land")
+
+
+func is_hopping() -> bool:
+	return fsm.current_state == "hop"
 
 
 # --- states: sword -------------------------------------------------------------------
@@ -520,9 +562,13 @@ func is_dead() -> bool:
 	return fsm.current_state == "dead"
 
 
-# Hit-stop hook used by Juice.hit_stop.
+# Hit-stop hook used by Juice.hit_stop; the World also freezes Joe during screen scrolls and door fades.
 func freeze(seconds: float) -> void:
 	_frozen_left = maxf(_frozen_left, seconds)
+
+
+func unfreeze() -> void:
+	_frozen_left = 0.0
 
 
 # The shield (always on Joe's arm) stops blockable hits coming at his front while he is not busy swinging.

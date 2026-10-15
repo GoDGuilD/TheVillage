@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.1.0
+Version: 1.2.0
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -28,7 +28,7 @@ Version: 1.1.0
 </head>
 <body>
 <h1>The Village — Operations &amp; Maintenance Guide</h1>
-<p class="meta">Author: Jose-Jorge HERNANDEZ · Parlee Conseiller, Inc. · Version 3.0.0 (2026-10-15)</p>
+<p class="meta">Author: Jose-Jorge HERNANDEZ · Parlee Conseiller, Inc. · Version 4.0.0 (2026-10-15)</p>
 
 <h2>1. System description</h2>
 <p>The Village is a single-player, offline, top-down action-adventure game (A Link to the Past style) built with
@@ -47,10 +47,13 @@ behaviour is verified by headless scripted test suites.</p>
 <ul>
 <li><b>Start:</b> open the editor, import the project folder, press F5.</li>
 <li><b>Stop:</b> close the game window (or F8 in the editor).</li>
-<li><b>Verify:</b> run both test suites; each must end with <code>0 failed</code> (92 checks today):</li>
+<li><b>Verify:</b> run the three test suites; each must end with <code>0 failed</code> (122 checks today):</li>
 </ul>
 <pre>Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_player.gd
-Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_combat.gd</pre>
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_combat.gd
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_world.gd</pre>
+<p>Level lint (must print <code>0 lint problems</code>):</p>
+<pre>python -I tools/gen_areas.py</pre>
 <p>Visual check (opens a window, writes <code>tmp/field_*.png</code>):</p>
 <pre>Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_field.gd</pre>
 
@@ -65,6 +68,7 @@ compare the number of checks between runs, since a script error can skip checks 
 <tr><td><code>project.godot</code></td><td>Resolution (384×216), scaling, input map, physics layers</td></tr>
 <tr><td><code>src/player/PlayerTuning.gd</code></td><td>Walk speed, corner nudge, sword, spin attack, shield, lift/throw, health, hurt and invincibility times</td></tr>
 <tr><td><code>src/core/GameState.gd</code></td><td>Drop table and gem values</td></tr>
+<tr><td><code>tools/gen_areas.py</code></td><td>The world map: every area and interior (regenerate after editing)</td></tr>
 <tr><td><code>tools/palette.py</code></td><td>All colours of generated art</td></tr>
 </table>
 <p>Regenerate art after a palette or generator change:</p>

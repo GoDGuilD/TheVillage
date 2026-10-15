@@ -1,0 +1,47 @@
+{
+ "id": "boni_shop",
+ "name": "Boni's Shop",
+ "kind": "interior",
+ "size_screens": [
+  1,
+  1
+ ],
+ "origin_tiles": [
+  1080,
+  1000
+ ],
+ "rows": [
+  "WWWWWWWWWWWWWWWW",
+  "WWWwWWWWWWWwWWWW",
+  "W_OO________OO_W",
+  "W______________W",
+  "W___Kx___Kx____W",
+  "W______________W",
+  "W______________W",
+  "W______________W",
+  "W______________W",
+  "W______MM______W",
+  "WWWWWWWWWWWWWWWW"
+ ],
+ "doors": [],
+ "exits": [
+  {
+   "cells": [
+    [
+     7,
+     9
+    ],
+    [
+     8,
+     9
+    ]
+   ],
+   "to": "el_pueblo",
+   "spawn_cell": [
+    8,
+    23
+   ],
+   "facing": "down"
+  }
+ ]
+}

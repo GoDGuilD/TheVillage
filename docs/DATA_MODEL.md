@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.1.0
+Version: 1.2.0
 -->
 
 # Data model
@@ -14,7 +14,13 @@ Version: 1.1.0
 `{frame_size: [48,48], feet: [24,34], anims: {<anim>_<facing>: {frames, fps, loop, hit_window?}, spin: {...}}}` - facings `down`, `up`, `side` (left = mirrored side). Strips are `joe_<anim>_<facing>.png`.
 
 ## Tile manifest (`assets/tiles/overworld_light.json`)
-`{tile_size: 16, cells: {name: {cell: [col,row], solid: bool}}}` - names: `grass_a`, `grass_b`, `flowers`, `rock`, `path_<dx>_<dy>` (nine-slice, dx/dy in -1..1), `tree_<x>_<y>` (2x2).
+`{tile_size: 16, cells: {name: {cell: [col,row], solid: bool, ledge?, door?, exit?}}}` - names include `path_<dx>_<dy>` / `water_<dx>_<dy>` (nine-slices), `ledge_l|m|r|s`, `cliff`, `cliff_top`, `tree_<x>_<y>`, `house_<red|blue>_<x>_<y>` (5x4, door at 2,3), `floor`, `wall_face`, `wall_shelf`, `wall_top`, `mat`, `table_l|r`, `bed_t|b`.
+
+## Areas (`src/world/areas/`)
+`index.json`: `{screen: [24, 14], start: "joe_house", areas: [ids]}`. Each `<id>.json`:
+`{id, name, kind: "overworld"|"interior", size_screens, origin_tiles: [x, y], rows: [...],
+doors: [{cell, to, spawn_cell, facing}], exits: [{cells: [[x, y]...], to, spawn_cell, facing}]}`.
+Glyphs are listed in `src/world/AreaBuilder.gd` and `docs/LEVEL_DESIGN.md`.
 
 ## Field layout (`TestField.layout`)
 Array of equal-length strings; glyphs: `.` `,` `*` grass, `#` path, `R` rock, `T`+`x` tree, `B` bush, `O` pot, `Z` slime, `G` guard, `Q` rock-spitter, `P` spawn.

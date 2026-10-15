@@ -1,0 +1,47 @@
+{
+ "id": "tato_house",
+ "name": "Tato's House",
+ "kind": "interior",
+ "size_screens": [
+  1,
+  1
+ ],
+ "origin_tiles": [
+  1040,
+  1000
+ ],
+ "rows": [
+  "WWWWWWWWWWWWWWWW",
+  "WWWwWWWWWWWwWWWW",
+  "W______________W",
+  "W_O_________D__W",
+  "W______Kx___x__W",
+  "W______________W",
+  "W______________W",
+  "W_O____________W",
+  "W______________W",
+  "W______MM______W",
+  "WWWWWWWWWWWWWWWW"
+ ],
+ "doors": [],
+ "exits": [
+  {
+   "cells": [
+    [
+     7,
+     9
+    ],
+    [
+     8,
+     9
+    ]
+   ],
+   "to": "el_pueblo",
+   "spawn_cell": [
+    36,
+    7
+   ],
+   "facing": "down"
+  }
+ ]
+}

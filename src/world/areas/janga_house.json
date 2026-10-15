@@ -1,0 +1,47 @@
+{
+ "id": "janga_house",
+ "name": "Janga's House",
+ "kind": "interior",
+ "size_screens": [
+  1,
+  1
+ ],
+ "origin_tiles": [
+  1120,
+  1000
+ ],
+ "rows": [
+  "WWWWWWWWWWWWWWWW",
+  "WWWwWWWWWWWwWWWW",
+  "W______________W",
+  "W__D___________W",
+  "W__x___________W",
+  "W______________W",
+  "W________Kx____W",
+  "W____________O_W",
+  "W______________W",
+  "W______MM______W",
+  "WWWWWWWWWWWWWWWW"
+ ],
+ "doors": [],
+ "exits": [
+  {
+   "cells": [
+    [
+     7,
+     9
+    ],
+    [
+     8,
+     9
+    ]
+   ],
+   "to": "el_pueblo",
+   "spawn_cell": [
+    36,
+    23
+   ],
+   "facing": "down"
+  }
+ ]
+}

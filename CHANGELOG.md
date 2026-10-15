@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 4.0.0
+Version: 5.0.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,25 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [4.0.0] - 2026-10-15 — Phase 3: the overworld engine
+
+### Added
+- `World` (new main scene): areas in one global coordinate system, clamped camera (rooms centred), ALttP screen
+  scroll between areas (0.6 s, Joe steps in), fades through house doors and exit mats, enemies respawn on
+  re-entry, death respawn at the area entry. The game starts in Joe's house.
+- `AreaBuilder`: shared ASCII-to-tiles painter with autotiled paths, water, ledges, cliffs and interior walls,
+  multi-cell trees/houses/furniture and TileSet flag layers (`ledge`, `door`, `exit`).
+- `tools/gen_areas.py`: El Pueblo, North Meadow, West Woods, East Lake, South Road and four house interiors;
+  lint (sizes, glyphs, pieces, ledge landings, edge openings, overlaps, door pairing, reachability, one spawn);
+  world and interior preview images. New `docs/LEVEL_DESIGN.md`.
+- `tools/terrain_art.py` + `gen_tiles.py` v2: 83-cell atlas (water, ledges, cliffs, fence, sign, two cottages,
+  interiors). Joe hops down ledges; new sounds `ledge_hop`, `land`, `door` (18 total).
+- `tests/test_world.gd` (30 checks), `tools/capture_world.gd`.
+
+### Changed
+- `TestField` now paints through `AreaBuilder` (same glyphs as real areas).
+- 122 checks in 3 suites, all passing.
 
 ## [3.0.0] - 2026-10-15 — Phase 2: combat core and game feel
 

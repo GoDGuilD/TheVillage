@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 2.1.0
+Version: 2.2.0
 -->
 
 # Game Design Document — The Village
@@ -59,6 +59,7 @@ mirror (the same land as Caver dreams it — rotten, inverted, full of his creat
 | Spin attack | hold after a slash: 0.8 s charge at half speed, then a 360 degree spin for 4 damage | `CHARGE_TIME`, `SPIN_*` |
 | Shield | always carried; blocks projectiles hitting his front while idle, walking or charging | `SHIELD_*` |
 | Lift and throw | interact on a pot or bush; throw 4 tiles for 2 damage; a hit makes him drop it | `LIFT_*`, `THROW_*` |
+| Ledges | walking south into a ledge hops down it; ledges cannot be climbed | `HOP_*`, `LEDGE_PROBE` |
 
 **Facing (ALttP rule):** while walking diagonally Joe keeps facing a direction that is still held; a new
 direction is taken from the dominant axis (vertical wins a perfect diagonal).
@@ -88,7 +89,11 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 
 ## 6. World structure
 - **Light World**: El Pueblo (hub village), its valley, forest, lake, hills and Caver's keep. Built from
-  screen-sized areas that scroll into each other the ALttP way (Phase 3).
+  screen-sized areas (24x14 tiles) that scroll into each other the ALttP way. **Implemented in Phase 3:**
+  El Pueblo (2x2 screens: Joe's, Tato's and Janga's houses, Boni's shop, gardens, crossing roads), North Meadow
+  (pond, slimes), West Woods (ledge, guard, spitter), East Lake (shore, spitters), South Road (cliff band crossed by
+  a one-way ledge with a ramp back up; boulders close the way south until the power glove). The game starts in
+  Joe's house.
 - **Dark World**: the same grid, re-skinned with the Dark World palette in `tools/palette.py` and re-populated.
   Umbra, Ignis, Tempus and Silva are its four regions.
 - **Dungeons**: 3 Light World (family seals) + 4 Dark World (dimension crystals) + Caver's tower.

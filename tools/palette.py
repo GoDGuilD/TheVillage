@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.2.0
+# Version: 1.3.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -98,6 +98,35 @@ WATER_DARK  = _hex("#2850a8")
 WATER_MID   = _hex("#3878d0")
 WATER_LIGHT = _hex("#70a8f0")
 WATER_FOAM  = _hex("#d0e8ff")
+
+# --- Village buildings and terrain -------------------------------------------
+ROOF_RED_DARK   = _hex("#7c2420")
+ROOF_RED_MID    = _hex("#b83c2c")
+ROOF_RED_LIGHT  = _hex("#e0704c")
+ROOF_BLUE_DARK  = _hex("#203c74")
+ROOF_BLUE_MID   = _hex("#3864a8")
+ROOF_BLUE_LIGHT = _hex("#6c98d8")
+WALL_DARK       = _hex("#a08868")    # plaster walls
+WALL_MID        = _hex("#d8c8a0")
+WALL_LIGHT      = _hex("#f4ecd0")
+GLASS_DARK      = _hex("#28406c")
+GLASS_LIGHT     = _hex("#88b8e8")
+CLIFF_DARK      = _hex("#5c3c28")    # earthen cliff faces and ledge lips
+CLIFF_MID       = _hex("#8c5c38")
+CLIFF_LIGHT     = _hex("#b88450")
+
+# --- Interiors ------------------------------------------------------------------
+FLOOR_DARK  = _hex("#7c5430")        # wooden floor planks
+FLOOR_MID   = _hex("#a87444")
+FLOOR_LIGHT = _hex("#c89460")
+INWALL_DARK = _hex("#3c2c38")        # interior wall tops (seen from above)
+INWALL_MID  = _hex("#c8b498")        # interior wall face
+INWALL_LIGHT = _hex("#e8d8bc")
+MAT_RED     = _hex("#a82c3c")
+MAT_LIGHT   = _hex("#e0606c")
+BED_BLUE    = _hex("#3c5ca8")
+BED_LIGHT   = _hex("#8cacf0")
+LINEN       = _hex("#f0ece0")
 
 # --- Enemies ------------------------------------------------------------------
 SLIME_DARK   = _hex("#1c4c78")   # jelly slime (blue gel)

@@ -1,0 +1,31 @@
+{
+ "id": "meadow_north",
+ "name": "North Meadow",
+ "kind": "overworld",
+ "size_screens": [
+  2,
+  1
+ ],
+ "origin_tiles": [
+  0,
+  0
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "Tx.*......,..*..,.*....,..,*..~~~~~~~~......,.Tx",
+  "xx....Tx,.BBB...Z.......,.....~~~~~~~~......*.xx",
+  "Tx....xx......,...............~~~~~~~~..,..B,.Tx",
+  "xx,...............,.....,......~~~~~~.....,B..xx",
+  "Tx......################################......Tx",
+  "xx...............,..,.####..,.................xx",
+  "Tx,...............*..,####.......,....R.....,.Tx",
+  "xx............Tx..BB,.####.Z.,.....,,...Tx....xx",
+  "Tx.......R....xx......####..BB.......*,.xx,...Tx",
+  "xx.*....,....,*...*..,####...............Z..,,xx",
+  "TxTxTxTxTxTxTxTxTxTxTx####TxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxx####xxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [],
+ "exits": []
+}
