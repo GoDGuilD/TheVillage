@@ -1,13 +1,13 @@
 # File: Bush.gd
-# Description: Cuttable bush: blocks walking like a solid tile until a sword slash cuts it, leaving a leaf burst.
+# Description: Bush: blocks walking until a sword slash cuts it (leaf burst) or Joe lifts it to throw.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.0
 class_name Bush
 extends StaticBody2D
-## Origin = the centre of the 16x16 tile it stands on. Lives on the Cuttable physics layer so Joe collides
+## Origin = the centre of the 16x16 tile it stands on. Lives on the Props physics layer (value 128) so Joe collides
 ## with it; its HurtBox listens to the PlayerHitBox layer so only the sword (later: boomerang, bombs) cuts it.
 
 signal cut(at: Vector2)
@@ -24,6 +24,7 @@ var _gone := false
 
 
 func _ready() -> void:
+	add_to_group("liftable")
 	collision_layer = LAYER_CUTTABLE
 	collision_mask = 0
 	var spr := Sprite2D.new()
@@ -57,8 +58,20 @@ func _on_hurt(_damage: int, _from: Vector2, _kb: Vector2) -> void:
 		return
 	_gone = true
 	cut.emit(global_position)
+	Audio.sfx("bush_cut")
 	_spawn_leaves()
 	queue_free()
+
+
+# Liftable contract: Joe pulls the bush out of the ground to throw it.
+func lift() -> Dictionary:
+	_gone = true
+	queue_free()
+	return {"kind": "bush", "texture": BUSH_TEX}
+
+
+func can_lift() -> bool:
+	return not _gone
 
 
 # One-shot leaf burst left in the parent after the bush is gone.

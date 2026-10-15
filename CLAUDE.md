@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
 Last edit date: 2026-10-15
-Version: 2.0.0
+Version: 2.1.0
 -->
 
 # The Village
@@ -34,3 +34,13 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
 - `TestField.layout` can be replaced before the node enters the tree (tests build custom arenas this way).
 - A HitBox hurts only while `monitorable`; toggle it with `HitBox.set_active()`.
 - Write long Python/patch scripts to files; long inline heredocs can break the Bash tool.
+- Two suites now (`test_player.gd` 36, `test_combat.gd` 56). In `-s` tests reach autoloads with
+  `root.get_node("GameState")` and `load()` enemy scripts - never use autoload-using classes as static types.
+  Set `GameState.drops_enabled = false`; force drops with `GameState.force_drop`.
+- Sounds only through `Audio.sfx(name)` (files from `tools/gen_sfx.py`), effects only through
+  `Juice.play_fx(name, pos, parent)` (`assets/sprites/vfx/vfx_manifest.json`). Hit-stop calls `freeze()` on actors.
+- Enemies extend `BaseEnemy` (pack + stats in `_init()`, AI in `_think()`); hit them in tests via the sword or
+  `_on_hurt`, never `health.take_damage` (skips flash/knockback/death).
+- Contracts: liftable (`can_lift()`, `lift() -> {kind, texture}`, group `liftable`), pickup (`collect(kind)`),
+  blockable projectile (`HitBox.blockable` + a `deflect()` on its parent). Physics layer 8 is `Props` (bushes, pots).
+- Windowed captures switch Joe's hurt box off so patrolling enemies cannot spoil a scripted shot.

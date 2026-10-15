@@ -15,6 +15,12 @@ run/main_scene="res://src/world/TestField.tscn"
 config/features=PackedStringArray("4.7")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameState="*res://src/core/GameState.gd"
+Audio="*res://src/core/Audio.gd"
+Juice="*res://src/core/Juice.gd"
+
 [display]
 
 window/size/viewport_width=384
@@ -117,7 +123,7 @@ pause={
 2d_physics/layer_5="EnemyHitBox"
 2d_physics/layer_6="PlayerHurtBox"
 2d_physics/layer_7="EnemyHurtBox"
-2d_physics/layer_8="Cuttable"
+2d_physics/layer_8="Props"
 
 [rendering]
 

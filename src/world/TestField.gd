@@ -1,13 +1,14 @@
 # File: TestField.gd
-# Description: Phase 1 playground: a two-by-two-screen Light World meadow built from an ASCII layout (tiles, trees, rocks, bushes, Joe).
+# Description: Playground meadow (2x2 screens) built from an ASCII layout: tiles, trees, rocks, bushes, pots, enemies, Joe, HUD, respawn.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 2.0.0
 extends Node2D
 ## Layout glyphs: '.' grass, ',' tufted grass, '*' flowers, '#' dirt path (edges chosen automatically),
-## 'R' rock (solid), 'T' top-left cell of a 2x2 tree with 'x' on its other three cells, 'B' bush, 'P' Joe's spawn.
+## 'R' rock (solid), 'T' top-left cell of a 2x2 tree with 'x' on its other three cells, 'B' bush, 'O' pot,
+## 'Z' slime, 'G' guard, 'Q' rock-spitter, 'P' Joe's spawn.
 ## Tests may assign `layout` before adding the node to the tree to build a custom arena.
 ## The TileSet is built at runtime from the atlas manifest written by tools/gen_tiles.py.
 
@@ -15,6 +16,9 @@ const TILE := 16
 const ATLAS_TEX := preload("res://assets/tiles/overworld_light.png")
 const ATLAS_JSON := "res://assets/tiles/overworld_light.json"
 const PLAYER_SCENE := preload("res://src/player/Player.tscn")
+const ENEMY_SCRIPTS := {"Z": preload("res://src/enemies/Slime.gd"), "G": preload("res://src/enemies/Guard.gd"),
+		"Q": preload("res://src/enemies/Spitter.gd")}
+const RESPAWN_DELAY := 1.5               # seconds between Joe falling and getting back up at the spawn
 const LAYER_WORLD := 1
 const PATH := "#"
 
@@ -22,40 +26,46 @@ const DEFAULT_LAYOUT := [
 	"TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
 	"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
 	"Tx,,.......,.....,....###....,.,...,,,,,.,....Tx",
-	"xx........,.........*,###.,....,...,..,....,..xx",
-	"Tx.,..Tx......,.,.....###..........,BB.*....,.Tx",
+	"xx........,.........*,###.,...Z,...,..,....,..xx",
+	"Tx.,..Tx....Z.,.,.....###..........,BB.*....,.Tx",
 	"xx....xx....,.,BBB..,.###,.....,Tx........*...xx",
-	"Tx,...*.Tx,.,.,B.B....###,,.....xx..*.,...,,,.Tx",
+	"Tx,...*.Tx,.,.,B.B....###,,.....xxG.*.,...,,,.Tx",
 	"xx,.,..,xx......*,,,,,###.,...,..,.........*..xx",
 	"Tx.,.,.,.,,.,.....,,.,###....,.....,..Tx.,....Tx",
-	"xx.....,..RR.,,...,...###*,.,,...,*.,.xx....,.xx",
-	"Tx.....,.....,...*...,###......,.,R,..*.,..,.,Tx",
+	"xx.....,..RR.,,...,...###*OO,,...,*.,.xx....,.xx",
+	"Tx...Q.,.....,...*...,###......,.,R,..*.,..,.,Tx",
 	"xx.......,,.,.....,...###..,.,..,...,.,.......xx",
 	"Tx############################################Tx",
 	"xx############################################xx",
 	"Tx############################################Tx",
 	"xx....,,....,..,..,..,###,...*.,,........,B.*,xx",
 	"Tx...,..,..,..**....P.###....*,....,......B...Tx",
-	"xx,.....R.........,...###.*.BBB........,.,..,.xx",
-	"Tx,...,*.,......,,....###..,..,........,.,.*.,Tx",
+	"xx,.....R........OOO..###.*.BBB........,.,..,.xx",
+	"Tx,...,*.,......,,....###..,..,........,Z,.*.,Tx",
 	"xx,.....,...Tx...,....###..........,,....,.,..xx",
 	"Tx.,,BB.....xx..,....,###..,..Tx....*.....,...Tx",
 	"xx............,..*....###,..*.xx...,..,.Tx...,xx",
 	"Tx....,...,....,..BB*,###.*,.,....,.....xx....Tx",
-	"xx*...................###,.R........,..,,....,xx",
-	"Tx.,,.,,.........*.,.,###,..,,.........,...,..Tx",
+	"xx*.......G...........###,.R........,..,,....,xx",
+	"Tx.,,.,,.........*.,.,###,..,,........Q,...,..Tx",
 	"xx,.....,.,.,.........###,...,.,.......,,...,.xx",
 	"TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
 	"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
 ]
 # Glyph -> atlas cell name for plain ground.
-const GROUND := {".": "grass_a", ",": "grass_b", "*": "flowers", "B": "grass_a", "P": "grass_a", "R": "rock"}
+const GROUND := {".": "grass_a", ",": "grass_b", "*": "flowers", "R": "rock"}
 
 var layout: Array = DEFAULT_LAYOUT
+var spawn_enemies := true                # tests may build arenas without the layout's enemies
 var tiles: TileMapLayer
 var actors: Node2D
 var player: Player
+var hud: Hud
 var bushes: Array = []
+var pots: Array = []
+var enemies: Array = []
+var spawn_point := Vector2.ZERO
+var deaths := 0
 
 var _cells: Dictionary = {}               # atlas cell name -> Vector2i
 
@@ -70,6 +80,14 @@ func _ready() -> void:
 	actors.y_sort_enabled = true           # Joe and bushes draw in feet order
 	add_child(actors)
 	_paint()
+	for e in enemies:
+		e.player = player
+	hud = Hud.new()
+	add_child(hud)
+	if player != null:
+		player.health_changed.connect(hud.set_health)
+		hud.set_health(player.health.current_health, player.health.max_health)
+		player.died.connect(_on_player_died)
 
 
 # TileSet from the atlas manifest: one 16x16 tile per named cell, full-square collision on solid ones.
@@ -128,6 +146,10 @@ func _paint() -> void:
 				_put_tile(x, y, GROUND.get(g, "grass_a"))
 			if g == "B":
 				_add_bush(x, y)
+			elif g == "O":
+				_add_pot(x, y)
+			elif ENEMY_SCRIPTS.has(g) and spawn_enemies:
+				_add_enemy(g, x, y)
 			elif g == "P":
 				_spawn_player(x, y)
 
@@ -145,14 +167,33 @@ func _path_piece(x: int, y: int) -> String:
 
 func _add_bush(x: int, y: int) -> void:
 	var b := Bush.new()
-	b.position = Vector2(x * TILE + TILE / 2.0, y * TILE + TILE / 2.0)
+	b.position = _cell_center(x, y)
 	actors.add_child(b)
 	bushes.append(b)
 
 
+func _add_pot(x: int, y: int) -> void:
+	var p := Pot.new()
+	p.position = _cell_center(x, y)
+	actors.add_child(p)
+	pots.append(p)
+
+
+func _add_enemy(glyph: String, x: int, y: int) -> void:
+	var e: BaseEnemy = ENEMY_SCRIPTS[glyph].new()
+	e.position = Vector2(x * TILE + TILE / 2.0, (y + 1) * TILE - 2)
+	actors.add_child(e)
+	enemies.append(e)
+
+
+func _cell_center(x: int, y: int) -> Vector2:
+	return Vector2(x * TILE + TILE / 2.0, y * TILE + TILE / 2.0)
+
+
 func _spawn_player(x: int, y: int) -> void:
 	player = PLAYER_SCENE.instantiate()
-	player.position = Vector2(x * TILE + TILE / 2.0, (y + 1) * TILE - 2)
+	spawn_point = Vector2(x * TILE + TILE / 2.0, (y + 1) * TILE - 2)
+	player.position = spawn_point
 	actors.add_child(player)
 	var cam := Camera2D.new()
 	cam.name = "Camera"
@@ -166,3 +207,11 @@ func _spawn_player(x: int, y: int) -> void:
 # Field size in pixels.
 func field_size() -> Vector2i:
 	return Vector2i(String(layout[0]).length() * TILE, layout.size() * TILE)
+
+
+# Joe fell: after a short beat he gets back up at the spawn with full hearts (Game Over screen: Phase 4).
+func _on_player_died() -> void:
+	deaths += 1
+	await get_tree().create_timer(RESPAWN_DELAY).timeout
+	if is_instance_valid(player):
+		player.revive(spawn_point)

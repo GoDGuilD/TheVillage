@@ -5,13 +5,13 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.0.0
+Version: 1.1.0
 -->
 
 # Development
 
 - Engine: `F:\Software\Godot\Godot_v4.7.2-stable_win64.exe` (editor) / `..._console.exe` (scripts, tests).
-- Python 3 + Pillow for the art tools: `python -I tools/gen_joe.py`, `python -I tools/gen_tiles.py`.
+- Python 3 + Pillow (art) and numpy (sound): `gen_joe.py`, `gen_tiles.py`, `gen_enemies.py`, `gen_props.py`, `gen_sfx.py` - run each with `python -I tools/<name>.py`.
 - Tests: see `TESTING.md`.
 
 ## Ignore files

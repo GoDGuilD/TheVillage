@@ -1,0 +1,24 @@
+{
+  "frame_size": [
+    32,
+    32
+  ],
+  "feet": [
+    16,
+    28
+  ],
+  "anims": {
+    "walk_down": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "walk_up": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "walk_side": {
+      "fps": 6.0,
+      "loop": true
+    }
+  }
+}

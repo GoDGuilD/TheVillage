@@ -1,21 +1,24 @@
 # File: Player.gd
-# Description: Top-down Joe: 8-way walking with A Link to the Past facing rules and corner nudging, sword slashes, being hurt.
+# Description: Top-down Joe: ALttP walking (facing rule, corner nudge), slash, charge + spin attack, shield block, lift/carry/throw, pickups, hurt and death.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 2.0.0
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
 ## so his head can overlap the tile above a wall. Children are built in code in _ready() so the scene file
 ## stays a one-liner and every number comes from PlayerTuning.
+##
+## States: idle, walk, attack, charge, spin, lift, carry, throw, hurt, dead.
 
 signal health_changed(current: int, maximum: int)
 signal died
 
 const SPRITE_DIR := "res://assets/sprites/joe/"
 const SHADOW_TEX := preload("res://assets/sprites/joe/joe_shadow.png")
+const THROWN_SCRIPT := preload("res://src/world/Thrown.gd")
 const FEET_BOX := Vector2(10, 6)          # world collision box (px) centred just above the feet
 const HURT_BOX := Vector2(12, 16)         # area enemies' hit boxes must touch to hurt Joe
 # Physics layers (see project.godot [layer_names]); values are bit values, not indices.
@@ -24,21 +27,32 @@ const LAYER_PLAYER := 2
 const LAYER_PLAYER_HITBOX := 8
 const LAYER_ENEMY_HITBOX := 16
 const LAYER_PLAYER_HURTBOX := 32
-const LAYER_CUTTABLE := 128
+const LAYER_PROPS := 128
+const SWORD_TIP := 18.0                   # px from the body centre to the held sword's tip (glint position)
+const DROP_TRAVEL := 2.0                  # a carried object dropped by a hit breaks right at Joe's feet
 
 # Cardinal facing; diagonal movement keeps the previous facing when it is one of the two components.
 var facing := Vector2i.DOWN
 var health: HealthComponent
 var sprite: AnimatedSprite2D
 var sword: HitBox
+var spin_box: HitBox
 var hurt_box: HurtBox
 var fsm: StateMachine
+var charged := false                      # spin attack ready (sword glinting)
+var carrying := ""                        # kind of the lifted object ("pot", "bush") or ""
+var carried_sprite: Sprite2D
 
 var _sword_shape: CollisionShape2D
 var _manifest: Dictionary = {}
 var _attack_buffer := 0.0
 var _hurt_left := 0.0
 var _iframes_left := 0.0
+var _frozen_left := 0.0
+var _charge_t := 0.0
+var _glint_t := 0.0
+var _timer := 0.0                         # generic countdown for timed states (spin, lift, throw)
+var _carried_tex: Texture2D
 var _knockback := Vector2.ZERO
 var _input_override = null                # tests may set a Vector2 here instead of reading the keyboard
 
@@ -46,16 +60,16 @@ var _input_override = null                # tests may set a Vector2 here instead
 func _ready() -> void:
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	collision_layer = LAYER_PLAYER
-	collision_mask = LAYER_WORLD | LAYER_CUTTABLE
+	collision_mask = LAYER_WORLD | LAYER_PROPS
 	_build_children()
 	health.max_health = PlayerTuning.MAX_HP
 	health.current_health = PlayerTuning.MAX_HP
 	health.health_changed.connect(func(c: int, m: int) -> void: health_changed.emit(c, m))
-	health.died.connect(func() -> void: died.emit())
+	health.died.connect(_on_died)
 	fsm.init(self, "idle")
 
 
-# Build collision, shadow, sprite, sword hit box, hurt box, health and state machine.
+# Build collision, shadow, sprite, sword + spin hit boxes, hurt box, health and state machine.
 func _build_children() -> void:
 	var feet := CollisionShape2D.new()
 	var feet_rect := RectangleShape2D.new()
@@ -95,6 +109,21 @@ func _build_children() -> void:
 	sword.add_child(_sword_shape)
 	add_child(sword)
 
+	spin_box = HitBox.new()
+	spin_box.name = "Spin"
+	spin_box.collision_layer = LAYER_PLAYER_HITBOX
+	spin_box.collision_mask = 0
+	spin_box.damage = PlayerTuning.SPIN_DAMAGE
+	spin_box.knockback = Vector2(PlayerTuning.SPIN_KNOCKBACK, 0)
+	spin_box.monitorable = false
+	var ss := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = PlayerTuning.SPIN_RADIUS
+	ss.shape = circle
+	ss.position = PlayerTuning.BODY_CENTER
+	spin_box.add_child(ss)
+	add_child(spin_box)
+
 	hurt_box = HurtBox.new()
 	hurt_box.name = "HurtBox"
 	hurt_box.collision_layer = LAYER_PLAYER_HURTBOX
@@ -119,6 +148,14 @@ func _build_children() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# Hit-stop: pause the state machine and the animation for a few frames.
+	if _frozen_left > 0.0:
+		_frozen_left -= delta
+		fsm.set_physics_process(false)
+		sprite.speed_scale = 0.0
+		return
+	fsm.set_physics_process(true)
+	sprite.speed_scale = 1.0
 	_attack_buffer = maxf(0.0, _attack_buffer - delta)
 	if _iframes_left > 0.0:
 		_iframes_left -= delta
@@ -159,6 +196,14 @@ func _dir_name() -> String:
 	return "side"
 
 
+func _facing_key() -> String:
+	if facing.x > 0:
+		return "right"
+	if facing.x < 0:
+		return "left"
+	return _dir_name()
+
+
 func _play(base: String) -> void:
 	sprite.flip_h = facing.x < 0
 	var anim := "%s_%s" % [base, _dir_name()]
@@ -166,9 +211,9 @@ func _play(base: String) -> void:
 		sprite.play(anim)
 
 
-# Walk at full speed; if a single-axis step is blocked near an obstacle's corner, slide around it.
-func _walk(dir: Vector2, delta: float) -> void:
-	velocity = dir.normalized() * PlayerTuning.WALK_SPEED if dir != Vector2.ZERO else Vector2.ZERO
+# Walk at `speed`; if a single-axis step is blocked near an obstacle's corner, slide around it.
+func _walk(dir: Vector2, delta: float, speed: float = PlayerTuning.WALK_SPEED) -> void:
+	velocity = dir.normalized() * speed if dir != Vector2.ZERO else Vector2.ZERO
 	var before := global_position
 	move_and_slide()
 	var axis_only := (dir.x == 0.0) != (dir.y == 0.0)
@@ -186,7 +231,41 @@ func _try_corner_nudge(step: Vector2, delta: float) -> void:
 				return
 
 
-# --- states -----------------------------------------------------------------------
+func _wants_attack() -> bool:
+	return Input.is_action_just_pressed("attack") or _attack_buffer > 0.0
+
+
+# Interact on a liftable thing in front of Joe; returns true if it started a lift.
+func _try_lift() -> bool:
+	if not Input.is_action_just_pressed("interact"):
+		return false
+	var target := liftable_in_front()
+	if target == null:
+		return false
+	var info: Dictionary = target.lift()
+	carrying = String(info["kind"])
+	_carried_tex = info["texture"]
+	fsm.transition_to("lift")
+	return true
+
+
+# The nearest liftable node (pot, bush) right in front of Joe's feet, or null.
+func liftable_in_front() -> Node2D:
+	var grab := global_position + Vector2(facing) * PlayerTuning.LIFT_REACH + PlayerTuning.LIFT_GRAB_OFFSET
+	var best: Node2D = null
+	var best_d := PlayerTuning.LIFT_RADIUS
+	for n in get_tree().get_nodes_in_group("liftable"):
+		var node := n as Node2D
+		if node == null or not node.call("can_lift"):
+			continue
+		var d := node.global_position.distance_to(grab)
+		if d <= best_d:
+			best = node
+			best_d = d
+	return best
+
+
+# --- states: moving ----------------------------------------------------------------
 
 func state_idle_enter() -> void:
 	velocity = Vector2.ZERO
@@ -197,8 +276,9 @@ func state_idle_update(delta: float) -> void:
 	if _wants_attack():
 		fsm.transition_to("attack")
 		return
-	var dir := _move_input()
-	if dir != Vector2.ZERO:
+	if _try_lift():
+		return
+	if _move_input() != Vector2.ZERO:
 		fsm.transition_to("walk")
 		return
 	_walk(Vector2.ZERO, delta)
@@ -207,6 +287,8 @@ func state_idle_update(delta: float) -> void:
 func state_walk_update(delta: float) -> void:
 	if _wants_attack():
 		fsm.transition_to("attack")
+		return
+	if _try_lift():
 		return
 	var dir := _move_input()
 	if dir == Vector2.ZERO:
@@ -217,6 +299,8 @@ func state_walk_update(delta: float) -> void:
 	_walk(dir, delta)
 
 
+# --- states: sword -------------------------------------------------------------------
+
 func state_attack_enter() -> void:
 	velocity = Vector2.ZERO
 	_attack_buffer = 0.0
@@ -224,6 +308,7 @@ func state_attack_enter() -> void:
 	sprite.flip_h = facing.x < 0
 	sprite.play("attack_%s" % _dir_name())
 	sprite.frame = 0
+	Audio.sfx("sword_slash")
 	_on_frame_changed()
 
 
@@ -236,22 +321,64 @@ func state_attack_exit() -> void:
 	sword.set_active(false)
 
 
-func state_hurt_enter() -> void:
-	_hurt_left = PlayerTuning.HURT_TIME
-	_play("hurt")
+# Holding the button after a slash: the sword stays out, Joe shuffles with his facing locked, and after
+# CHARGE_TIME the blade glints. Releasing a charged sword spins; releasing early just stops.
+func state_charge_enter() -> void:
+	_charge_t = 0.0
+	_glint_t = 0.0
+	charged = false
+	sprite.flip_h = facing.x < 0
+	sprite.play("charge_%s" % _dir_name())
 
 
-func state_hurt_update(delta: float) -> void:
-	_hurt_left -= delta
-	velocity = _knockback
-	move_and_slide()
-	if _hurt_left <= 0.0:
-		_knockback = Vector2.ZERO
+func state_charge_update(delta: float) -> void:
+	if not Input.is_action_pressed("attack"):
+		fsm.transition_to("spin" if charged else "idle")
+		return
+	var dir := _move_input()
+	_walk(dir, delta, PlayerTuning.CHARGE_WALK_SPEED)
+	if dir == Vector2.ZERO:
+		sprite.pause()
+	elif not sprite.is_playing():
+		sprite.play()
+	_charge_t += delta
+	if not charged and _charge_t >= PlayerTuning.CHARGE_TIME:
+		charged = true
+		Audio.sfx("charge_ready")
+		_glint()
+	elif charged:
+		_glint_t += delta
+		if _glint_t >= PlayerTuning.GLINT_EVERY:
+			_glint_t = 0.0
+			_glint()
+
+
+func _glint() -> void:
+	var tip := global_position + PlayerTuning.BODY_CENTER + Vector2(facing) * SWORD_TIP
+	Juice.play_fx("glint", tip, get_parent())
+
+
+func state_spin_enter() -> void:
+	velocity = Vector2.ZERO
+	charged = false
+	sprite.flip_h = false                   # the spin strip is drawn for every direction already
+	sprite.play("spin")
+	var spin_info: Dictionary = _manifest.get("spin", {})
+	var starts: Dictionary = spin_info.get("start", {})
+	sprite.frame = int(starts.get(_facing_key(), 0))
+	_timer = PlayerTuning.SPIN_TIME
+	spin_box.set_active(true)
+	Audio.sfx("sword_spin")
+
+
+func state_spin_update(delta: float) -> void:
+	_timer -= delta
+	if _timer <= 0.0:
 		fsm.transition_to("idle")
 
 
-func _wants_attack() -> bool:
-	return Input.is_action_just_pressed("attack") or _attack_buffer > 0.0
+func state_spin_exit() -> void:
+	spin_box.set_active(false)
 
 
 # Orient the slash box in front of Joe for the current facing.
@@ -281,21 +408,182 @@ func _on_animation_finished() -> void:
 	if _attack_buffer > 0.0:
 		state_attack_enter()                   # chained slash: restart the attack without leaving the state
 		return
+	if Input.is_action_pressed("attack"):
+		fsm.transition_to("charge")
+		return
 	fsm.transition_to("walk" if _move_input() != Vector2.ZERO else "idle")
 
 
-# --- damage -----------------------------------------------------------------------
+# --- states: lifting and throwing -------------------------------------------------------
+
+func state_lift_enter() -> void:
+	velocity = Vector2.ZERO
+	_timer = PlayerTuning.LIFT_TIME
+	carried_sprite = Sprite2D.new()
+	carried_sprite.texture = _carried_tex
+	carried_sprite.position = Vector2(Vector2(facing) * PlayerTuning.LIFT_REACH) + Vector2(0, -6)
+	carried_sprite.z_index = 1
+	add_child(carried_sprite)
+	var tw := carried_sprite.create_tween()
+	tw.tween_property(carried_sprite, "position", Vector2(0, -PlayerTuning.CARRY_HEIGHT), PlayerTuning.LIFT_TIME)
+	sprite.flip_h = facing.x < 0
+	sprite.play("lift_%s" % _dir_name())
+	Audio.sfx("lift")
+
+
+func state_lift_update(delta: float) -> void:
+	_timer -= delta
+	if _timer <= 0.0:
+		fsm.transition_to("carry")
+
+
+func state_carry_update(delta: float) -> void:
+	if Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("attack"):
+		fsm.transition_to("throw")
+		return
+	var dir := _move_input()
+	_update_facing(dir)
+	_play("carry_walk" if dir != Vector2.ZERO else "carry")
+	_walk(dir, delta)
+
+
+func state_throw_enter() -> void:
+	velocity = Vector2.ZERO
+	_timer = PlayerTuning.THROW_TIME
+	_release_carried(PlayerTuning.THROW_RANGE)
+	sprite.flip_h = facing.x < 0
+	sprite.play("throw_%s" % _dir_name())
+	Audio.sfx("throw")
+
+
+func state_throw_update(delta: float) -> void:
+	_timer -= delta
+	if _timer <= 0.0:
+		fsm.transition_to("idle")
+
+
+# Turn the carried object into a flying Thrown that travels `travel` px along the facing.
+func _release_carried(travel: float) -> Node2D:
+	if carrying == "":
+		return null
+	var t: CharacterBody2D = THROWN_SCRIPT.new()
+	t.kind = carrying
+	t.texture = _carried_tex
+	t.direction = Vector2(facing)
+	t.speed = PlayerTuning.THROW_SPEED
+	t.travel = travel
+	t.start_height = PlayerTuning.CARRY_HEIGHT
+	t.damage = PlayerTuning.THROW_DAMAGE
+	t.position = position
+	get_parent().add_child(t)
+	carrying = ""
+	if is_instance_valid(carried_sprite):
+		carried_sprite.queue_free()
+	carried_sprite = null
+	return t
+
+
+# --- states: damage ---------------------------------------------------------------------
+
+func state_hurt_enter() -> void:
+	_hurt_left = PlayerTuning.HURT_TIME
+	_play("hurt")
+
+
+func state_hurt_update(delta: float) -> void:
+	_hurt_left -= delta
+	velocity = _knockback
+	move_and_slide()
+	if _hurt_left <= 0.0:
+		_knockback = Vector2.ZERO
+		fsm.transition_to("idle")
+
+
+func state_dead_enter() -> void:
+	velocity = Vector2.ZERO
+	sword.set_active(false)
+	spin_box.set_active(false)
+	sprite.visible = true
+	_iframes_left = 0.0
+	_play("hurt")
+
+
+func state_dead_update(_delta: float) -> void:
+	pass
+
 
 func is_invincible() -> bool:
 	return _iframes_left > 0.0
 
 
+func is_dead() -> bool:
+	return fsm.current_state == "dead"
+
+
+# Hit-stop hook used by Juice.hit_stop.
+func freeze(seconds: float) -> void:
+	_frozen_left = maxf(_frozen_left, seconds)
+
+
+# The shield (always on Joe's arm) stops blockable hits coming at his front while he is not busy swinging.
+func blocks_from(source_position: Vector2) -> bool:
+	if not fsm.current_state in PlayerTuning.SHIELD_STATES:
+		return false
+	var to_src := source_position - (global_position + PlayerTuning.BODY_CENTER)
+	if to_src.length() < 0.01:
+		return false
+	return to_src.normalized().dot(Vector2(facing)) >= PlayerTuning.SHIELD_DOT
+
+
 func _on_hurt(damage: int, source_position: Vector2, _kb: Vector2) -> void:
+	if is_dead():
+		return
+	var hit := hurt_box.last_hit
+	if hit != null and hit.blockable and blocks_from(source_position):
+		Audio.sfx("shield_block")
+		Juice.play_fx("hit_spark", global_position + PlayerTuning.BODY_CENTER + Vector2(facing) * PlayerTuning.SHIELD_FX_OUT, get_parent())
+		var owner_node := hit.get_parent()
+		if owner_node != null and owner_node.has_method("deflect"):
+			owner_node.deflect()
+		return
 	if is_invincible() or not health.is_alive():
 		return
+	if carrying != "":
+		_release_carried(DROP_TRAVEL)       # a hit makes Joe drop what he carries
 	health.take_damage(damage)
+	if not health.is_alive():
+		return                               # _on_died takes over
+	Audio.sfx("hurt")
+	Juice.shake(PlayerTuning.HURT_SHAKE.x, PlayerTuning.HURT_SHAKE.y)
 	var away := (global_position + PlayerTuning.BODY_CENTER - source_position)
 	_knockback = (away.normalized() if away.length() > 0.01 else -Vector2(facing)) * PlayerTuning.HURT_KNOCKBACK_SPEED
 	_iframes_left = PlayerTuning.IFRAMES
 	HitFlash.flash(sprite)
 	fsm.transition_to("hurt")
+
+
+func _on_died() -> void:
+	Audio.sfx("player_die")
+	fsm.transition_to("dead")
+	died.emit()
+
+
+# Back on his feet at `at` with full health (the field calls this after a death).
+func revive(at: Vector2) -> void:
+	global_position = at
+	velocity = Vector2.ZERO
+	facing = Vector2i.DOWN
+	health.heal(health.max_health)
+	_iframes_left = 0.0
+	sprite.visible = true
+	fsm.transition_to("idle")
+
+
+# Pickup contract (Pickup.gd calls this on touch).
+func collect(kind: String) -> void:
+	if kind == "heart":
+		health.heal(PlayerTuning.HEART_HEAL)
+		Audio.sfx("pickup_heart")
+	elif GameState.GEM_VALUES.has(kind):
+		GameState.add_gems(int(GameState.GEM_VALUES[kind]))
+		Audio.sfx("pickup_gem")

@@ -1,0 +1,292 @@
+# File: gen_sfx.py
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield) as 16-bit mono WAVs and self-checks their levels.
+# Author: Jose-Jorge HERNANDEZ
+# Company: Parlee Conseiller, Inc.
+# Date: 2026-10-15
+# Last edit date: 2026-10-15
+# Version: 1.0.0
+#
+# Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
+# Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
+# swept band-pass, exponential envelopes, bit-crushing). Sounds aim at the SNES/ALttP palette:
+# short, bright, distinct from each other.
+import math
+import os
+import wave
+
+import numpy as np
+
+SEED = 1991                      # fixed seed -> identical output on every run
+SR = 44100                       # Hz
+FADE_S = 0.004                   # fade in/out applied to every effect (kills clicks)
+ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+SFX_DIR = os.path.join(ROOT, "assets", "audio", "sfx")
+TMP_DIR = os.path.join(ROOT, "tmp")
+rng = np.random.default_rng(SEED)
+
+
+# --------------------------------------------------------------- primitives
+def tt(dur):
+    """Time axis in seconds."""
+    return np.arange(int(round(dur * SR))) / SR
+
+
+def sweep(f0, f1, dur, curve=1.0):
+    """Per-sample frequency gliding exponentially from f0 to f1."""
+    n = int(round(dur * SR))
+    x = (np.arange(n) / max(1, n - 1)) ** curve
+    return f0 * (f1 / f0) ** x
+
+
+def phase(freq):
+    """Integrate a frequency array into a 0..1 phase (click-free sweeps)."""
+    return np.cumsum(freq) / SR % 1.0
+
+
+def pulse(freq, duty=0.5):
+    """NES/SNES-style pulse wave."""
+    return np.where(phase(freq) < duty, 1.0, -1.0)
+
+
+def tri(freq, levels=32):
+    """Stair-stepped triangle wave."""
+    w = 2.0 * np.abs(2.0 * phase(freq) - 1.0) - 1.0
+    return np.round(w * (levels / 2)) / (levels / 2)
+
+
+def noise(n):
+    """White noise in -1..1 (seeded)."""
+    return rng.uniform(-1.0, 1.0, n)
+
+
+def decay(n, tau, attack=0.001):
+    """Exponential decay with a short linear attack."""
+    env = np.exp(-(np.arange(n) / SR) / tau)
+    a = max(1, int(attack * SR))
+    env[:a] *= np.linspace(0, 1, a)
+    return env
+
+
+def bandpass(x, fc, q=2.0):
+    """State-variable band-pass with a per-sample centre frequency."""
+    low = band = 0.0
+    out = np.empty(len(x))
+    inv_q = 1.0 / q
+    for i in range(len(x)):
+        f = 2.0 * math.sin(math.pi * min(fc[i], SR / 6.0) / SR)
+        low += f * band
+        high = x[i] - low - inv_q * band
+        band += f * high
+        out[i] = band
+    return out
+
+
+def lowpass(x, cutoff):
+    """One-pole low-pass."""
+    a = 1 - math.exp(-2 * math.pi * cutoff / SR)
+    out = np.empty(len(x))
+    y = 0.0
+    for i in range(len(x)):
+        y += a * (x[i] - y)
+        out[i] = y
+    return out
+
+
+def crush(x, step):
+    """Sample-and-hold bit crusher."""
+    return x[(np.arange(len(x)) // step) * step]
+
+
+def fit(n, *arrs):
+    """Trim/pad arrays to length n so layers can be summed."""
+    return [np.pad(a, (0, max(0, n - len(a))))[:n] for a in arrs]
+
+
+def finish(x, peak_db):
+    """Remove DC, fade the ends, normalise to the requested peak."""
+    x = x - x.mean()
+    f = int(FADE_S * SR)
+    x[:f] *= np.linspace(0, 1, f)
+    x[-f:] *= np.linspace(1, 0, f)
+    return x / np.max(np.abs(x)) * 10 ** (peak_db / 20)
+
+
+def notes(seq, duty=0.25, tau=0.06):
+    """Consecutive pulse blips: seq = [(freq, seconds), ...]."""
+    parts = []
+    for f, d in seq:
+        n = int(d * SR)
+        parts.append(pulse(np.full(n, f), duty) * decay(n, tau))
+    return np.concatenate(parts)
+
+
+def whoosh(f0, f1, dur, q, body, body_f):
+    """Swing whoosh: swept band-passed noise plus a singing pulse sweep."""
+    n = int(dur * SR)
+    s = bandpass(noise(n), sweep(f0, f1, dur), q)
+    s /= np.max(np.abs(s))
+    env = np.sin(np.pi * (np.arange(n) / n) ** 0.7) ** 1.5
+    return s * env + body * 0.5 * pulse(sweep(body_f[0], body_f[1], dur), 0.25) * env
+
+
+# ------------------------------------------------------------------- effects
+def sword_slash():
+    return whoosh(600, 3400, 0.15, 1.8, 0.6, (600, 1300))
+
+
+def sword_spin():
+    # Two overlapping rising whooshes plus a ringing tone: the spin feels bigger than a slash.
+    a = whoosh(300, 2600, 0.42, 1.2, 0.9, (300, 1400))
+    ring = np.sin(2 * np.pi * phase(sweep(1200, 2400, 0.42))) * decay(int(0.42 * SR), 0.3) * 0.4
+    a, ring = fit(len(a), a, ring)
+    return a + ring
+
+
+def charge_ready():
+    # Bright "ting" when the spin attack is charged.
+    t = tt(0.35)
+    n = len(t)
+    return (np.sin(2 * np.pi * 2637 * t) + 0.5 * np.sin(2 * np.pi * 3951 * t)) * decay(n, 0.09)
+
+
+def enemy_hit():
+    n = int(0.12 * SR)
+    thump = pulse(sweep(320, 90, 0.12), 0.5) * decay(n, 0.035)
+    nb = lowpass(noise(n), 5000) * decay(n, 0.02)
+    return crush(thump * 0.8 + nb * 0.7, 2)
+
+
+def enemy_die():
+    d = 0.45
+    n = int(d * SR)
+    base = noise(n)
+    out = np.empty(n)
+    step_t, i = 1.0, 0
+    while i < n:                                   # grit whose hold grows: the crunch pitch falls
+        step = int(step_t)
+        out[i:i + step] = base[i]
+        i += step
+        step_t = min(36.0, step_t * 1.05 + 0.2)
+    blip = pulse(sweep(1200, 150, d), 0.125) * decay(n, 0.1)
+    return out * decay(n, 0.12) * 0.8 + blip * 0.5
+
+
+def hurt():
+    d = 0.24
+    n = int(d * SR)
+    f = sweep(600, 200, d) * (1 + 0.05 * np.sin(2 * np.pi * 30 * tt(d)))
+    return pulse(f, 0.5) * decay(n, 0.12) + 0.4 * crush(noise(n), 3) * decay(n, 0.03)
+
+
+def player_die():
+    d = 1.0
+    n = int(d * SR)
+    f = sweep(700, 70, d, 0.7)
+    return pulse(f, 0.25) * decay(n, 0.45) * 0.7 + tri(f * 0.5) * decay(n, 0.55)
+
+
+def bush_cut():
+    n = int(0.16 * SR)
+    rustle = bandpass(noise(n), sweep(3500, 1500, 0.16), 1.5)
+    rustle /= np.max(np.abs(rustle))
+    return rustle * decay(n, 0.05) + 0.3 * pulse(sweep(500, 250, 0.16), 0.125) * decay(n, 0.04)
+
+
+def lift():
+    n = int(0.12 * SR)
+    return tri(sweep(180, 420, 0.12)) * decay(n, 0.08) + 0.3 * lowpass(noise(n), 1200) * decay(n, 0.03)
+
+
+def throw():
+    return whoosh(900, 300, 0.16, 1.4, 0.3, (500, 300))
+
+
+def shatter():
+    n = int(0.3 * SR)
+    out = np.zeros(n)
+    for k in range(7):                             # several bright shards landing a few ms apart
+        start = int(rng.uniform(0, 0.12) * SR)
+        m = int(0.06 * SR)
+        c = bandpass(noise(m), np.full(m, rng.uniform(2500, 6000)), 5.0) * decay(m, 0.012)
+        c /= np.max(np.abs(c)) + 1e-9
+        seg = c[:n - start]
+        out[start:start + len(seg)] += seg * (1.0 - k * 0.08)
+    thud = tri(sweep(150, 60, 0.3)) * decay(n, 0.05)
+    return out + thud * 0.8
+
+
+def pickup_heart():
+    return notes([(1046.5, 0.06), (1318.5, 0.06), (1568.0, 0.12)], 0.25, 0.07)
+
+
+def pickup_gem():
+    return notes([(1568.0, 0.05), (2093.0, 0.1)], 0.125, 0.06)
+
+
+def shield_block():
+    t = tt(0.18)
+    n = len(t)
+    clang = (np.sin(2 * np.pi * 1800 * t) + 0.6 * np.sin(2 * np.pi * 2710 * t)) * decay(n, 0.05)
+    return clang + 0.5 * crush(noise(n), 2) * decay(n, 0.01)
+
+
+def spit():
+    n = int(0.12 * SR)
+    return pulse(sweep(220, 600, 0.12), 0.25) * decay(n, 0.06) + 0.4 * lowpass(noise(n), 2000) * decay(n, 0.02)
+
+
+# name -> (generator, peak dB)
+SFX = {
+    "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
+    "enemy_hit": (enemy_hit, -3.5), "enemy_die": (enemy_die, -4.0), "hurt": (hurt, -3.5),
+    "player_die": (player_die, -3.5), "bush_cut": (bush_cut, -5.0), "lift": (lift, -5.5), "throw": (throw, -5.5),
+    "shatter": (shatter, -4.0), "pickup_heart": (pickup_heart, -5.5), "pickup_gem": (pickup_gem, -6.0),
+    "shield_block": (shield_block, -5.0), "spit": (spit, -5.5),
+}
+
+
+def write_wav(path, x):
+    """16-bit mono PCM; returns the quantised data for checking."""
+    pcm = np.clip(np.round(x * 32767), -32768, 32767).astype("<i2")
+    with wave.open(path, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(SR)
+        w.writeframes(pcm.tobytes())
+    return pcm.astype(np.float64) / 32768.0
+
+
+def main():
+    os.makedirs(SFX_DIR, exist_ok=True)
+    os.makedirs(TMP_DIR, exist_ok=True)
+    data, bad = {}, 0
+    for name, (gen, pk) in SFX.items():
+        y = write_wav(os.path.join(SFX_DIR, name + ".wav"), finish(gen(), pk))
+        data[name] = y
+        peak = 20 * math.log10(np.max(np.abs(y)))
+        flags = ""
+        if peak > -2.9 or peak < -6.1:
+            flags += " BAD-LEVEL"
+        if abs(y[0]) > 0.003 or abs(y[-1]) > 0.003:
+            flags += " CLICK"
+        bad += bool(flags)
+        print("%-14s %6.3f s  peak %6.2f dB%s" % (name, len(y) / SR, peak, flags))
+    try:
+        from PIL import Image, ImageDraw
+        W, H = 900, 30
+        img = Image.new("RGB", (W, H * len(data)), (20, 20, 28))
+        dr = ImageDraw.Draw(img)
+        for r, (name, y) in enumerate(data.items()):
+            cy = r * H + H // 2
+            for cx, c in enumerate(np.array_split(np.abs(y), W)):
+                h = int(c.max() * (H / 2 - 1))
+                dr.line([(cx, cy - h), (cx, cy + h)], fill=(120, 200, 255))
+            dr.text((4, r * H + 1), name, fill=(255, 220, 120))
+        img.save(os.path.join(TMP_DIR, "sfx_waveforms.png"))
+    except ImportError:
+        pass
+    print("%d effects, %d with problems" % (len(data), bad))
+
+
+if __name__ == "__main__":
+    main()

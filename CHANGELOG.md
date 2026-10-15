@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 3.0.0
+Version: 4.0.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,28 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [3.0.0] - 2026-10-15 — Phase 2: combat core and game feel
+
+### Added
+- Spin attack: hold the sword button after a slash, shuffle at half speed with the facing locked, the blade glints
+  after 0.8 s, release for a 360 degree spin (4 damage).
+- The family shield on every Joe frame; it blocks enemy rocks hitting his front (idle, walking, charging).
+- Lift, carry and throw pots and bushes (interact); thrown objects arc 4 tiles, hurt enemies, shatter; a hit makes
+  Joe drop what he carries.
+- Enemies on a shared `BaseEnemy` (knockback, hit flash, i-frames, hit-stop, death puff, drops): slime, Caver's
+  guard (patrol + axis chase), rock-spitter (spits blockable rocks).
+- `GameState` (gems, drop table), `Pickup` (recovery heart; green/blue/red gems worth 1/5/20), minimal `Hud`
+  (hearts with halves, gem counter), respawn at the field spawn after dying.
+- Autoloads `Juice` (shake, hit-stop, one-shot effects) and `Audio` (pooled SFX), ported and trimmed from Chapel.
+- Generators: `tools/gen_enemies.py`, `tools/gen_props.py` (pot, pickups, HUD hearts/digits, poof/spark/glint/shards),
+  `tools/gen_sfx.py` (15 chiptune effects); `gen_joe.py` v2 adds the shield and charge/spin/lift/carry/throw strips.
+- `tests/test_combat.gd` (56 checks); `tools/capture_field.gd` v2 captures charge, spin, carry, throw and enemies.
+
+### Changed
+- Physics layer 8 renamed `Cuttable` -> `Props` (bushes and pots); `HitBox.blockable`.
+- Meadow layout now has pots, three slimes, two guards and two spitters.
+- 92 checks in 2 suites, all passing.
 
 ## [2.0.0] - 2026-10-15 — Rebuild on the Chapel of Dreams architecture, Phases 0 and 1
 

@@ -79,6 +79,92 @@
       "frames": 1,
       "fps": 1.0,
       "loop": false
+    },
+    "charge_down": {
+      "frames": 4,
+      "fps": 8.0,
+      "loop": true
+    },
+    "charge_up": {
+      "frames": 4,
+      "fps": 8.0,
+      "loop": true
+    },
+    "charge_side": {
+      "frames": 4,
+      "fps": 8.0,
+      "loop": true
+    },
+    "lift_down": {
+      "frames": 2,
+      "fps": 10.0,
+      "loop": false
+    },
+    "lift_up": {
+      "frames": 2,
+      "fps": 10.0,
+      "loop": false
+    },
+    "lift_side": {
+      "frames": 2,
+      "fps": 10.0,
+      "loop": false
+    },
+    "carry_down": {
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    "carry_up": {
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    "carry_side": {
+      "frames": 1,
+      "fps": 1.0,
+      "loop": true
+    },
+    "carry_walk_down": {
+      "frames": 6,
+      "fps": 12.0,
+      "loop": true
+    },
+    "carry_walk_up": {
+      "frames": 6,
+      "fps": 12.0,
+      "loop": true
+    },
+    "carry_walk_side": {
+      "frames": 6,
+      "fps": 12.0,
+      "loop": true
+    },
+    "throw_down": {
+      "frames": 2,
+      "fps": 12.0,
+      "loop": false
+    },
+    "throw_up": {
+      "frames": 2,
+      "fps": 12.0,
+      "loop": false
+    },
+    "throw_side": {
+      "frames": 2,
+      "fps": 12.0,
+      "loop": false
+    },
+    "spin": {
+      "frames": 8,
+      "fps": 24.0,
+      "loop": true,
+      "start": {
+        "right": 0,
+        "down": 2,
+        "left": 4,
+        "up": 6
+      }
     }
   }
 }

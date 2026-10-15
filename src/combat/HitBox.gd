@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-12
-# Last edit date: 2026-10-12
-# Version: 1.1.0
+# Last edit date: 2026-10-15
+# Version: 1.2.0
 class_name HitBox
 extends Area2D
 ## Detects nothing itself (monitoring is off). It is only found by HurtBoxes whose mask matches this layer.
@@ -18,6 +18,8 @@ signal landed(hurt_box: HurtBox)
 @export var knockback: Vector2 = Vector2(60.0, 80.0)
 # "" (physical), "fire", "frost", "lightning" or "holy": decides weakness/resistance and status effects.
 @export var element: String = ""
+# True for hits a shield can stop (enemy projectiles); the target decides whether it actually blocked.
+@export var blockable: bool = false
 
 
 func _ready() -> void:

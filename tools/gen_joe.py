@@ -1,10 +1,10 @@
 # File: gen_joe.py
-# Description: Generates Joe's top-down sprite strips (idle, walk, sword slash, hurt in three facings) plus his drop shadow and an animation manifest.
+# Description: Generates Joe's top-down sprite strips (idle, walk, slash, hurt, charge, spin, lift, carry, throw; shield on) plus his shadow and an animation manifest.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 2.0.0
 #
 # Run:  python -I tools/gen_joe.py   (from the project root; writes assets/sprites/joe/ and tmp/joe_preview.png)
 #
@@ -21,8 +21,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from palette import (BOOT_DARK, BOOT_MID, CLEAR, COAT_DARK, COAT_LIGHT, COAT_MID, EYE_GREEN, GOLD, GOLD_DARK,
                      HAIR_DARK, HAIR_LIGHT, HAIR_MID, HILT_DARK, OUTLINE, PANTS_DARK, PANTS_MID, SCARF_DARK,
-                     SCARF_RED, SHADOW, SKIN_DARK, SKIN_LIGHT, SKIN_MID, SLASH_A, SLASH_B, STEEL_DARK,
-                     STEEL_LIGHT, STEEL_MID)
+                     SCARF_RED, SHADOW, SHIELD_DARK, SHIELD_FACE, SHIELD_RIM, SKIN_DARK, SKIN_LIGHT, SKIN_MID,
+                     SLASH_A, SLASH_B, SPIN_A, SPIN_B, STEEL_DARK, STEEL_LIGHT, STEEL_MID)
 from sprite_lib import Canvas, pack_strip, upscale
 from PIL import Image
 
@@ -61,9 +61,22 @@ WALK_VERT = [(0, 0, 0, 0, 0), (2, 0, -1, 1, -1), (1, 0, 0, 1, -1),
 # Walk cycle for the side view: (front-leg stride, lift of the passing leg, body bob, arm swing).
 WALK_SIDE = [(0, 0, 0, 0), (2, 1, -1, 2), (3, 0, 0, 2), (0, 0, 0, 0), (-2, 1, -1, -2), (-3, 0, 0, -2)]
 
+# Charge shuffle reuses these walk-cycle frames (legs only; the sword is held forward).
+CHARGE_WALK_FRAMES = [0, 1, 3, 4]
+# Spin attack: 8 frames, the sword advancing 45 degrees per frame (clockwise on screen) with a trail behind it.
+SPIN_FRAMES = 8
+SPIN_STEP = 45
+SPIN_TRAIL = 100
+# Frame the spin starts on for each facing (frame i has the sword at i*45 degrees: 0 = right, 90 = down).
+SPIN_START = {"right": 0, "down": 2, "left": 4, "up": 6}
+LIFT_HEIGHTS = [0.0, 1.0]        # arm height per lift frame (0 = chest, 1 = over the head)
+THROW_HEIGHTS = [0.6, 0.0]       # arm height per throw frame
+
 # Animation table written to the manifest: name -> (frames per facing, fps, loop).
 ANIMS = {"idle": (2, 2.0, True), "walk": (6, 12.0, True), "attack": (len(ATTACK_FRAMES), 22.0, False),
-         "hurt": (1, 1.0, False)}
+         "hurt": (1, 1.0, False), "charge": (len(CHARGE_WALK_FRAMES), 8.0, True), "lift": (2, 10.0, False),
+         "carry": (1, 1.0, True), "carry_walk": (6, 12.0, True), "throw": (2, 12.0, False)}
+SPIN_FPS = 24.0
 
 
 # --------------------------------------------------------------------------- body parts
@@ -107,6 +120,38 @@ def _arm_vertical(c, x, fy, swing):
     c.set(x, fy - 7 + swing, SKIN_LIGHT)
 
 
+def _arm_raised(c, x, fy, height):
+    """A sleeve raised beside the head (lifting/carrying); height 0 = hands at the chest, 1 = over the head."""
+    top = fy - 13 - height * 9
+    c.rect(x, top, 2, fy - 9 - top, COAT_MID)
+    c.rect(x, top, 1, fy - 9 - top, COAT_LIGHT)
+    c.rect(x, top - 2, 2, 2, SKIN_MID)
+    c.set(x, top - 2, SKIN_LIGHT)
+
+
+def _shield_front(c, cx, fy):
+    """Family shield on Joe's left arm, seen from the front (screen right when he faces down)."""
+    c.rect(cx + 4, fy - 12, 6, 8, SHIELD_RIM)
+    c.rect(cx + 5, fy - 11, 4, 6, SHIELD_FACE)
+    c.rect(cx + 5, fy - 6, 4, 1, SHIELD_DARK)
+    c.rect(cx + 6, fy - 10, 2, 3, GOLD)
+    c.set(cx + 7, fy - 8, GOLD_DARK)
+
+
+def _shield_back(c, cx, fy):
+    """The shield's back (leather straps) on the left arm, seen from behind (screen left)."""
+    c.rect(cx - 10, fy - 12, 6, 8, SHIELD_RIM)
+    c.rect(cx - 9, fy - 11, 4, 6, SHIELD_DARK)
+    c.rect(cx - 9, fy - 9, 4, 1, HILT_DARK)
+
+
+def _shield_side(c, cx, fy):
+    """Shield held out in front while facing right (a narrow slab, emblem edge-on)."""
+    c.rect(cx + 4, fy - 13, 3, 9, SHIELD_RIM)
+    c.rect(cx + 5, fy - 12, 2, 7, SHIELD_FACE)
+    c.set(cx + 6, fy - 9, GOLD)
+
+
 def _head_vertical(c, cx, fy, back, eyes_closed=False):
     """Big ALttP-style head: hair cap + face (front) or full hair (back)."""
     hy = fy - 18
@@ -142,13 +187,23 @@ def _head_vertical(c, cx, fy, back, eyes_closed=False):
 def _figure_vertical(c, cx, fy, back, pose):
     """Whole front/back figure. pose: lift_l, lift_r, bob, arm_l, arm_r, eyes_closed, hide_right_arm."""
     fy_b = fy + pose.get("bob", 0)
+    raised = pose.get("raised")                       # None, or 0..1 arm height when lifting/carrying
     _legs_vertical(c, cx, fy, pose.get("lift_l", 0), pose.get("lift_r", 0))
     _torso_vertical(c, cx, fy_b, back)
-    if not pose.get("hide_left_arm"):
-        _arm_vertical(c, cx - 7, fy_b, pose.get("arm_l", 0))
-    if not pose.get("hide_right_arm"):
-        _arm_vertical(c, cx + 5, fy_b, pose.get("arm_r", 0))
+    if raised is None:
+        if not pose.get("hide_left_arm"):
+            _arm_vertical(c, cx - 7, fy_b, pose.get("arm_l", 0))
+        if not pose.get("hide_right_arm"):
+            _arm_vertical(c, cx + 5, fy_b, pose.get("arm_r", 0))
     _head_vertical(c, cx, fy_b, back, pose.get("eyes_closed", False))
+    if raised is not None:
+        _arm_raised(c, cx - 7, fy_b, raised)
+        _arm_raised(c, cx + 5, fy_b, raised)
+    elif pose.get("shield", True):
+        if back:
+            _shield_back(c, cx, fy_b)
+        else:
+            _shield_front(c, cx, fy_b)
 
 
 def _figure_side(c, cx, fy, pose):
@@ -194,11 +249,18 @@ def _figure_side(c, cx, fy, pose):
     else:
         c.set(cx + 3, hy, EYE_GREEN)
         c.set(cx + 3, hy + 1, OUTLINE)
-    # Front arm swinging forward/back.
-    if not pose.get("hide_arm"):
+    # Front arm swinging forward/back, or raised over the head when lifting/carrying.
+    raised = pose.get("raised")
+    if raised is not None:
+        top = fy_b - 13 - int(raised * 9)
+        c.rect(cx, top, 2, fy_b - 9 - top, COAT_LIGHT)
+        c.rect(cx, top - 2, 2, 2, SKIN_MID)
+    elif not pose.get("hide_arm"):
         a = pose.get("arm", 0)
         c.rect(cx - 1 + a // 2, fy_b - 12, 2, 5, COAT_LIGHT)
         c.rect(cx - 1 + a, fy_b - 7, 2, 2, SKIN_MID)
+    if raised is None and pose.get("shield", True):
+        _shield_side(c, cx, fy_b)
 
 
 def _draw_figure(c, facing, cx, fy, pose):
@@ -233,8 +295,8 @@ def _draw_sword(c, center, angle_deg):
     c.rect(round(hand[0]) - 1, round(hand[1]) - 1, 2, 2, SKIN_MID)
 
 
-def _draw_trail(c, center, a0, a1):
-    """White-blue slash arc between angles a0..a1 (degrees, clockwise), drawn without an outline."""
+def _draw_trail(c, center, a0, a1, core=SLASH_A, fade=SLASH_B):
+    """Slash arc between angles a0..a1 (degrees, clockwise), drawn without an outline (white-blue by default)."""
     lo, hi = min(a0, a1), max(a0, a1)
     for y in range(c.h):
         for x in range(c.w):
@@ -249,7 +311,7 @@ def _draw_trail(c, center, a0, a1):
             while ang >= lo + 360.0:
                 ang -= 360.0
             if ang <= hi and c.px[x, y][3] == 0:
-                c.set(x, y, SLASH_A if TRAIL_CORE[0] <= r <= TRAIL_CORE[1] else SLASH_B)
+                c.set(x, y, core if TRAIL_CORE[0] <= r <= TRAIL_CORE[1] else fade)
 
 
 # --------------------------------------------------------------------------- frames
@@ -301,7 +363,8 @@ def frame_attack(facing, i):
     if facing == "side":
         pose = {"hide_arm": True, "stride": 1 if lean else 0}
     else:
-        pose = {"hide_right_arm": facing == "down", "hide_left_arm": facing == "up"}
+        # The sword hand is Joe's right: screen left when he faces down, screen right from behind.
+        pose = {"hide_left_arm": facing == "down", "hide_right_arm": facing == "up"}
     if behind:
         _draw_sword(c, center, sword_angle)
         _draw_figure(c, facing, cx, fy, pose)
@@ -326,7 +389,98 @@ def frame_hurt(facing, i):
     return c
 
 
-BUILDERS = {"idle": frame_idle, "walk": frame_walk, "attack": frame_attack, "hurt": frame_hurt}
+def frame_charge(facing, i):
+    """Holding a charged sword straight ahead while shuffling (legs from the walk cycle)."""
+    walk_i = CHARGE_WALK_FRAMES[i]
+    if facing == "side":
+        stride, lift, bob, _arm = WALK_SIDE[walk_i]
+        pose = {"stride": stride, "lift": lift, "bob": bob, "hide_arm": True}
+    else:
+        lift_l, lift_r, bob, _al, _ar = WALK_VERT[walk_i]
+        pose = {"lift_l": lift_l, "lift_r": lift_r, "bob": bob,
+                "hide_left_arm": facing == "down", "hide_right_arm": facing == "up"}
+    base = FACING_ANGLE[facing]
+    center = (FEET[0], FEET[1] - 9)
+    c = Canvas(FRAME, FRAME)
+    if facing == "up":
+        _draw_sword(c, center, base)                 # pointing away from the camera: behind the body
+        _draw_figure(c, facing, FEET[0], FEET[1], pose)
+    else:
+        _draw_figure(c, facing, FEET[0], FEET[1], pose)
+        _draw_sword(c, center, base)
+    c.outline(OUTLINE)
+    return c
+
+
+def frame_spin(i):
+    """One step of the 360 degree spin: sword at i*45 degrees, body facing the nearest cardinal behind it."""
+    angle = i * SPIN_STEP
+    facing_for = {0: "side", 90: "down", 180: "side", 270: "up"}
+    body_angle = (angle // 90) * 90
+    facing = facing_for[body_angle]
+    center = (FEET[0], FEET[1] - 9)
+    body = Canvas(FRAME, FRAME)
+    pose = {"hide_arm": True, "hide_left_arm": facing == "down", "hide_right_arm": facing == "up"}
+    _draw_figure(body, facing, FEET[0], FEET[1], pose)
+    if body_angle == 180:
+        body = body.flipped()                        # facing left is the mirrored side view
+    c = Canvas(FRAME, FRAME)
+    behind = math.sin(math.radians(angle)) < -0.2
+    if behind:
+        _draw_sword(c, center, angle)
+        c.paste(body)
+    else:
+        c.paste(body)
+        _draw_sword(c, center, angle)
+    c.outline(OUTLINE)
+    _draw_trail(c, center, angle - SPIN_TRAIL, angle, SPIN_A, SPIN_B)
+    return c
+
+
+def frame_lift(facing, i):
+    """Lifting an object: hands at the chest, then over the head."""
+    c = Canvas(FRAME, FRAME)
+    _draw_figure(c, facing, FEET[0], FEET[1], {"raised": LIFT_HEIGHTS[i], "bob": 1 if i == 0 else 0})
+    c.outline(OUTLINE)
+    return c
+
+
+def frame_carry(facing, i):
+    """Standing with the object held over the head."""
+    c = Canvas(FRAME, FRAME)
+    _draw_figure(c, facing, FEET[0], FEET[1], {"raised": 1.0})
+    c.outline(OUTLINE)
+    return c
+
+
+def frame_carry_walk(facing, i):
+    """Walking with the object held over the head."""
+    c = Canvas(FRAME, FRAME)
+    if facing == "side":
+        stride, lift, bob, _arm = WALK_SIDE[i]
+        pose = {"stride": stride, "lift": lift, "bob": bob, "raised": 1.0}
+    else:
+        lift_l, lift_r, bob, _al, _ar = WALK_VERT[i]
+        pose = {"lift_l": lift_l, "lift_r": lift_r, "bob": bob, "raised": 1.0}
+    _draw_figure(c, facing, FEET[0], FEET[1], pose)
+    c.outline(OUTLINE)
+    return c
+
+
+def frame_throw(facing, i):
+    """Throwing: arms snap forward (frame 0 still high, frame 1 at the chest), leaning in."""
+    base = FACING_ANGLE[facing]
+    lx = round(math.cos(math.radians(base)) * (i + 1))
+    ly = round(math.sin(math.radians(base)) * (i + 1))
+    c = Canvas(FRAME, FRAME)
+    _draw_figure(c, facing, FEET[0] + lx, FEET[1] + ly, {"raised": THROW_HEIGHTS[i]})
+    c.outline(OUTLINE)
+    return c
+
+
+BUILDERS = {"idle": frame_idle, "walk": frame_walk, "attack": frame_attack, "hurt": frame_hurt,
+            "charge": frame_charge, "lift": frame_lift, "carry": frame_carry, "carry_walk": frame_carry_walk,
+            "throw": frame_throw}
 
 
 def make_shadow():
@@ -351,6 +505,11 @@ def main():
                 entry["hit_window"] = ATTACK_HIT_WINDOW
             manifest["anims"][name] = entry
             rows.append(frames)
+    # The spin is one strip shared by every facing; the manifest says where each facing starts.
+    spin = [frame_spin(i) for i in range(SPIN_FRAMES)]
+    pack_strip(spin).save(os.path.join(OUT_DIR, "joe_spin.png"))
+    manifest["anims"]["spin"] = {"frames": SPIN_FRAMES, "fps": SPIN_FPS, "loop": True, "start": SPIN_START}
+    rows.append(spin)
     make_shadow().img.save(os.path.join(OUT_DIR, "joe_shadow.png"))
     with open(os.path.join(OUT_DIR, "joe_animations.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)

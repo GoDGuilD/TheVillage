@@ -1,0 +1,34 @@
+{
+  "poof.png": {
+    "frame_size": [
+      32,
+      32
+    ],
+    "fps": 16.0,
+    "origin": "center"
+  },
+  "hit_spark.png": {
+    "frame_size": [
+      16,
+      16
+    ],
+    "fps": 24.0,
+    "origin": "center"
+  },
+  "glint.png": {
+    "frame_size": [
+      9,
+      9
+    ],
+    "fps": 16.0,
+    "origin": "center"
+  },
+  "shards.png": {
+    "frame_size": [
+      32,
+      32
+    ],
+    "fps": 14.0,
+    "origin": "center"
+  }
+}

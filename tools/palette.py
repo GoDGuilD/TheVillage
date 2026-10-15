@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.2.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -58,6 +58,13 @@ STEEL_LIGHT = _hex("#e8f0ff")
 HILT_DARK   = _hex("#5a3020")
 SLASH_A     = _hex("#ffffff")  # sword-arc core
 SLASH_B     = _hex("#a8d0ff")  # sword-arc fade
+SPIN_A      = _hex("#fff4a0")  # spin-attack arc core (warmer than a slash)
+SPIN_B      = _hex("#f0b040")  # spin-attack arc fade
+
+# --- Shield (the family shield: deep blue face, steel rim, gold emblem) ----
+SHIELD_FACE = _hex("#3050a8")
+SHIELD_DARK = _hex("#203470")
+SHIELD_RIM  = _hex("#c0c8e0")
 
 # --- Light World ground -----------------------------------------------------
 GRASS_DARK   = _hex("#287838")
@@ -91,6 +98,38 @@ WATER_DARK  = _hex("#2850a8")
 WATER_MID   = _hex("#3878d0")
 WATER_LIGHT = _hex("#70a8f0")
 WATER_FOAM  = _hex("#d0e8ff")
+
+# --- Enemies ------------------------------------------------------------------
+SLIME_DARK   = _hex("#1c4c78")   # jelly slime (blue gel)
+SLIME_MID    = _hex("#3c88c8")
+SLIME_LIGHT  = _hex("#88c8f0")
+CAVER_DARK   = _hex("#4c1028")   # Caver's colours on his cursed guards' tabards
+CAVER_RED    = _hex("#901c44")
+CAVER_LIGHT  = _hex("#c8406c")
+SPIT_DARK    = _hex("#a03420")   # rock-spitter shell (octorok-like)
+SPIT_MID     = _hex("#e06838")
+SPIT_LIGHT   = _hex("#f8a868")
+
+# --- Props, pickups, effects -------------------------------------------------
+POT_DARK     = _hex("#6c3c24")
+POT_MID      = _hex("#b0683c")
+POT_LIGHT    = _hex("#e09c68")
+HEART_RED    = _hex("#e82840")
+HEART_LIGHT  = _hex("#ff98a0")
+GEM_G_DARK   = _hex("#1c7028")   # gems are the money (green 1, blue 5, red 20)
+GEM_G_MID    = _hex("#40c050")
+GEM_G_LIGHT  = _hex("#b0f8a0")
+GEM_B_DARK   = _hex("#1c3c98")
+GEM_B_MID    = _hex("#4878e8")
+GEM_B_LIGHT  = _hex("#b8d0ff")
+GEM_R_DARK   = _hex("#8c1428")
+GEM_R_MID    = _hex("#e83850")
+GEM_R_LIGHT  = _hex("#ffb0b8")
+SMOKE_LIGHT  = _hex("#f4f4fc")
+SMOKE_MID    = _hex("#b8b8cc")
+SMOKE_DARK   = _hex("#787890")
+SPARK_CORE   = _hex("#fffce0")
+SPARK_EDGE   = _hex("#f8d040")
 
 # --- Dark World (the Caver's mirror of the same land) ----------------------
 DW_GRASS_DARK  = _hex("#3c3048")
