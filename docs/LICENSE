@@ -1,0 +1,15 @@
+<!--
+File: LICENSE
+Description: License terms.
+Author: Jose-Jorge HERNANDEZ
+Company: Parlee Conseiller, Inc.
+Date: 2026-10-15
+Last edit date: 2026-10-15
+Version: 1.0.0
+-->
+
+# License
+
+Copyright (c) 2024-2026 Parlee Conseiller, Inc. All rights reserved.
+
+No license is granted to copy, modify or redistribute this project's code, generated assets or documentation without the written permission of the copyright holder. Third-party components keep their own licenses (see `CREDITS.md`). The bundled Godot editor addon `addons/godot_mcp` carries its own `LICENSE`.

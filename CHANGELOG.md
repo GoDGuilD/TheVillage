@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-09-07
-Version: 2.0.0
+Last edit date: 2026-10-15
+Version: 3.0.0
 -->
 
 # Changelog — The Village
@@ -23,7 +23,36 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [2.0.0] - 2026-10-15 — Rebuild on the Chapel of Dreams architecture, Phases 0 and 1
+
+The game is now the first, ALttP-inspired chapter of The Village trilogy (prequel to
+*Chapel of Dreams*). Owner decisions: rebuild in this repo on Chapel's base, 384×216 render,
+Light/Dark mirror worlds.
+
+### Changed
+- Godot 4.7.2 project rewritten (`project.godot`): 384×216 viewport, gl_compatibility, top-down
+  input map with an SNES-style gamepad layout, physics layer 8 `Cuttable`.
+- Docs moved into `docs/` (`GDD.md` rewritten for the trilogy, `ARCHITECTURE.md`, `LORE.md`,
+  `TODO.md`) and the full documentation set created; new `docs/ROADMAP.md` (phases 0–15).
+
+### Removed
+- The 2026 prototype code (`scenes/`, `scripts/`, `autoloads/`, `Tools/gen_sprites.py`) and its
+  sprites — superseded; still available in git history up to `cec47ca`.
+
+### Added
+- `tools/palette.py` (Light + Dark World master palette), `tools/sprite_lib.py` (from Chapel).
+- `tools/gen_joe.py`: generated top-down Joe — idle, walk, sword slash and hurt in three facings,
+  shadow, animation manifest with the slash hit window.
+- `tools/gen_tiles.py`: Light World tile atlas (grass, flowers, rock, 2×2 tree, nine-slice path)
+  with a solidity manifest, plus bush and leaf-burst sprites.
+- Ported from Chapel: `HitBox`, `HurtBox`, `HealthComponent`, `StateMachine`, `SpriteStrips`,
+  `HitFlash` + flash shader.
+- `Player`: instant 8-way walking, ALttP facing rule, corner nudge, sword slash with buffered
+  chains, hurt knockback and blinking invincibility; `PlayerTuning` holds every number.
+- `Bush` (solid until cut, leaf burst) and `TestField` (ASCII-layout meadow, runtime TileSet).
+- `tests/test_player.gd` (36 checks, all passing) and `tools/capture_field.gd` (screenshots).
+
+## [Unreleased — prototype era, superseded by 2.0.0]
 
 ### Added
 - `LORE.md` — the original, richer narrative concept (protagonist Joe,

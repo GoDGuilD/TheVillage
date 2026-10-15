@@ -1,0 +1,75 @@
+<!--
+File: executive_overview.html
+Description: Printable, non-technical executive overview of The Village (what it is, how it is built, benefits, status).
+Author: Jose-Jorge HERNANDEZ
+Company: Parlee Conseiller, Inc.
+Date: 2026-10-15
+Last edit date: 2026-10-15
+Version: 1.0.0
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Village - Executive Overview</title>
+<style>
+  :root { --ink: #1c1a24; --muted: #5a5868; --light: #48a048; --dark: #483058; --accent: #c83040; --box: #f4f3f8; --line: #d8d6e0; }
+  body { font-family: Georgia, "Times New Roman", serif; color: var(--ink); max-width: 820px; margin: 32px auto; padding: 0 20px; line-height: 1.55; }
+  h1 { color: var(--dark); border-bottom: 3px solid var(--accent); padding-bottom: 6px; }
+  h2 { color: var(--dark); margin-top: 28px; }
+  .meta { color: var(--muted); }
+  .flow { display: flex; align-items: stretch; gap: 6px; flex-wrap: wrap; margin: 14px 0; }
+  .step { flex: 1 1 120px; background: var(--box); border: 2px solid var(--line); border-radius: 8px; padding: 10px; text-align: center; }
+  .step b { display: block; color: var(--dark); margin-bottom: 4px; }
+  .arrow { align-self: center; font-size: 22px; color: var(--accent); }
+  .worlds { display: flex; gap: 12px; flex-wrap: wrap; }
+  .world { flex: 1 1 240px; border-radius: 8px; padding: 12px; color: #fff; }
+  .lw { background: var(--light); }
+  .dw { background: var(--dark); }
+  ul.benefits li { margin-bottom: 6px; }
+  @media print { body { margin: 0; } .step, .world { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<h1>The Village — Executive Overview</h1>
+<p class="meta">Author: Jose-Jorge HERNANDEZ · Parlee Conseiller, Inc. · 2026-10-15</p>
+
+<h2>What it is</h2>
+<p>The Village is a video game: a top-down adventure in the spirit of the much-loved 1991 classic
+<i>A Link to the Past</i>. The player guides Joe, a veteran returning to his home village, through fields,
+forests and dungeons to break a curse cast by the village's ruler. It is the <b>first chapter of a trilogy</b>;
+the second chapter, <i>Chapel of Dreams</i>, is already playable in beta.</p>
+
+<h2>The two worlds</h2>
+<div class="worlds">
+  <div class="world lw"><b>Light World</b><br>The village and its valley, as they are. Three dungeons hold the family seals.</div>
+  <div class="world dw"><b>Dark World</b><br>The same land as the villain dreams it. Four regions — Darkness, Fire, Time, Jungle — each with a dungeon.</div>
+</div>
+
+<h2>How it is built</h2>
+<div class="flow">
+  <div class="step"><b>Design</b>Story, rules and plan written down first</div>
+  <div class="arrow">&#10140;</div>
+  <div class="step"><b>Generated art</b>Every picture drawn by a program from one colour palette</div>
+  <div class="arrow">&#10140;</div>
+  <div class="step"><b>Game engine</b>Godot, a free professional engine</div>
+  <div class="arrow">&#10140;</div>
+  <div class="step"><b>Automatic checks</b>Robot play-tests confirm each feature works</div>
+  <div class="arrow">&#10140;</div>
+  <div class="step"><b>Playable build</b>Delivered phase by phase</div>
+</div>
+
+<h2>Key benefits</h2>
+<ul class="benefits">
+<li><b>Proven recipe:</b> the same methods already produced the trilogy's second game.</li>
+<li><b>Consistent look:</b> one palette and one generator style keep every screen coherent.</li>
+<li><b>Low risk of regressions:</b> automatic checks run after every change (36 today).</li>
+<li><b>Shared universe:</b> characters and story carry across all three games.</li>
+</ul>
+
+<h2>Where it stands</h2>
+<p>October 2026: the foundations are rebuilt and the first playable phase is done — Joe walks, swings his
+sword and cuts bushes in a test meadow. Next: enemies and combat feel, then the overworld and the village.
+The plan has 16 phases ending in a Windows release.</p>
+</body>
+</html>

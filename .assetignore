@@ -1,6 +1,10 @@
 # .assetignore — asset-pipeline exclusions for The Village
-# Godot itself doesn't read this file; it documents intent for any future
-# asset-processing/optimization tooling (e.g. successors to Tools/gen_sprites.py).
+# Godot itself doesn't read this file; it documents what the art generators in tools/ and any
+# future asset-processing step (optimisation, packing, scanning) must skip. See docs/DEVELOPMENT.md.
 
 assets/reference/   # reference-only art (character design sheets, pixel-art frames) recovered from school coursework — never imported into the game, not real game assets
-assets/audio/*.wav  # uncompressed masters kept alongside their .mp3 counterparts for reference; neither format is cleared to ship yet — licenses unverified, see technical_memory/technical_memory.ipynb
+assets/audio/       # 2024 music/SFX recovered from the UE5 prototype; licences unverified — never bundle until cleared (see technical_memory/technical_memory.ipynb)
+assets/branding/    # 2024 icon/splash source art; the shipped icon will be generated in the release phase
+*.pxo               # Pixelorama working files - source art, not shipped
+*.aseprite          # Aseprite working files - source art, not shipped
+tmp/                # generator previews and screenshots - regenerable

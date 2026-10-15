@@ -1,0 +1,124 @@
+{
+  "tile_size": 16,
+  "cells": {
+    "grass_a": {
+      "cell": [
+        0,
+        0
+      ],
+      "solid": false
+    },
+    "grass_b": {
+      "cell": [
+        1,
+        0
+      ],
+      "solid": false
+    },
+    "flowers": {
+      "cell": [
+        2,
+        0
+      ],
+      "solid": false
+    },
+    "rock": {
+      "cell": [
+        3,
+        0
+      ],
+      "solid": true
+    },
+    "path_-1_-1": {
+      "cell": [
+        0,
+        1
+      ],
+      "solid": false
+    },
+    "path_0_-1": {
+      "cell": [
+        1,
+        1
+      ],
+      "solid": false
+    },
+    "path_1_-1": {
+      "cell": [
+        2,
+        1
+      ],
+      "solid": false
+    },
+    "path_-1_0": {
+      "cell": [
+        0,
+        2
+      ],
+      "solid": false
+    },
+    "path_0_0": {
+      "cell": [
+        1,
+        2
+      ],
+      "solid": false
+    },
+    "path_1_0": {
+      "cell": [
+        2,
+        2
+      ],
+      "solid": false
+    },
+    "path_-1_1": {
+      "cell": [
+        0,
+        3
+      ],
+      "solid": false
+    },
+    "path_0_1": {
+      "cell": [
+        1,
+        3
+      ],
+      "solid": false
+    },
+    "path_1_1": {
+      "cell": [
+        2,
+        3
+      ],
+      "solid": false
+    },
+    "tree_0_0": {
+      "cell": [
+        4,
+        0
+      ],
+      "solid": true
+    },
+    "tree_1_0": {
+      "cell": [
+        5,
+        0
+      ],
+      "solid": true
+    },
+    "tree_0_1": {
+      "cell": [
+        4,
+        1
+      ],
+      "solid": true
+    },
+    "tree_1_1": {
+      "cell": [
+        5,
+        1
+      ],
+      "solid": true
+    }
+  }
+}
