@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.2.0
+Version: 1.3.0
 -->
 
 # Data model
@@ -19,7 +19,8 @@ Version: 1.2.0
 ## Areas (`src/world/areas/`)
 `index.json`: `{screen: [24, 14], start: "joe_house", areas: [ids]}`. Each `<id>.json`:
 `{id, name, kind: "overworld"|"interior", size_screens, origin_tiles: [x, y], rows: [...],
-doors: [{cell, to, spawn_cell, facing}], exits: [{cells: [[x, y]...], to, spawn_cell, facing}]}`.
+doors: [{cell, to, spawn_cell, facing}], exits: [{cells: [[x, y]...], to, spawn_cell, facing}],
+npcs: [{id, cell, facing, across}], signs: [{cell, text}]}`.
 Glyphs are listed in `src/world/AreaBuilder.gd` and `docs/LEVEL_DESIGN.md`.
 
 ## Field layout (`TestField.layout`)
@@ -37,5 +38,22 @@ Array of equal-length strings; glyphs: `.` `,` `*` grass, `#` path, `R` rock, `T
 ## Drop table (`GameState.DROP_TABLE`)
 Weights: nothing 50, heart 20, green gem 22, blue gem 6, red gem 2. Gem values 1 / 5 / 20.
 
-## Planned (Phase 4)
-Save file: current area and position, health, inventory, flags, both worlds' explored screens.
+## Dialogue (`assets/data/dialogue.json`)
+`{"_header": {...}, "<key>": {name?, pages: [..], once?: [..], flag?}}` - keys are villager ids and sign keys.
+`DialogueData.pages_for(key, GameState)` returns `once` the first time (and sets `flag`), `pages` afterwards.
+
+## Villager sprites (`assets/sprites/npcs/npcs.json`)
+`{frame: [32, 32], feet: [16, 29], fps: 2, npcs: [ids]}` with strips `<id>_idle_<down|up|side>.png` (2 frames;
+side faces right, mirrored for left).
+
+## UI art (`assets/ui/ui_manifest.json`, fonts)
+Manifest: `{"<path>": {size, frames, notes}}`. Fonts: `font_5x7.png/.json`, `font_3x5.png/.json` -
+`{cell, columns: 16, first_char: 32, advance: {char: px}}`.
+
+## Save file (`user://village_save.json`)
+`{version: 1, area, pos: [x, y] (the entry point of that area), facing: [x, y], hp, max_hp, saved_at,
+state: {gems, magic, keys, items: {id: level}, equipped, seals: [bool x3], flags: {name: bool}}}`.
+A file with another `version` is ignored (treated as no save).
+
+## Planned
+Both worlds' explored screens (map, Phase 8); settings (volume, language) in Phase 14.

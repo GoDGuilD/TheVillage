@@ -14,8 +14,8 @@
   "WWWWWWWWWWWWWWWW",
   "WWWwWWWWWWWwWWWW",
   "W_OO________OO_W",
-  "W______________W",
-  "W___Kx___Kx____W",
+  "W______N_______W",
+  "W___KxKxKxKx___W",
   "W______________W",
   "W______________W",
   "W______________W",
@@ -43,5 +43,17 @@
    ],
    "facing": "down"
   }
- ]
+ ],
+ "npcs": [
+  {
+   "id": "boni",
+   "cell": [
+    7,
+    3
+   ],
+   "facing": "down",
+   "across": true
+  }
+ ],
+ "signs": []
 }

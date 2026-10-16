@@ -21,11 +21,21 @@
   "xx...............,..,.####..,.................xx",
   "Tx,...............*..,####.......,....R.....,.Tx",
   "xx............Tx..BB,.####.Z.,.....,,...Tx....xx",
-  "Tx.......R....xx......####..BB.......*,.xx,...Tx",
+  "Tx.......R....xx....S.####..BB.......*,.xx,...Tx",
   "xx.*....,....,*...*..,####...............Z..,,xx",
   "TxTxTxTxTxTxTxTxTxTxTx####TxTxTxTxTxTxTxTxTxTxTx",
   "xxxxxxxxxxxxxxxxxxxxxx####xxxxxxxxxxxxxxxxxxxxxx"
  ],
  "doors": [],
- "exits": []
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    20,
+    10
+   ],
+   "text": "sign_meadow"
+  }
+ ]
 }

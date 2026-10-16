@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.2.0
+Version: 1.3.0
 -->
 
 # Assets
@@ -18,8 +18,11 @@ Version: 1.2.0
 | `assets/sprites/vfx/` | `poof`, `hit_spark`, `glint`, `shards` + `vfx_manifest.json` | `tools/gen_props.py` |
 | `assets/sprites/world/` | `bush.png`, `leaf_burst.png` | `tools/gen_tiles.py` |
 | `assets/tiles/` | `overworld_light.png` + `.json` (83 cells: grass, path, water, ledges, cliffs, fence, sign, trees, two cottages, interiors; flags solid/ledge/door/exit) | `tools/gen_tiles.py` + `tools/terrain_art.py` |
-| `src/world/areas/` | `index.json` + 9 area files (5 overworld, 4 interiors) | `tools/gen_areas.py` |
-| `assets/audio/sfx/` | 18 effects: sword_slash, sword_spin, charge_ready, enemy_hit, enemy_die, hurt, player_die, bush_cut, lift, throw, shatter, pickup_heart, pickup_gem, shield_block, spit, ledge_hop, land, door | `tools/gen_sfx.py` |
+| `assets/sprites/npcs/` | Tato, Boni, Janga, villager_woman (Marta), villager_boy (Pico): idle x down/up/side + `npcs.json` | `tools/gen_npcs.py` |
+| `assets/ui/` | fonts `font_5x7` / `font_3x5` (+ metrics), `hud/` (magic frame + fill, item box, key), `menu/` (box, caption, cursor, more arrow, slot, seals, sword/shield icons), `title_logo.png`, `ui_manifest.json` | `tools/gen_ui.py` (glyphs: `tools/font_glyphs.py`, shared with Chapel of Dreams) |
+| `assets/data/dialogue.json` | every villager line and sign text | hand-written (story lines are a draft) |
+| `src/world/areas/` | `index.json` + 9 area files (5 overworld, 4 interiors) with villagers and signs | `tools/gen_areas.py` |
+| `assets/audio/sfx/` | 25 effects: sword_slash, sword_spin, charge_ready, enemy_hit, enemy_die, hurt, player_die, bush_cut, lift, throw, shatter, pickup_heart, pickup_gem, shield_block, spit, ledge_hop, land, door, menu_move, menu_select, menu_back, text_blip, pause, save_done, game_over | `tools/gen_sfx.py` |
 | `assets/shaders/` | `flash.gdshader` (white hit flash) | ported from Chapel |
 | `assets/branding/` | icon and splash from the 2024 UE5 prototype | recovered |
 | `assets/reference/joe/` | 2024 character sheet and pixel frames | recovered, reference only |

@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.3.0
+# Version: 1.4.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -173,3 +173,51 @@ DW_LEAF_LIGHT  = _hex("#705088")
 DW_WATER_DARK  = _hex("#381c48")
 DW_WATER_MID   = _hex("#58306c")
 DW_SKY_GLOW    = _hex("#c05878")
+
+# --- UI (ALttP-style: deep-blue boxes with a pale double rim, gold highlights) -------
+UI_BOX_FILL   = _hex("#101848")    # dialogue / menu box interior
+UI_BOX_EDGE   = _hex("#283890")    # inner bevel of the box
+UI_RIM_LIGHT  = _hex("#f0f0f8")    # outer rim
+UI_RIM_MID    = _hex("#a8b0d0")
+UI_RIM_DARK   = _hex("#585c88")
+UI_GOLD       = _hex("#f8d040")    # cursor, titles, selected rows
+UI_GOLD_DARK  = _hex("#b08820")
+UI_TEXT       = _hex("#f8f8f8")
+UI_TEXT_DIM   = _hex("#8890b8")
+UI_WELL       = _hex("#181828")    # empty meter well
+MAGIC_DARK    = _hex("#188030")    # magic meter fill
+MAGIC_MID     = _hex("#38c048")
+MAGIC_LIGHT   = _hex("#a0f090")
+KEY_DARK      = _hex("#a87818")
+KEY_MID       = _hex("#e8b830")
+KEY_LIGHT     = _hex("#fff0a0")
+SEAL_DARK     = _hex("#6c3c9c")    # the three family seals (violet stone in a gold ring)
+SEAL_MID      = _hex("#a068d8")
+SEAL_LIGHT    = _hex("#e0c0ff")
+LOGO_TOP      = _hex("#fff4b0")    # title logo letter gradient
+LOGO_MID      = _hex("#f0c040")
+LOGO_LOW      = _hex("#c07020")
+LOGO_SHADE    = _hex("#5c2810")
+
+# --- Villagers (NPC clothing and hair) -------------------------------------------------
+HAIR_WHITE    = _hex("#e8e8f0")    # Tato's hair and beard
+HAIR_GREY     = _hex("#a8a8b8")
+ROBE_DARK     = _hex("#3c2c5c")    # Tato's elder robe
+ROBE_MID      = _hex("#5c4888")
+ROBE_LIGHT    = _hex("#8870b8")
+APRON_DARK    = _hex("#a89878")    # Boni's shop apron
+APRON_MID     = _hex("#e0d4b0")
+SHIRT_GREEN_D = _hex("#2c6430")    # Boni's shirt
+SHIRT_GREEN_M = _hex("#4c9848")
+HAIR_ORANGE_D = _hex("#9c4818")    # Boni's hair
+HAIR_ORANGE_M = _hex("#d87830")
+VEST_DARK     = _hex("#5c3418")    # Janga's leather vest
+VEST_MID      = _hex("#8c5428")
+VEST_LIGHT    = _hex("#b87840")
+BANDANA_D     = _hex("#1c5c8c")    # Janga's blue bandana
+BANDANA_M     = _hex("#3888c8")
+DRESS_DARK    = _hex("#8c2c50")    # village woman
+DRESS_MID     = _hex("#c84c78")
+DRESS_LIGHT   = _hex("#f08cac")
+TUNIC_DARK    = _hex("#7c6c20")    # village boy
+TUNIC_MID     = _hex("#c0a838")

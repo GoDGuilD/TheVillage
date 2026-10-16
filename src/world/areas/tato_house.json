@@ -15,7 +15,7 @@
   "WWWwWWWWWWWwWWWW",
   "W______________W",
   "W_O_________D__W",
-  "W______Kx___x__W",
+  "W______Kx_N_x__W",
   "W______________W",
   "W______________W",
   "W_O____________W",
@@ -43,5 +43,17 @@
    ],
    "facing": "down"
   }
- ]
+ ],
+ "npcs": [
+  {
+   "id": "tato",
+   "cell": [
+    10,
+    4
+   ],
+   "facing": "down",
+   "across": false
+  }
+ ],
+ "signs": []
 }

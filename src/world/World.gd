@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, hosts the HUD and respawns.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 2.0.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -12,17 +12,22 @@ extends Node2D
 ## when his feet leave the current area, the neighbour is built, the camera slides over while Joe takes a few
 ## steps in, and the old area is freed. Doors and exit mats fade to black and move Joe between areas.
 ## Only the current area exists in the tree (enemies and cut bushes come back when an area is re-entered).
+## Talking, the pause and item menus and Game Over pause the tree; their CanvasLayers keep processing.
+## A save stores the area and the point where Joe entered it; the title screen hands a loaded save over through
+## SaveGame.pending, applied here before the first area is built.
 
 signal area_entered(area_id: String)
 
 const AREA_DIR := "res://src/world/areas/"
 const PLAYER_SCENE := preload("res://src/player/Player.tscn")
+const TITLE_SCENE := "res://src/ui/TitleScreen.tscn"
 const TILE := 16
 const VIEW := Vector2(384, 216)
 const SCROLL_TIME := 0.6                 # seconds the camera takes to slide to the next area
 const SCROLL_PUSH := 14.0                # px Joe walks into the new area during the slide
 const FADE_TIME := 0.22                  # door fade out / in
-const RESPAWN_DELAY := 1.5
+const RESPAWN_DELAY := 1.5               # s between Joe falling and the Game Over screen
+const BOX_TOP_BELOW := 0.55              # Joe below this fraction of the view height -> dialogue box at the top
 const BLACK := Color(0.0, 0.0, 0.0, 1.0)
 const FACINGS := {"up": Vector2i.UP, "down": Vector2i.DOWN, "left": Vector2i.LEFT, "right": Vector2i.RIGHT}
 
@@ -32,9 +37,15 @@ var current: Dictionary = {}             # {id, data, tiles, actors, rect, bushe
 var player: Player
 var camera: Camera2D
 var hud: Hud
+var dialogue: DialogueBox
+var pause_menu: PauseMenu
+var item_menu: ItemMenu
+var game_over: GameOver
+var talking: Node2D = null               # the villager or sign in the current conversation
 var transitioning := false
 var transitions := 0                     # screen scrolls + door warps done (tests)
-var entry_point := Vector2.ZERO          # where Joe entered the current area (respawn point)
+var entry_point := Vector2.ZERO          # where Joe entered the current area (respawn point, save point)
+var entry_facing := Vector2i.DOWN
 var deaths := 0
 
 var _ground: Node2D
@@ -42,6 +53,8 @@ var _actors: Node2D
 var _fade: ColorRect
 var _area_override := ""                 # tests may start somewhere else
 var _spawn_override = null
+var _facing_override := Vector2i.DOWN
+var _save_to_apply: Dictionary = {}
 
 
 func _ready() -> void:
@@ -60,21 +73,63 @@ func _ready() -> void:
 	player = PLAYER_SCENE.instantiate()
 	_actors.add_child(player)
 	player.died.connect(_on_player_died)
+	player.talk_requested.connect(_on_talk_requested)
 	hud = Hud.new()
 	add_child(hud)
 	player.health_changed.connect(hud.set_health)
 	hud.set_health(player.health.current_health, player.health.max_health)
-	var layer := CanvasLayer.new()
-	layer.layer = 20
-	add_child(layer)
-	_fade = ColorRect.new()
-	_fade.color = BLACK
-	_fade.size = VIEW
-	_fade.modulate.a = 0.0
-	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(_fade)
+	area_entered.connect(func(aid: String) -> void: hud.show_caption(String(areas[aid]["name"]).to_upper()))
+	_build_overlays()
+	_take_pending_save()
 	var first := _area_override if _area_override != "" else start_area
-	_enter(first, _spawn_override if _spawn_override != null else _spawn_point(first))
+	_enter(first, _spawn_override if _spawn_override != null else _spawn_point(first), _facing_override)
+	if not _save_to_apply.is_empty():
+		_set_hearts(int(_save_to_apply.get("hp", PlayerTuning.MAX_HP)), int(_save_to_apply.get("max_hp", PlayerTuning.MAX_HP)))
+		_save_to_apply = {}
+
+
+func _build_overlays() -> void:
+	dialogue = DialogueBox.new()
+	add_child(dialogue)
+	dialogue.closed.connect(_on_dialogue_closed)
+	pause_menu = PauseMenu.new()
+	add_child(pause_menu)
+	pause_menu.save_requested.connect(func() -> void: pause_menu.show_saved(save_game()))
+	pause_menu.quit_requested.connect(func() -> void:
+		save_game()
+		quit_to_title())
+	item_menu = ItemMenu.new()
+	add_child(item_menu)
+	game_over = GameOver.new()
+	add_child(game_over)
+	game_over.picked.connect(_on_game_over_picked)
+	var layer := CanvasLayer.new()
+	layer.layer = UiTheme.LAYER_FADE
+	add_child(layer)
+	_fade = UiTheme.overlay(BLACK)
+	_fade.modulate.a = 0.0
+	layer.add_child(_fade)
+
+
+# A save handed over by the title screen (CONTINUE): restore the global state and start where it was made.
+func _take_pending_save() -> void:
+	var data := SaveGame.pending
+	SaveGame.pending = {}
+	if data.is_empty() or not areas.has(String(data.get("area", ""))):
+		return
+	GameState.restore(data.get("state", {}))
+	var pos: Array = data.get("pos", [])
+	var f: Array = data.get("facing", [0, 1])
+	_area_override = String(data["area"])
+	_spawn_override = Vector2(float(pos[0]), float(pos[1])) if pos.size() == 2 else _spawn_point(_area_override)
+	_facing_override = Vector2i(int(f[0]), int(f[1]))
+	_save_to_apply = data
+
+
+func _set_hearts(current: int, maximum: int) -> void:
+	player.health.max_health = maximum
+	player.health.current_health = clampi(current, 1, maximum)
+	player.health.health_changed.emit(player.health.current_health, maximum)
 
 
 # Tests call this before adding the World to the tree to start in a given area at a given feet position.
@@ -136,6 +191,17 @@ func _build(area_id: String) -> Dictionary:
 	_ground.add_child(built["tiles"])
 	for e in built["enemies"]:
 		e.player = player
+	var origin := origin_of(area_id)
+	for n in data.get("npcs", []):
+		var npc := Npc.new()
+		npc.setup(String(n["id"]), String(n["facing"]), bool(n.get("across", false)))
+		npc.position = cell_feet(area_id, n["cell"])
+		actors.add_child(npc)
+	for sgn in data.get("signs", []):
+		var post := SignPost.new()
+		post.setup(String(sgn["text"]))
+		post.position = origin + (Vector2(float(sgn["cell"][0]), float(sgn["cell"][1])) + Vector2(0.5, 0.5)) * TILE
+		actors.add_child(post)
 	return {"id": area_id, "data": data, "tiles": built["tiles"], "actors": actors, "rect": rect_of(area_id),
 			"bushes": built["bushes"], "pots": built["pots"], "enemies": built["enemies"]}
 
@@ -156,6 +222,7 @@ func _enter(area_id: String, feet: Vector2, facing: Vector2i = Vector2i.DOWN) ->
 		player.revive(feet)
 	player.facing = facing
 	entry_point = feet
+	entry_facing = facing
 	_snap_camera()
 	area_entered.emit(area_id)
 
@@ -233,6 +300,7 @@ func _scroll_to(next_id: String) -> void:
 	current["actors"].process_mode = Node.PROCESS_MODE_INHERIT
 	player.unfreeze()
 	entry_point = player.global_position
+	entry_facing = Vector2i(dir)
 	transitions += 1
 	transitioning = false
 	area_entered.emit(next_id)
@@ -266,15 +334,84 @@ func _warp(area_id: String, feet: Vector2, facing: Vector2i) -> void:
 	transitioning = false
 
 
+# --- talking ----------------------------------------------------------------------------------------
+
+func _on_talk_requested(target: Node2D) -> void:
+	if transitioning or dialogue.is_open or not is_instance_valid(target):
+		return
+	var key := String(target.call("talk", player.global_position))
+	var pages := DialogueData.pages_for(key, GameState)
+	if pages.is_empty():
+		return
+	talking = target
+	# ALttP: the box goes to the top when Joe stands in the lower part of the screen.
+	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
+	dialogue.open(pages, DialogueData.speaker(key), box_at_top(on_screen))
+
+
+# True when Joe's on-screen position is low enough that the dialogue box should go to the top.
+func box_at_top(screen_pos: Vector2) -> bool:
+	return screen_pos.y > VIEW.y * BOX_TOP_BELOW
+
+
+func _on_dialogue_closed() -> void:
+	if is_instance_valid(talking):
+		talking.call("rest")
+	talking = null
+	player.freeze(PlayerTuning.TALK_COOLDOWN)
+
+
+# --- menus ------------------------------------------------------------------------------------------
+
+# True when nothing else owns the screen (no scroll, fade, conversation, menu or death in progress).
+func can_open_menu() -> bool:
+	return not transitioning and not dialogue.is_open and not pause_menu.is_open and not item_menu.is_open \
+			and not game_over.is_open and not player.is_dead()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_echo() or not can_open_menu():
+		return
+	if event.is_action_pressed("pause"):
+		get_viewport().set_input_as_handled()
+		pause_menu.open()
+	elif event.is_action_pressed("inventory"):
+		get_viewport().set_input_as_handled()
+		item_menu.open()
+
+
+# Write the save file: the current area, where Joe entered it, his hearts and the GameState snapshot.
+func save_game() -> bool:
+	var data := SaveGame.capture(current_id(), entry_point, entry_facing, player.health.current_health,
+			player.health.max_health, GameState)
+	return SaveGame.write(data)
+
+
+func quit_to_title() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file(TITLE_SCENE)
+
+
 # --- death ----------------------------------------------------------------------------------------
 
-# Joe fell: after a short beat he gets back up where he entered this area (Game Over screen: Phase 4).
+# Joe fell: after a short beat the Game Over screen offers to continue (and save, or quit).
 func _on_player_died() -> void:
 	deaths += 1
 	await get_tree().create_timer(RESPAWN_DELAY).timeout
-	if is_instance_valid(player):
-		player.revive(entry_point)
-		_snap_camera()
+	if is_instance_valid(player) and player.is_dead():
+		game_over.open()
+
+
+# Continue = Joe gets back up where he entered this area with full hearts (the area is rebuilt fresh).
+# The save variants write the file first (with Joe already back on his feet).
+func _on_game_over_picked(choice: int) -> void:
+	player.revive(entry_point)
+	if choice == GameOver.SAVE_CONTINUE or choice == GameOver.SAVE_QUIT:
+		save_game()
+		if choice == GameOver.SAVE_QUIT:
+			quit_to_title()
+			return
+	_enter(current_id(), entry_point, entry_facing)
 
 
 func current_id() -> String:

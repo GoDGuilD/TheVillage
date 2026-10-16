@@ -1,21 +1,37 @@
 # File: GameState.gd
-# Description: Autoload holding run-wide state: gems (money) and the enemy/pot drop table with a seedable RNG.
+# Description: Autoload holding run-wide state - gems, magic, small keys, items, family seals, story flags - plus the drop table, and the snapshot/restore used by saves.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 2.0.0
 extends Node
-## Grows with the game (inventory, flags, saves arrive in Phases 4-5). Keep it data + small helpers only.
+## Keep it data + small helpers only. Joe's own hearts live on his HealthComponent (the World copies them in and
+## out of saves). Items are listed here so the item menu can show their slots; they are found from Phase 5 on.
 
 signal gems_changed(amount: int)
+signal magic_changed(current: int, maximum: int)
+signal keys_changed(amount: int)
+signal equipped_changed(item: String)
 
 const MAX_GEMS := 999
+const MAX_MAGIC := 32                    # one pixel of the HUD meter per unit
+const MAX_KEYS := 9
+const SEAL_COUNT := 3                    # the three family seals of the Light World dungeons
+# Y-button items in item-menu order (ALttP's subscreen); names match their future icon files.
+const ITEM_ORDER := ["boomerang", "bow", "bombs", "lantern", "grapple",
+		"fire_rod", "ice_rod", "hammer", "moon_mirror", "bottle"]
 # Drop table rolled when an enemy dies or a pot breaks: [kind, weight]. "" = nothing.
 const DROP_TABLE := [["", 50], ["heart", 20], ["gem_green", 22], ["gem_blue", 6], ["gem_red", 2]]
 const GEM_VALUES := {"gem_green": 1, "gem_blue": 5, "gem_red": 20}
 
 var gems := 0
+var magic := MAX_MAGIC
+var keys := 0
+var items: Dictionary = {}               # item id -> level/count (absent = not found)
+var equipped := ""                       # the item in the HUD box ("" = none)
+var seals: Array = [false, false, false]
+var flags: Dictionary = {}               # story flags, e.g. "met_tato": true
 var drops_enabled := true                # tests switch random drops off
 var force_drop := ""                     # tests force a specific drop ("" = roll normally)
 var rng := RandomNumberGenerator.new()
@@ -24,6 +40,54 @@ var rng := RandomNumberGenerator.new()
 func add_gems(amount: int) -> void:
 	gems = clampi(gems + amount, 0, MAX_GEMS)
 	gems_changed.emit(gems)
+
+
+# Spend magic; false (and nothing spent) if there is not enough.
+func use_magic(amount: int) -> bool:
+	if magic < amount:
+		return false
+	magic -= amount
+	magic_changed.emit(magic, MAX_MAGIC)
+	return true
+
+
+func add_magic(amount: int) -> void:
+	magic = clampi(magic + amount, 0, MAX_MAGIC)
+	magic_changed.emit(magic, MAX_MAGIC)
+
+
+func add_keys(amount: int) -> void:
+	keys = clampi(keys + amount, 0, MAX_KEYS)
+	keys_changed.emit(keys)
+
+
+func has_item(item: String) -> bool:
+	return items.has(item)
+
+
+func give_item(item: String, level: int = 1) -> void:
+	items[item] = level
+	if equipped == "":
+		equip(item)
+
+
+func equip(item: String) -> void:
+	if item != "" and not has_item(item):
+		return
+	equipped = item
+	equipped_changed.emit(equipped)
+
+
+func set_flag(flag: String, value: bool = true) -> void:
+	flags[flag] = value
+
+
+func has_flag(flag: String) -> bool:
+	return bool(flags.get(flag, false))
+
+
+func seal_count() -> int:
+	return seals.count(true)
 
 
 # Pick a drop kind ("" for none) from DROP_TABLE.
@@ -43,9 +107,36 @@ func roll_drop() -> String:
 	return ""
 
 
+# Everything a save needs from this autoload.
+func snapshot() -> Dictionary:
+	return {"gems": gems, "magic": magic, "keys": keys, "items": items.duplicate(), "equipped": equipped,
+			"seals": seals.duplicate(), "flags": flags.duplicate()}
+
+
+# Put a snapshot back (missing fields fall back to a fresh game's values).
+func restore(data: Dictionary) -> void:
+	gems = clampi(int(data.get("gems", 0)), 0, MAX_GEMS)
+	magic = clampi(int(data.get("magic", MAX_MAGIC)), 0, MAX_MAGIC)
+	keys = clampi(int(data.get("keys", 0)), 0, MAX_KEYS)
+	items = Dictionary(data.get("items", {})).duplicate()
+	equipped = String(data.get("equipped", ""))
+	var s: Array = data.get("seals", [])
+	seals = []
+	for i in SEAL_COUNT:
+		seals.append(i < s.size() and bool(s[i]))
+	flags = Dictionary(data.get("flags", {})).duplicate()
+	_emit_all()
+
+
 # Back to a fresh run (title screen / tests).
 func reset() -> void:
-	gems = 0
+	restore({})
 	drops_enabled = true
 	force_drop = ""
+
+
+func _emit_all() -> void:
 	gems_changed.emit(gems)
+	magic_changed.emit(magic, MAX_MAGIC)
+	keys_changed.emit(keys)
+	equipped_changed.emit(equipped)

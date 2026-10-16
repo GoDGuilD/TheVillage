@@ -1,0 +1,130 @@
+{
+ "font_5x7.png": {
+  "size": [
+   96,
+   48
+  ],
+  "frames": 1,
+  "notes": "Bitmap font, white glyphs, 16 columns from ASCII 32."
+ },
+ "font_3x5.png": {
+  "size": [
+   64,
+   36
+  ],
+  "frames": 1,
+  "notes": "Bitmap font, white glyphs, 16 columns from ASCII 32."
+ },
+ "hud/magic_frame.png": {
+  "size": [
+   10,
+   38
+  ],
+  "frames": 1,
+  "notes": "Magic meter rim; fill at (3,3), 32 px tall."
+ },
+ "hud/magic_fill.png": {
+  "size": [
+   4,
+   32
+  ],
+  "frames": 1,
+  "notes": "Meter fill; show the bottom part in proportion."
+ },
+ "hud/item_box.png": {
+  "size": [
+   22,
+   22
+  ],
+  "frames": 1,
+  "notes": "Equipped item box; icon centred."
+ },
+ "hud/key.png": {
+  "size": [
+   7,
+   10
+  ],
+  "frames": 1,
+  "notes": "Small key counter icon."
+ },
+ "menu/box.png": {
+  "size": [
+   24,
+   24
+  ],
+  "frames": 1,
+  "notes": "Nine-slice, border 8."
+ },
+ "menu/caption.png": {
+  "size": [
+   16,
+   16
+  ],
+  "frames": 1,
+  "notes": "Nine-slice, border 5."
+ },
+ "menu/cursor.png": {
+  "size": [
+   8,
+   8
+  ],
+  "frames": 4,
+  "notes": "Menu cursor, 8 fps loop."
+ },
+ "menu/more.png": {
+  "size": [
+   7,
+   6
+  ],
+  "frames": 2,
+  "notes": "Dialogue continue arrow, 4 fps loop."
+ },
+ "menu/slot.png": {
+  "size": [
+   20,
+   20
+  ],
+  "frames": 1,
+  "notes": "Item-menu slot."
+ },
+ "menu/seal_empty.png": {
+  "size": [
+   14,
+   14
+  ],
+  "frames": 1,
+  "notes": "Family seal socket."
+ },
+ "menu/seal_full.png": {
+  "size": [
+   14,
+   14
+  ],
+  "frames": 1,
+  "notes": "Family seal found."
+ },
+ "menu/icon_sword.png": {
+  "size": [
+   16,
+   16
+  ],
+  "frames": 1,
+  "notes": "Equipment icon."
+ },
+ "menu/icon_shield.png": {
+  "size": [
+   16,
+   16
+  ],
+  "frames": 1,
+  "notes": "Equipment icon."
+ },
+ "title_logo.png": {
+  "size": [
+   192,
+   30
+  ],
+  "frames": 1,
+  "notes": "Title logo."
+ }
+}

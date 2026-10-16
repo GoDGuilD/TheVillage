@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.1.0
+# Version: 2.2.0
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -15,6 +15,7 @@ extends CharacterBody2D
 
 signal health_changed(current: int, maximum: int)
 signal died
+signal talk_requested(target: Node2D)   # interact pressed facing a villager or sign (the World opens the box)
 
 const SPRITE_DIR := "res://assets/sprites/joe/"
 const SHADOW_TEX := preload("res://assets/sprites/joe/joe_shadow.png")
@@ -237,10 +238,16 @@ func _wants_attack() -> bool:
 	return Input.is_action_just_pressed("attack") or _attack_buffer > 0.0
 
 
-# Interact on a liftable thing in front of Joe; returns true if it started a lift.
+# Interact in front of Joe: talking to a villager / reading a sign wins over lifting.
+# Returns true if it started a lift or a conversation.
 func _try_lift() -> bool:
 	if not Input.is_action_just_pressed("interact"):
 		return false
+	var talker := talkable_in_front()
+	if talker != null:
+		velocity = Vector2.ZERO
+		talk_requested.emit(talker)
+		return true
 	var target := liftable_in_front()
 	if target == null:
 		return false
@@ -261,6 +268,22 @@ func liftable_in_front() -> Node2D:
 		if node == null or not node.call("can_lift"):
 			continue
 		var d := node.global_position.distance_to(grab)
+		if d <= best_d:
+			best = node
+			best_d = d
+	return best
+
+
+# The nearest villager or sign whose talk point is right in front of Joe, or null.
+func talkable_in_front() -> Node2D:
+	var probe := global_position + PlayerTuning.TALK_PROBE_UP + Vector2(facing) * PlayerTuning.TALK_REACH
+	var best: Node2D = null
+	var best_d := PlayerTuning.TALK_RADIUS
+	for n in get_tree().get_nodes_in_group("talkable"):
+		var node := n as Node2D
+		if node == null or not node.is_inside_tree():
+			continue
+		var d: float = (node.call("talk_point") as Vector2).distance_to(probe)
 		if d <= best_d:
 			best = node
 			best_d = d

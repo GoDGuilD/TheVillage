@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 2.2.0
+Version: 2.3.0
 -->
 
 # Game Design Document — The Village
@@ -75,6 +75,18 @@ direction is taken from the dominant axis (vertical wins a perfect diagonal).
 | Map | Tab | North (Y / Triangle) — SNES X |
 | Inventory | I | Left shoulder |
 | Pause | Esc | Start |
+
+### HUD, menus, dialogue, saves (implemented in Phase 4)
+- **HUD** (ALttP layout): magic meter and equipped-item box top-left, gems and small keys beside them (keys hide at
+  zero), "- LIFE -" over up to 20 hearts top-right; the area's name appears in a small plate when Joe enters it.
+- **Talking and reading**: interact facing a villager or a sign. Text boxes type out with a blip, show the speaker's
+  name, and sit at the top of the screen when Joe is in its lower part. The world pauses while they are open.
+  Villagers say different things the first time; Boni is talked to across her counter.
+- **Villagers**: Tato (Tato's House), Boni (Boni's Shop), Janga (Janga's House), Marta and Pico (El Pueblo).
+- **Menus**: title (CONTINUE / NEW GAME / QUIT), pause (CONTINUE / SAVE GAME / SAVE AND QUIT), item menu (Y-items
+  grid, equipment, the three family seals), Game Over (CONTINUE / SAVE AND CONTINUE / SAVE AND QUIT).
+- **Saves**: one slot; a save remembers the area and where Joe entered it, his hearts, gems, magic, keys, items,
+  seals and story flags. Continuing after Game Over puts Joe back at the area's entrance with full hearts.
 
 ## 5. Enemies and drops (implemented in Phase 2)
 

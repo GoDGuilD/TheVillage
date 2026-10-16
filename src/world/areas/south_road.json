@@ -15,7 +15,7 @@
   "xxxxxxxxxxxxxxxxxxxxxx####xxxxxxxxxxxxxxxxxxxxxx",
   "Tx...,................####################....Tx",
   "xx....BB.......,......####################....xx",
-  "Tx................,..,#####............,##.,..Tx",
+  "Tx................,..S#####............,##.,..Tx",
   "xx....................#####.............##,...xx",
   "Tx^^^^^^^^^^^^^^vvvvvvvvvvvv^^^^^^^^^^^^##^^^^Tx",
   "xx^^^^^^^^^^^^^^############^^^^^^^^^^^^##^^^^xx",
@@ -27,5 +27,15 @@
   "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
  ],
  "doors": [],
- "exits": []
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    21,
+    4
+   ],
+   "text": "sign_south_road"
+  }
+ ]
 }

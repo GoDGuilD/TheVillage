@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.2.0
+Version: 1.3.0
 -->
 
 # Roadmap
@@ -19,8 +19,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 1 | Movement & sword | Generated Joe (idle/walk/slash/hurt in 4 facings), 8-way walking, ALttP facing rule, corner nudge, sword slash with hit window + chained slashes, hurt knockback + i-frames, generated Light World tiles, cuttable bushes, 2×2-screen test meadow | Done (36 checks pass) |
 | 2 | Combat core & game feel | Spin attack (hold to charge), shield blocking, first enemies (Caver's guard, rock-spitter, slime), enemy knockback + hit flash + death puff, heart/gem drops, lift-and-throw pots and bushes, hit-stop and screen shake, `Audio` autoload with 15 generated SFX, minimal HUD (hearts + gems), respawn on death | Done (56 combat checks pass) |
 | 3 | Overworld engine | Areas from `tools/gen_areas.py` + lint, autotiled paths/water/ledges/cliffs/walls, ALttP screen-edge scrolling, house doors and exit mats, ledge hops, El Pueblo + four neighbouring areas + four house interiors, `World` as the main scene | Done (30 world checks pass) |
-| 4 | HUD, menus, saves, dialogue | Full HUD (item box, magic meter, keys), area-name captions, item menu, title + pause menus, save/load, NPCs with dialogue boxes (Tato, Boni, Janga), readable signs, Game Over screen | Next |
-| 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers | Planned |
+| 4 | HUD, menus, saves, dialogue | Full HUD (item box, magic meter, keys), area-name captions, item menu, title + pause menus, save/load, NPCs with dialogue boxes (Tato, Boni, Janga), readable signs, Game Over screen | Done (61 UI checks pass) |
+| 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers, Boni's shop stock | Next |
 | 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal | Planned |
 | 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, power glove, Caver's keep, Act 1 ending | Planned |
 | 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub | Planned |
@@ -58,3 +58,15 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] Joe hops down south ledges (0.35 s arc, `ledge_hop`/`land` sounds); `door` sound
 - [x] `tests/test_world.gd`: 30 checks; `tools/capture_world.gd`
 - [ ] Owner playtest: scroll speed, village layout, how the double tree belts between areas read
+
+## Phase 4 detail
+- [x] `tools/gen_ui.py`: 5x7 and 3x5 bitmap fonts (glyphs shared with Chapel of Dreams), magic meter, item box, key icon, nine-slice dialogue/menu box and caption plate, cursor, "more" arrow, item slot, seals, sword/shield icons, title logo
+- [x] `tools/gen_npcs.py`: Tato, Boni, Janga, Marta, Pico - 32x32 idle strips facing down/up/side
+- [x] HUD: magic meter, item box, gems, keys (hidden at zero), "- LIFE -" hearts (10 per row); area-name captions
+- [x] Dialogue box: wrapped pages, typewriter + blip, name plate, more arrow, top/bottom placement, pauses the world; `assets/data/dialogue.json` with first-meeting lines and story flags
+- [x] Villagers turn to face Joe; Boni is talked to across her counter; signs in every overworld area are readable; talking wins over lifting
+- [x] Title screen (village backdrop pan; CONTINUE only with a save), pause menu (continue / save / save and quit), item menu (grid, equip, equipment, seals), Game Over (continue / save and continue / save and quit)
+- [x] `SaveGame`: one JSON save at `user://village_save.json`; Joe restarts where he entered the saved area
+- [x] `gen_areas.py` lint for villagers and signs; 7 new sounds (25 total)
+- [x] `tests/test_ui.gd`: 61 checks; `tools/capture_ui.gd`
+- [ ] Owner review: dialogue lines (the story is still a draft), the title subtitle, text speed, menu layout

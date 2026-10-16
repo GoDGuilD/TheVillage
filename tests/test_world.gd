@@ -1,10 +1,10 @@
 # File: test_world.gd
-# Description: Headless scripted checks for Phase 3: area data, house doors and exit mats, ALttP screen scrolls in all directions, camera clamping, ledge hops, water, enemy respawn, death.
+# Description: Headless scripted checks for Phase 3 (and the Phase 4 Game Over): area data, house doors and exit mats, ALttP screen scrolls in all directions, camera clamping, ledge hops, water, enemy respawn, death and the Game Over continue.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.1
 # Run:  Godot_console --headless --fixed-fps 60 --path . -s tests/test_world.gd   (must end "0 failed")
 extends SceneTree
 
@@ -196,5 +196,10 @@ func _t_death_respawn_at_entry() -> void:
 	_p.global_position += Vector2(-40, 0)
 	_p._on_hurt(99, _p.global_position + Vector2(0, -20), Vector2.ZERO)
 	await _frames(int(FPS * 1.7))
-	_check("Joe gets back up where he entered the area", _p.global_position == entry and not _p.is_dead(),
-			"%s vs %s" % [_p.global_position, entry])
+	_check("death opens the Game Over screen and pauses the world", _w.game_over.is_open and paused)
+	await _frames(int(FPS * 1.3))
+	_check("the Game Over choices appear after the fade", _w.game_over.is_ready_to_choose())
+	_w.game_over.menu.confirm()                    # CONTINUE is the first row
+	await _frames(3)
+	_check("Joe gets back up where he entered the area", _p.global_position == entry and not _p.is_dead()
+			and not paused, "%s vs %s" % [_p.global_position, entry])

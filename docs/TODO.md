@@ -5,23 +5,23 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 3.2.0
+Version: 3.3.0
 -->
 
 # TODO — The Village
 
 Phase numbers match `ROADMAP.md` (the plan and status of record).
 
-## Open from Phases 1-3
-- [ ] Owner playtest: walking, slash, spin, throws, enemies, scroll speed, village layout
-- [ ] Audition the 18 sound effects and set a mix
+## Open from Phases 1-4
+- [ ] Owner playtest: walking, slash, spin, throws, enemies, scroll speed, village layout, text speed, menus
+- [ ] Audition the 25 sound effects and set a mix
 - [ ] Decide on the tree belts between areas (keep, or thin them to one ring shared by both areas)
+- [ ] Owner to confirm the story draft, the villagers' lines and the title subtitle
 
-## Phase 4 — HUD, menus, saves, dialogue (next)
-- [ ] Full HUD: item box, magic meter, keys; area-name caption on entry
-- [ ] Title screen, pause menu, Game Over screen
-- [ ] Save/load (area, position, hearts, gems, flags)
-- [ ] NPCs (Tato, Boni, Janga, villagers) with dialogue boxes; readable signs (pixel font, English + Spanish later)
+## Phase 5 — Items I (next)
+- [ ] Chests, small keys, heart pieces and containers
+- [ ] Boomerang, bow + arrows, bombs, lantern (with item icons for the HUD box and the item menu)
+- [ ] Boni's shop stock (buy with gems)
 
 ## Later phases
 See `ROADMAP.md` phases 5-15.

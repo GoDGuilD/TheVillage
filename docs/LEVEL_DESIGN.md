@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.0.0
+Version: 1.1.0
 -->
 
 # Level design
@@ -40,9 +40,19 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `M` | exit mat | `K` / `D` | 2x1 table / 1x2 bed |
 | `B` `O` | bush, pot | `Z` `G` `Q` | slime, guard, rock-spitter |
 | `P` | Joe's spawn (exactly one in the world) | `x` | filler of a multi-cell piece |
+| `N` | a villager's cell (solid; placed from `NPCS`) | | |
+
+## Villagers and signs
+Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
+- `NPCS = {area: [(x, y, id, facing, talk_across)]}` - `id` is both the sprite set (`tools/gen_npcs.py`) and the
+  dialogue key; `talk_across` lets Joe talk over the tile in front of the villager (Boni behind her counter).
+- `SIGNS = {area: [(x, y, dialogue_key)]}`.
+The text lives in `assets/data/dialogue.json`: `{name?, pages, once?, flag?}` - `once` is said the first time
+and sets `flag`. Pages wrap themselves; `\n` forces a break.
 
 ## Lint
 Sizes, unknown glyphs, multi-cell pieces (fit, fillers covered exactly once), ledge landings, edge openings,
 overlaps between areas, door/exit pairing and spawn cells, reachability from every entrance (ledges are one-way),
-exactly one spawn. Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
+exactly one spawn, and for villagers/signs: glyph and list agree, the text key exists, the villager has a
+sprite, and Joe can stand next to each one (two tiles away for a counter). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

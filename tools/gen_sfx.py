@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.1.0
+# Version: 2.0.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -253,6 +253,46 @@ def door():
     return knock + creak
 
 
+# --- Phase 4: menus, dialogue, saves --------------------------------------------------
+
+def menu_move():
+    # A tiny tick for each cursor step.
+    return notes([(1760.0, 0.03)], 0.25, 0.02)
+
+
+def menu_select():
+    return notes([(1046.5, 0.04), (1568.0, 0.08)], 0.25, 0.05)
+
+
+def menu_back():
+    return notes([(1174.7, 0.04), (784.0, 0.08)], 0.25, 0.05)
+
+
+def text_blip():
+    # One letter of a dialogue box being typed (played every few letters).
+    return notes([(1318.5, 0.025)], 0.5, 0.012)
+
+
+def pause():
+    # Menus open: a short rising pair.
+    return notes([(659.3, 0.05), (987.8, 0.05), (1318.5, 0.1)], 0.25, 0.06)
+
+
+def save_done():
+    # Saved: a bright little arpeggio.
+    return notes([(784.0, 0.06), (1046.5, 0.06), (1318.5, 0.06), (1568.0, 0.18)], 0.25, 0.08)
+
+
+def game_over():
+    # A slow falling line on a soft triangle.
+    seq = [(523.3, 0.22), (493.9, 0.22), (466.2, 0.22), (440.0, 0.6)]
+    parts = []
+    for f, d in seq:
+        n = int(d * SR)
+        parts.append(tri(np.full(n, f)) * decay(n, d * 0.8, 0.005))
+    return np.concatenate(parts)
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -261,6 +301,9 @@ SFX = {
     "shatter": (shatter, -4.0), "pickup_heart": (pickup_heart, -5.5), "pickup_gem": (pickup_gem, -6.0),
     "shield_block": (shield_block, -5.0), "spit": (spit, -5.5), "ledge_hop": (ledge_hop, -5.5),
     "land": (land, -5.0), "door": (door, -5.0),
+    "menu_move": (menu_move, -8.0), "menu_select": (menu_select, -6.5), "menu_back": (menu_back, -6.5),
+    "text_blip": (text_blip, -9.0), "pause": (pause, -6.0), "save_done": (save_done, -6.0),
+    "game_over": (game_over, -5.0),
 }
 
 
@@ -284,7 +327,7 @@ def main():
         data[name] = y
         peak = 20 * math.log10(np.max(np.abs(y)))
         flags = ""
-        if peak > -2.9 or peak < -6.1:
+        if abs(peak - pk) > 0.6:                     # each effect must land on its own target level
             flags += " BAD-LEVEL"
         if abs(y[0]) > 0.003 or abs(y[-1]) > 0.003:
             flags += " CLICK"

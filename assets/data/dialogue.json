@@ -1,0 +1,78 @@
+{
+ "_header": {
+  "File": "dialogue.json",
+  "Description": "Every line the villagers say and every sign's text. Keys are referenced by tools/gen_areas.py (npcs/signs) and checked by its lint; read at runtime by src/core/DialogueData.gd.",
+  "Author": "Jose-Jorge HERNANDEZ",
+  "Company": "Parlee Conseiller, Inc.",
+  "Date": "2026-10-15",
+  "Last edit date": "2026-10-15",
+  "Version": "1.0.0",
+  "Format": "entry = {name?, pages: [...], once?: [...], flag?}. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
+ },
+ "tato": {
+  "name": "Tato",
+  "flag": "met_tato",
+  "once": [
+   "Joe... is that really you? Come in, come in. These old eyes have waited a long time for that face.",
+   "Since you left, Caver spends his nights under the old chapel. The dogs will not go near it. Neither will I.",
+   "Rest a while, then see Boni at the shop and Janga across the road. You will need them both."
+  ],
+  "pages": [
+   "Caver's guards walk the south road now. The boulders keep them out... for the moment.",
+   "If you are hurt, cut the grass and break the pots. The village has always looked after its own."
+  ]
+ },
+ "boni": {
+  "name": "Boni",
+  "flag": "met_boni",
+  "once": [
+   "Joe! Welcome home! My shelves are a little bare these days, I'm afraid.",
+   "Caver's men take half of every cart that comes up the road. When the roads are safe again, so is my stock!"
+  ],
+  "pages": [
+   "Gems, Joe! Green is one, blue is five, red is twenty. A hero's pocket money grows in every bush."
+  ]
+ },
+ "janga": {
+  "name": "Janga",
+  "flag": "met_janga",
+  "once": [
+   "Joe! I knew you'd come back. Look at you - still carrying that old family shield.",
+   "I'm working on something at the forge for you. Give me a little time.",
+   "Until then, remember what your father taught us: hold the sword after a swing, then let go for a spin!"
+  ],
+  "pages": [
+   "Walk off a ledge to hop down. You can't climb back up the same way, so look for a ramp."
+  ]
+ },
+ "villager_woman": {
+  "name": "Marta",
+  "pages": [
+   "The flowers came back this spring. Strange... the ones along the chapel road grew black."
+  ]
+ },
+ "villager_boy": {
+  "name": "Pico",
+  "pages": [
+   "Mister, can you lift pots? Stand in front of one and press the action button. I'm not strong enough yet!"
+  ]
+ },
+ "sign_pueblo_cross": {
+  "pages": ["EL PUEBLO\nNorth: the meadow.  West: the woods.\nEast: the lake.  South: the old road."]
+ },
+ "sign_pueblo_south": {
+  "pages": ["West: Boni's Shop.\nEast: Janga's house."]
+ },
+ "sign_meadow": {
+  "pages": ["NORTH MEADOW\nMind the slimes. They hop when you come close."]
+ },
+ "sign_woods": {
+  "pages": ["WEST WOODS\nThe ledge only goes one way."]
+ },
+ "sign_lake": {
+  "pages": ["EAST LAKE\nNo swimming. Do not feed the rock-spitters."]
+ },
+ "sign_south_road": {
+  "pages": ["SOUTH ROAD\nClosed by order of Caver.\nThe boulders are too heavy to lift."]
+ }
+}

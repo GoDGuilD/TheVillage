@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.1.0
+# Version: 2.2.0
 class_name PlayerTuning
 extends RefCounted
 
@@ -57,6 +57,12 @@ const THROW_TIME := 0.15
 const THROW_SPEED := 180.0
 const THROW_RANGE := 64.0             # four tiles, like ALttP
 const THROW_DAMAGE := 2
+
+# --- Talking and reading (interact button, Phase 4) ---------------------------------------------------
+const TALK_REACH := 16.0              # px in front of Joe where the talk probe lands (one tile)
+const TALK_PROBE_UP := Vector2(0, -6) # probe raised from the feet to tile-centre height
+const TALK_RADIUS := 11.0             # how close a villager's or sign's talk point must be to the probe
+const TALK_COOLDOWN := 0.15           # s Joe stays still after a conversation (the closing press must not re-open it)
 
 # --- Health and being hurt ------------------------------------------------------
 const MAX_HP := 6                     # half-heart units: 6 = three hearts, like ALttP's start

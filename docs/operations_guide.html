@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.2.0
+Version: 1.3.0
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -45,29 +45,36 @@ behaviour is verified by headless scripted test suites.</p>
 
 <h2>3. Start, stop, verify</h2>
 <ul>
-<li><b>Start:</b> open the editor, import the project folder, press F5.</li>
+<li><b>Start:</b> open the editor, import the project folder, press F5. The title screen opens; NEW GAME starts in Joe's house, CONTINUE loads the save.</li>
 <li><b>Stop:</b> close the game window (or F8 in the editor).</li>
-<li><b>Verify:</b> run the three test suites; each must end with <code>0 failed</code> (122 checks today):</li>
+<li><b>Verify:</b> run the four test suites; each must end with <code>0 failed</code> (185 checks today):</li>
 </ul>
 <pre>Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_player.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_combat.gd
-Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_world.gd</pre>
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_world.gd
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_ui.gd</pre>
 <p>Level lint (must print <code>0 lint problems</code>):</p>
 <pre>python -I tools/gen_areas.py</pre>
-<p>Visual check (opens a window, writes <code>tmp/field_*.png</code>):</p>
-<pre>Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_field.gd</pre>
+<p>Visual checks (open a window, write <code>tmp/field_*.png</code>, <code>tmp/world_*.png</code>, <code>tmp/ui_*.png</code>):</p>
+<pre>Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_field.gd
+Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_world.gd
+Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_ui.gd</pre>
 
 <h2>4. Logs and monitoring</h2>
 <p>The game writes Godot's standard log to <code>%APPDATA%\Godot\app_userdata\The Village\logs\godot.log</code>.
 Test runs print <code>PASS</code>/<code>FAIL</code> lines and a final <code>RESULT</code> line to the console;
 compare the number of checks between runs, since a script error can skip checks without failing them.</p>
+<p>The save file is <code>%APPDATA%\Godot\app_userdata\The Village\village_save.json</code> (plain JSON). Deleting it
+resets the game to a fresh start; the title screen then offers only NEW GAME.</p>
 
 <h2>5. Configuration parameters</h2>
 <table>
 <tr><th>File</th><th>Controls</th></tr>
 <tr><td><code>project.godot</code></td><td>Resolution (384×216), scaling, input map, physics layers</td></tr>
 <tr><td><code>src/player/PlayerTuning.gd</code></td><td>Walk speed, corner nudge, sword, spin attack, shield, lift/throw, health, hurt and invincibility times</td></tr>
-<tr><td><code>src/core/GameState.gd</code></td><td>Drop table and gem values</td></tr>
+<tr><td><code>src/core/GameState.gd</code></td><td>Drop table, gem values, magic and key limits, item order</td></tr>
+<tr><td><code>assets/data/dialogue.json</code></td><td>Every villager line and sign text</td></tr>
+<tr><td><code>src/ui/DialogueBox.gd</code>, <code>src/ui/UiTheme.gd</code></td><td>Text speed, box layout, UI colours</td></tr>
 <tr><td><code>tools/gen_areas.py</code></td><td>The world map: every area and interior (regenerate after editing)</td></tr>
 <tr><td><code>tools/palette.py</code></td><td>All colours of generated art</td></tr>
 </table>
@@ -76,7 +83,10 @@ compare the number of checks between runs, since a script error can skip checks 
 python -I tools/gen_tiles.py
 python -I tools/gen_enemies.py
 python -I tools/gen_props.py
+python -I tools/gen_ui.py
+python -I tools/gen_npcs.py
 python -I tools/gen_sfx.py
+python -I tools/gen_areas.py
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --import</pre>
 
 <h2>6. Common troubleshooting</h2>
@@ -86,6 +96,8 @@ Godot_v4.7.2-stable_win64_console.exe --headless --path . --import</pre>
 <tr><td>Screenshots black or missing</td><td>Capture scripts must run windowed (no <code>--headless</code>).</td></tr>
 <tr><td>A test fails right after a simulated key press</td><td>Presses register on the next physics frame; tests wait two frames.</td></tr>
 <tr><td>"ObjectDB instances were leaked" at exit</td><td>Harmless teardown warning.</td></tr>
+<tr><td>CONTINUE is greyed out</td><td>No save file (or one from an older format): start a NEW GAME and save from the pause menu (Esc).</td></tr>
+<tr><td>Every test suite fails to compile after a UI edit</td><td>Look for <code>round()</code> feeding a typed variable (use <code>roundf()</code>) or a test naming a menu class statically.</td></tr>
 </table>
 <p class="meta">Full details: <code>docs/TROUBLESHOOTING.md</code>, <code>docs/RUNBOOK.md</code>.</p>
 </body>

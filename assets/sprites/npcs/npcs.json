@@ -1,0 +1,18 @@
+{
+ "frame": [
+  32,
+  32
+ ],
+ "feet": [
+  16,
+  29
+ ],
+ "fps": 2.0,
+ "npcs": [
+  "boni",
+  "janga",
+  "tato",
+  "villager_boy",
+  "villager_woman"
+ ]
+}

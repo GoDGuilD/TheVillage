@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
 Last edit date: 2026-10-15
-Version: 2.2.0
+Version: 2.3.0
 -->
 
 # The Village
@@ -50,3 +50,11 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   (a compile failure hangs a headless `-s` run). World tests move Joe with `world._enter(area, world.cell_feet(...))`.
 - Terrain flags (`ledge`, `door`, `exit`) are TileSet custom data read with `AreaBuilder.flag_at`; nine-slices treat
   off-area cells as the same terrain (seamless edges).
+- Phase 4: the main scene is `src/ui/TitleScreen.tscn`; the World hosts `DialogueBox`, `PauseMenu`, `ItemMenu`,
+  `GameOver` (all pause the tree; their layers are `PROCESS_MODE_ALWAYS`). Four suites now (185 checks; `test_ui.gd`
+  61). Villagers/signs come from the `NPCS`/`SIGNS` tables in `gen_areas.py`; their text is
+  `assets/data/dialogue.json` (the lint checks keys). UI colours/layers only via `UiTheme`.
+- Never name an autoload-using class statically in a `-s` test (`PauseMenu.ITEM_SAVE` breaks compilation): read
+  constants through the instance. Use `roundf()`, not `round()`, for typed variables (warnings are errors).
+- Menus read `_unhandled_input`: tests drive them with `Input.parse_input_event` or `confirm()`/`advance()`; UI
+  tests and captures set `SaveGame.path` to a throw-away file so the player's save is never touched.

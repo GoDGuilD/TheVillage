@@ -1,10 +1,10 @@
 # File: gen_areas.py
-# Description: Builds every overworld area and house interior as ASCII rows, lints them (sizes, multi-cell pieces, edge openings, reachability, ledges, doors) and writes src/world/areas/*.json plus a rendered world preview.
+# Description: Builds every overworld area and house interior as ASCII rows with their villagers and signs, lints them (sizes, multi-cell pieces, edge openings, reachability, ledges, doors, dialogue keys) and writes src/world/areas/*.json plus a rendered world preview.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.2.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -25,6 +25,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(ROOT, "src", "world", "areas")
 ATLAS_PNG = os.path.join(ROOT, "assets", "tiles", "overworld_light.png")
 ATLAS_JSON = os.path.join(ROOT, "assets", "tiles", "overworld_light.json")
+DIALOGUE_JSON = os.path.join(ROOT, "assets", "data", "dialogue.json")
+NPC_MANIFEST = os.path.join(ROOT, "assets", "sprites", "npcs", "npcs.json")
 PREVIEW = os.path.join(ROOT, "tmp", "world_preview.png")
 PREVIEW_IN = os.path.join(ROOT, "tmp", "interiors_preview.png")
 
@@ -36,11 +38,12 @@ SEED = 1987
 
 MULTI = {"T": (2, 2), "H": (5, 4), "J": (5, 4), "K": (2, 1), "D": (1, 2)}
 HOUSE_DOOR = (2, 3)
-SOLID = set("R~v^fSTHJWwKD")
+SOLID = set("R~v^fSTHJWwKDN")    # N = a villager standing on that cell (solid body)
 ACTORS = set("BOZGQP")
 GROUND = set(".,*#_M")
 VALID = SOLID | ACTORS | GROUND | {"x"}
 ENEMIES = set("ZGQ")
+FACING_STEP = {"down": (0, 1), "up": (0, -1), "left": (-1, 0), "right": (1, 0)}
 OPEN_LO, OPEN_HI = 10, 14         # edge openings are 4 tiles wide, centred on each side of a screen pair
 # Openings: north/south at columns 22..25 of a 2-screen-wide area, east/west at rows 12..15 of a 2-screen-tall one.
 
@@ -147,7 +150,6 @@ def build_el_pueblo(rng):
         g.rect(x0, y0, x0 + 4, y0, "f")
         g.rect(x0, y0 + 1, x0 + 4, y0 + 3, "*")
     g.place([(5, 8), (12, 8), (33, 8), (40, 8), (5, 24), (12, 25), (33, 25), (40, 24)], "O")
-    g.place([(20, 10), (27, 17)], "S")
     g.place([(3, 3), (3, 4), (44, 3), (44, 4), (3, 23), (44, 23)], "B")
     g.scatter(rng, [",", ",", "*"], 140)
     return g, doors
@@ -245,8 +247,8 @@ def build_interior(kind, rng, spawn=False):
         g.piece(12, 3, "D")
         g.place([(2, 3), (2, 7)], "O")
     elif kind == "shop":
-        g.piece(4, 4, "K")
-        g.piece(9, 4, "K")
+        for x in (4, 6, 8, 10):                        # one long counter; Boni stands behind it
+            g.piece(x, 4, "K")
         g.place([(2, 2), (3, 2), (12, 2), (13, 2)], "O")
     else:
         g.piece(3, 3, "D")
@@ -433,8 +435,43 @@ def lint_world(areas, problems):
                 problems.append("%s: door at %s is unreachable" % (a["id"], d["cell"]))
         for (x, y) in entries[a["id"]]:
             pass
+        # Villagers and signs: glyphs match the lists, the text exists, and Joe can stand next to each one.
+        lint_talkers(a, solid, seen, problems)
     if spawns != 1:
         problems.append("world: %d 'P' spawns (need exactly 1)" % spawns)
+
+
+def lint_talkers(a, solid, seen, problems):
+    rows = a["rows"]
+    with open(DIALOGUE_JSON, encoding="utf-8") as f:
+        dialogue = json.load(f)
+    with open(NPC_MANIFEST, encoding="utf-8") as f:
+        sprites = set(json.load(f)["npcs"])
+    listed = {}
+    across = {}                                  # villager cell -> facing step, for those talked to over a counter
+    for n in a.get("npcs", []):
+        listed[tuple(n["cell"])] = ("N", n["id"])
+        if n.get("across"):
+            across[tuple(n["cell"])] = FACING_STEP[n["facing"]]
+        if n["id"] not in sprites:
+            problems.append("%s: villager %s has no sprite" % (a["id"], n["id"]))
+    for s_ in a.get("signs", []):
+        listed[tuple(s_["cell"])] = ("S", s_["text"])
+    for y, r in enumerate(rows):
+        for x, g in enumerate(r):
+            if g in "NS" and (x, y) not in listed:
+                problems.append("%s: %s at (%d,%d) has no entry (no text)" % (a["id"], g, x, y))
+    for (x, y), (g, key) in listed.items():
+        if rows[y][x] != g:
+            problems.append("%s: %s entry at (%d,%d) sits on %r" % (a["id"], g, x, y, rows[y][x]))
+        if key not in dialogue:
+            problems.append("%s: text %r at (%d,%d) is missing from dialogue.json" % (a["id"], key, x, y))
+        near = [(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+        if (x, y) in across:                     # over the counter: Joe stands two tiles out, along the facing
+            dx, dy = across[(x, y)]
+            near = [(x + 2 * dx, y + 2 * dy)]
+        if not any(p in seen for p in near):
+            problems.append("%s: nobody can reach the %s at (%d,%d)" % (a["id"], g, x, y))
 
 
 # --------------------------------------------------------------------------- assembly
@@ -455,23 +492,54 @@ INTERIORS = [
 ]
 START_AREA = "joe_house"
 
+# Villagers: area -> [(x, y, dialogue/sprite id, facing, talk_across)]. talk_across = Joe talks over the tile in
+# front of the villager (Boni behind her counter).
+NPCS = {
+    "el_pueblo": [(15, 9, "villager_woman", "down", False), (30, 17, "villager_boy", "left", False)],
+    "tato_house": [(10, 4, "tato", "down", False)],
+    "boni_shop": [(7, 3, "boni", "down", True)],
+    "janga_house": [(11, 4, "janga", "down", False)],
+}
+# Signs: area -> [(x, y, dialogue id)].
+SIGNS = {
+    "el_pueblo": [(20, 10, "sign_pueblo_cross"), (27, 17, "sign_pueblo_south")],
+    "meadow_north": [(20, 10, "sign_meadow")],
+    "west_woods": [(18, 11, "sign_woods")],
+    "east_lake": [(4, 11, "sign_lake")],
+    "south_road": [(21, 4, "sign_south_road")],
+}
+
+
+def add_people_and_signs(g, aid):
+    """Stand the area's villagers and signs on the grid (N / S glyphs) and return their JSON lists."""
+    npcs, signs = [], []
+    for x, y, nid, facing, across in NPCS.get(aid, []):
+        g.place([(x, y)], "N")
+        npcs.append({"id": nid, "cell": [x, y], "facing": facing, "across": across})
+    for x, y, text in SIGNS.get(aid, []):
+        g.place([(x, y)], "S")
+        signs.append({"cell": [x, y], "text": text})
+    return {"npcs": npcs, "signs": signs}
+
 
 def assemble():
     rng = random.Random(SEED)
     areas = []
     for aid, name, origin, size, builder in OVERWORLD:
         g, doors = builder(rng)
+        extras = add_people_and_signs(g, aid)
         areas.append({"id": aid, "name": name, "kind": "overworld", "size_screens": list(size),
                       "origin_tiles": [origin[0] * SCREEN[0], origin[1] * SCREEN[1]],
-                      "rows": g.rows(), "doors": doors, "exits": []})
+                      "rows": g.rows(), "doors": doors, "exits": [], **extras})
     by_id = {a["id"]: a for a in areas}
     for i, (aid, name, kind, spawn) in enumerate(INTERIORS):
         g = build_interior(kind, rng, spawn)
+        extras = add_people_and_signs(g, aid)
         rows = g.rows()
         mats = [[x, y] for y, r in enumerate(rows) for x, c in enumerate(r) if c == "M"]
         areas.append({"id": aid, "name": name, "kind": "interior", "size_screens": [1, 1],
                       "origin_tiles": [INTERIOR_BASE[0] + i * INTERIOR_STRIDE, INTERIOR_BASE[1]],
-                      "rows": rows, "doors": [], "exits": []})
+                      "rows": rows, "doors": [], "exits": [], **extras})
     # Pair doors with interiors: the door leads to the cell above the mat; the mat leads below the door.
     for a in list(areas):
         for d in a["doors"]:
@@ -562,7 +630,7 @@ def render(areas):
                     name = "floor" if indoor else "grass_a"
                 img.alpha_composite(tile(name), (px, py))
                 marks = {"B": (56, 144, 76), "O": (176, 104, 60), "Z": (60, 136, 200), "G": (144, 28, 68),
-                         "Q": (224, 104, 56), "P": (255, 255, 255)}
+                         "Q": (224, 104, 56), "P": (255, 255, 255), "N": (248, 208, 64)}
                 if g in marks:
                     for yy in range(4, 12):
                         for xx in range(4, 12):

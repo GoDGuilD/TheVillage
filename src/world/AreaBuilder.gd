@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.1.0
+# Version: 1.2.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -13,6 +13,8 @@ extends RefCounted
 ## Glyphs (indoors):   _  floor   W  wall (face or top, chosen by the cell below)   w  wall with a shelf
 ##                     M  exit mat   K  2x1 table   D  1x2 bed
 ## Actors on any ground: B bush, O pot, Z slime, G guard, Q rock-spitter, P Joe's spawn (test fields only).
+## N marks a villager's cell (ground is painted; the World places the Npc from the area's "npcs" list,
+## and makes each S readable from its "signs" list).
 ## The source of these rows is tools/gen_areas.py (areas) or TestField.layout (test arenas).
 
 const TILE := 16

@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 5.0.0
+Version: 5.1.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,40 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [5.0.0] - 2026-10-15 — Phase 4: HUD, menus, saves, dialogue
+
+### Added
+- Title screen (new main scene): "THE VILLAGE" logo over a slow pan across El Pueblo; CONTINUE (when a save
+  exists), NEW GAME, QUIT.
+- Full ALttP-style HUD: magic meter, equipped-item box, gem counter, small-key counter (hidden at zero),
+  "- LIFE -" with up to 20 hearts in two rows; area-name captions when Joe enters an area.
+- Dialogue: `DialogueBox` (word-wrapped pages typed out with a blip, speaker name plate, "more" arrow, box at the
+  top when Joe is low on the screen; pauses the world). Text lives in `assets/data/dialogue.json`, read by
+  `DialogueData` (first-meeting lines set a story flag; later talks use other lines).
+- Villagers (`Npc`): Tato, Boni (behind her new shop counter, talked to across it), Janga, and Marta and Pico in
+  El Pueblo; they turn to face Joe. Signs are readable (`SignPost`): two in El Pueblo and one in each other area.
+  Joe's interact talks/reads before it lifts.
+- Pause menu (Esc / Start: CONTINUE, SAVE GAME, SAVE AND QUIT), item menu (I / left shoulder: 5x2 item grid that
+  equips found items, equipment, the three family seals), Game Over screen (red-to-black fade; CONTINUE,
+  SAVE AND CONTINUE, SAVE AND QUIT) instead of the automatic respawn.
+- Save/load (`SaveGame`, `user://village_save.json`): area + entry point, hearts, gems, magic, keys, items,
+  equipped item, seals and story flags.
+- `GameState` grows magic, keys, items, equipped item, seals, flags, `snapshot()` / `restore()`.
+- Generators: `tools/gen_ui.py` (fonts, HUD pieces, boxes, cursor, slots, seals, equipment icons, logo; glyphs in
+  `tools/font_glyphs.py`, shared with Chapel of Dreams), `tools/gen_npcs.py` (5 villagers x 3 facings);
+  `gen_sfx.py` adds menu_move, menu_select, menu_back, text_blip, pause, save_done, game_over (25 effects) and
+  checks each effect against its own level target.
+- `gen_areas.py`: villager and sign tables (`NPCS`, `SIGNS`), the `N` glyph, and lint for both (glyph and list
+  agree, text exists in dialogue.json, villager sprite exists, Joe can stand next to each one).
+- `tests/test_ui.gd` (61 checks), `tools/capture_ui.gd`.
+
+### Changed
+- `World` hosts the dialogue box and the menus, opens Game Over on death, saves at the area's entry point and
+  applies a pending save; Joe's facing at each entry is remembered.
+- `PixelText` and `MenuList` ported from Chapel of Dreams (PixelText gains `wrap()`); UI colours and CanvasLayer
+  order live in `UiTheme`.
+- 185 checks in 4 suites, all passing.
 
 ## [4.0.0] - 2026-10-15 — Phase 3: the overworld engine
 
