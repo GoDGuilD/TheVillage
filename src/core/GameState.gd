@@ -1,10 +1,10 @@
 # File: GameState.gd
-# Description: Autoload holding run-wide state - gems, magic, small keys, bombs/arrows, heart pieces, items, family seals, story flags - plus the drop table, and the snapshot/restore used by saves.
+# Description: Autoload holding run-wide state - gems, magic, small keys (one pool per dungeon), dungeon items, bombs/arrows, heart pieces, items, family seals, story flags, visited areas - plus the drop table, and the snapshot/restore used by saves.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 2.1.0
+# Last edit date: 2026-10-16
+# Version: 3.0.1
 extends Node
 ## Keep it data + small helpers only. Joe's own hearts live on his HealthComponent (the World copies them in and
 ## out of saves). Items are listed here so the item menu can show their slots; they are found from Phase 5 on.
@@ -31,7 +31,17 @@ const GEM_VALUES := {"gem_green": 1, "gem_blue": 5, "gem_red": 20}
 
 var gems := 0
 var magic := MAX_MAGIC
-var keys := 0
+# Small keys belong to the place they were found (ALttP): one pool for the overworld ("") and one per dungeon.
+# `keys` reads and writes the pool of wherever Joe is (the World calls set_key_pool on every area change).
+var key_pool := ""
+var key_pools: Dictionary = {}
+var keys: int:
+	get:
+		return int(key_pools.get(key_pool, 0))
+	set(value):
+		key_pools[key_pool] = value
+var dungeon_items: Dictionary = {}       # dungeon id -> {"map": true, "compass": true, "big_key": true}
+var visited: Dictionary = {}             # area id -> true (the map screen draws visited rooms)
 var bombs := 0
 var arrows := 0
 var heart_pieces := 0                    # 0..3 pieces toward the next container
@@ -61,6 +71,21 @@ func use_magic(amount: int) -> bool:
 func add_magic(amount: int) -> void:
 	magic = clampi(magic + amount, 0, MAX_MAGIC)
 	magic_changed.emit(magic, MAX_MAGIC)
+
+
+func set_key_pool(pool: String) -> void:
+	key_pool = pool
+	keys_changed.emit(keys)
+
+
+func has_dungeon_item(dungeon: String, item: String) -> bool:
+	return bool(dungeon_items.get(dungeon, {}).get(item, false))
+
+
+func give_dungeon_item(dungeon: String, item: String) -> void:
+	if not dungeon_items.has(dungeon):
+		dungeon_items[dungeon] = {}
+	dungeon_items[dungeon][item] = true
 
 
 func add_keys(amount: int) -> void:
@@ -106,7 +131,7 @@ func has_item(item: String) -> bool:
 
 func give_item(item: String, level: int = 1) -> void:
 	items[item] = level
-	if equipped == "":
+	if equipped == "" and ITEM_ORDER.has(item):        # passive gear (the glove) is never "equipped"
 		equip(item)
 
 
@@ -148,7 +173,8 @@ func roll_drop() -> String:
 
 # Everything a save needs from this autoload.
 func snapshot() -> Dictionary:
-	return {"gems": gems, "magic": magic, "keys": keys, "bombs": bombs, "arrows": arrows,
+	return {"gems": gems, "magic": magic, "key_pools": key_pools.duplicate(), "dungeon_items": dungeon_items.duplicate(true),
+			"visited": visited.keys(), "bombs": bombs, "arrows": arrows,
 			"heart_pieces": heart_pieces, "items": items.duplicate(), "equipped": equipped,
 			"seals": seals.duplicate(), "flags": flags.duplicate()}
 
@@ -157,7 +183,14 @@ func snapshot() -> Dictionary:
 func restore(data: Dictionary) -> void:
 	gems = clampi(int(data.get("gems", 0)), 0, MAX_GEMS)
 	magic = clampi(int(data.get("magic", MAX_MAGIC)), 0, MAX_MAGIC)
-	keys = clampi(int(data.get("keys", 0)), 0, MAX_KEYS)
+	key_pool = ""
+	key_pools = Dictionary(data.get("key_pools", {"": int(data.get("keys", 0))})).duplicate()
+	for pool in key_pools:
+		key_pools[pool] = clampi(int(key_pools[pool]), 0, MAX_KEYS)
+	dungeon_items = Dictionary(data.get("dungeon_items", {})).duplicate(true)
+	visited = {}
+	for aid in data.get("visited", []):
+		visited[String(aid)] = true
 	bombs = clampi(int(data.get("bombs", 0)), 0, MAX_BOMBS)
 	arrows = clampi(int(data.get("arrows", 0)), 0, MAX_ARROWS)
 	heart_pieces = clampi(int(data.get("heart_pieces", 0)), 0, PIECES_PER_HEART - 1)

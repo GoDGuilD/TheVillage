@@ -1,10 +1,10 @@
 # File: gen_areas.py
-# Description: Builds every overworld area and house interior as ASCII rows with their villagers, signs, chests, torches, cracked rocks, key blocks, heart pieces and shop wares, lints them (sizes, pieces, openings, reachability, ledges, doors, dialogue keys, item kinds, keys vs locks) and writes src/world/areas/*.json plus a preview.
+# Description: Builds every overworld area, house interior and dungeon room as ASCII rows with their villagers, signs, chests, torches, rocks, key blocks, heart pieces, wares, doors, switches and blocks, lints them (sizes, pieces, openings, reachability, ledges, doors, dialogue keys, item kinds, keys vs locks, big keys) and writes src/world/areas/*.json plus previews.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 2.0.0
+# Last edit date: 2026-10-16
+# Version: 3.0.1
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -29,27 +29,35 @@ DIALOGUE_JSON = os.path.join(ROOT, "assets", "data", "dialogue.json")
 NPC_MANIFEST = os.path.join(ROOT, "assets", "sprites", "npcs", "npcs.json")
 PREVIEW = os.path.join(ROOT, "tmp", "world_preview.png")
 PREVIEW_IN = os.path.join(ROOT, "tmp", "interiors_preview.png")
+PREVIEW_DUNGEON = os.path.join(ROOT, "tmp", "dungeon_d1_preview.png")
 
 SCREEN = (24, 14)                 # tiles per screen (384 x 224 px; the 216-px view scrolls 8 px inside one screen)
 TILE = 16
 INTERIOR_BASE = (1000, 1000)      # interiors are placed at this tile offset, far from the overworld grid
 INTERIOR_STRIDE = 40
+DUNGEON_BASE = (2000, 0)          # dungeons get their own room grid, far from everything else
 SEED = 1987
 
-MULTI = {"T": (2, 2), "H": (5, 4), "J": (5, 4), "K": (2, 1), "D": (1, 2)}
+MULTI = {"T": (2, 2), "H": (5, 4), "J": (5, 4), "K": (2, 1), "D": (1, 2), "E": (5, 3), "$": (2, 1)}
 HOUSE_DOOR = (2, 3)
-SOLID = set("R~v^fSTHJWwKDNCLkl")  # N villager, C chest, L torch, k cracked rock, l key block (all solid bodies)
-ACTORS = set("BOZGQPh")           # h = a heart piece lying on the ground
-OPENABLE = set("kl")               # solid until a bomb / a small key opens them (reachability treats them as open)
-GROUND = set(".,*#_M")
-VALID = SOLID | ACTORS | GROUND | {"x"}
-ENEMIES = set("ZGQ")
+SHRINE_DOOR = (2, 2)
+# Solid: N villager, C chest, L torch, k cracked rock, l key block, % dungeon wall, + pillar, o pit (Joe falls),
+# [ door, & push block, r heavy rock (all solid bodies or impassable cells).
+SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&r")
+ACTORS = set("BOZGQPhY")          # h = a heart piece lying on the ground, Y = a dungeon boss
+OPENABLE = set("kl[&r")            # solid until a bomb / key / push / glove opens them (reachability: open)
+GROUND = set(".,*#_M=;@s")         # = ; dungeon floor, @ floor switch, s exit stairs
+VALID = SOLID | ACTORS | GROUND | {"x"} | set(MULTI)
+ENEMIES = set("ZGQY")
 FACING_STEP = {"down": (0, 1), "up": (0, -1), "left": (-1, 0), "right": (1, 0)}
 # Everything a chest, gift or ware may hand out - mirrors ItemDB.KINDS in src/items/ItemDB.gd (test_items.gd
 # checks that every kind used by the areas exists there).
-ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "heart_piece", "heart_container", "gems"}
+ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "heart_piece", "heart_container", "gems",
+              "map", "compass", "big_key", "glove"}
 WARE_IDS = {"bombs", "arrows", "heart_piece"}                       # ItemDB.WARES
-OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h"}
+OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h", "door": "[",
+                 "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r"}
+DOORWAYS = {"n": (11, 0), "s": (11, 12), "w": (0, 6), "e": (22, 6)}   # top-left cell of each 2x2 dungeon doorway
 OPEN_LO, OPEN_HI = 10, 14         # edge openings are 4 tiles wide, centred on each side of a screen pair
 # Openings: north/south at columns 22..25 of a 2-screen-wide area, east/west at rows 12..15 of a 2-screen-tall one.
 
@@ -186,12 +194,13 @@ def build_west_woods(rng):
     for x, y in ((4, 2), (8, 2), (12, 2), (16, 2), (4, 6), (16, 6), (4, 18), (8, 22), (14, 22), (18, 18)):
         g.piece(x, y, "T")
     g.rect(6, 9, 15, 9, "v")                           # ledge: hop down from the upper wood into the clearing
-    g.place([(9, 5), (10, 5), (12, 18), (13, 18), (6, 15)], "B")
+    g.piece(8, 4, "E")                                 # the Moss Shrine, up in the old wood
+    g.place([(6, 8), (7, 8), (12, 18), (13, 18), (6, 15)], "B")
     g.place([(7, 13)], "G")
     g.place([(12, 20)], "Q")
     g.place([(18, 4)], "R")
     g.scatter(rng, [",", ","], 60)
-    return g, []
+    return g, [{"cell": [8 + SHRINE_DOOR[0], 4 + SHRINE_DOOR[1]], "to": "d1_entrance"}]
 
 
 def build_east_lake(rng):
@@ -281,6 +290,8 @@ def solid_map(rows):
                         solid[yy][xx] = True
                 if g in "HJ":
                     solid[y + HOUSE_DOOR[1]][x + HOUSE_DOOR[0]] = False
+                if g == "E":
+                    solid[y + SHRINE_DOOR[1]][x + SHRINE_DOOR[0]] = False
             elif g in SOLID:
                 solid[y][x] = True
     return solid
@@ -348,27 +359,36 @@ def neighbours_walk(rows, solid, x, y):
             yield nx, ny
 
 
+def group_of(a):
+    """Areas that scroll into each other share a group: the overworld, or one dungeon's rooms."""
+    return "overworld" if a["kind"] == "overworld" else a.get("dungeon")
+
+
 def lint_world(areas, problems):
     by_id = {a["id"]: a for a in areas}
     solids = {a["id"]: lint_area(a, problems) for a in areas}
-    # Global occupancy of the overworld (tile -> area id).
+    passable = {aid: [[sv and a_rows[y][x] not in OPENABLE for x, sv in enumerate(row)] for y, row in enumerate(sm)]
+                for aid, sm, a_rows in ((a["id"], solids[a["id"]], a["rows"]) for a in areas)}
+    # Global occupancy per group (tile -> area id).
     owner = {}
     for a in areas:
-        if a["kind"] != "overworld":
+        grp = group_of(a)
+        if grp is None:
             continue
         ox, oy = a["origin_tiles"]
         for y in range(len(a["rows"])):
             for x in range(len(a["rows"][0])):
-                key = (ox + x, oy + y)
+                key = (grp, ox + x, oy + y)
                 if key in owner:
-                    problems.append("overlap: %s and %s at tile %s" % (owner[key], a["id"], key))
+                    problems.append("overlap: %s and %s at tile %s" % (owner[key], a["id"], key[1:]))
                 owner[key] = a["id"]
-    # Edge openings must continue into a walkable cell of a neighbour.
+    # Edge openings must continue into a walkable (or openable) cell of a neighbour of the same group.
     entries = {a["id"]: [] for a in areas}
     for a in areas:
-        if a["kind"] != "overworld":
+        grp = group_of(a)
+        if grp is None:
             continue
-        rows, solid = a["rows"], solids[a["id"]]
+        rows, solid = a["rows"], passable[a["id"]]
         ox, oy = a["origin_tiles"]
         h, w = len(rows), len(rows[0])
         for y in range(h):
@@ -379,13 +399,13 @@ def lint_world(areas, problems):
                     nx, ny = x + dx, y + dy
                     if 0 <= nx < w and 0 <= ny < h:
                         continue
-                    other = owner.get((ox + nx, oy + ny))
+                    other = owner.get((grp, ox + nx, oy + ny))
                     if other is None:
                         problems.append("%s: opening at (%d,%d) leads off the world" % (a["id"], x, y))
                         continue
                     b = by_id[other]
                     bx, by = ox + nx - b["origin_tiles"][0], oy + ny - b["origin_tiles"][1]
-                    if solids[other][by][bx]:
+                    if passable[other][by][bx]:
                         problems.append("%s: opening at (%d,%d) runs into a wall of %s" % (a["id"], x, y, other))
                     entries[a["id"]].append((x, y))
     # Doors and exits pair up.
@@ -448,30 +468,71 @@ def lint_world(areas, problems):
         lint_objects(a, seen, problems)
     if spawns != 1:
         problems.append("world: %d 'P' spawns (need exactly 1)" % spawns)
-    keys = sum(1 for a in areas for o in a.get("objects", []) if o.get("item") == "small_key")
-    locks = sum(1 for a in areas for o in a.get("objects", []) if o["kind"] == "key_block")
-    if keys < locks:
-        problems.append("world: %d key blocks but only %d small keys" % (locks, keys))
+    # Keys per pool (overworld = None, else the dungeon id): small keys >= key blocks + distinct locked doors;
+    # a big key wherever there is a big door or a big chest; the glove somewhere if a heavy rock exists.
+    pools = {}
+    for a in areas:
+        pool = a.get("dungeon")
+        p = pools.setdefault(pool, {"keys": 0, "locks": set(), "big_key": False, "needs_big": False})
+        for o in a.get("objects", []):
+            p["keys"] += o.get("item") == "small_key"
+            p["big_key"] |= o.get("item") == "big_key"
+            if o["kind"] == "key_block":
+                p["locks"].add((a["id"], tuple(o["cell"])))
+            if o["kind"] == "door" and o["type"] == "locked":
+                p["locks"].add(o["id"])
+            p["needs_big"] |= o["kind"] == "big_chest" or (o["kind"] == "door" and o["type"] == "big")
+    for pool, p in pools.items():
+        name = pool or "overworld"
+        if p["keys"] < len(p["locks"]):
+            problems.append("%s: %d locks but only %d small keys" % (name, len(p["locks"]), p["keys"]))
+        if p["needs_big"] and not p["big_key"]:
+            problems.append("%s: a big door or big chest but no big key" % name)
+    every = [o for a in areas for o in a.get("objects", [])]
+    if any(o["kind"] == "heavy_rock" for o in every) and not any(o.get("item") == "glove" for o in every):
+        problems.append("world: heavy rocks but no power glove anywhere")
 
 
 def lint_objects(a, seen, problems):
     """Objects and wares: glyphs agree with the lists, contents exist, and Joe can use each one."""
     rows = a["rows"]
     listed = {tuple(o["cell"]): o for o in a.get("objects", [])}
+    covered = set(listed)
+    for o in a.get("objects", []):
+        if o["kind"] == "door":                                   # doors cover a 2x2 doorway
+            x, y = o["cell"]
+            covered |= {(x + dx, y + dy) for dx in (0, 1) for dy in (0, 1)}
     for y, r in enumerate(rows):
         for x, g in enumerate(r):
-            if g in OBJECT_GLYPHS.values() and (x, y) not in listed:
+            if g in OBJECT_GLYPHS.values() and (x, y) not in covered:
                 problems.append("%s: %s at (%d,%d) has no object entry" % (a["id"], g, x, y))
     torches = [o for o in a.get("objects", []) if o["kind"] == "torch"]
+    switch_flags = {o.get("flag") for o in a.get("objects", []) if o["kind"] == "switch"}
     for (x, y), o in listed.items():
+        if o["kind"] == "door":
+            # A boss door starts open (floor) and shuts behind Joe; every other door fills its doorway with [.
+            want = "=" if o["type"] == "boss" else "["
+            cells = [(x + dx, y + dy) for dx in (0, 1) for dy in (0, 1)]
+            if any(rows[cy][cx] != want for cx, cy in cells):
+                problems.append("%s: door %s does not fill its doorway" % (a["id"], o["id"]))
+            if (x, y) != DOORWAYS[o["dir"]]:
+                problems.append("%s: door %s is not on the %s doorway" % (a["id"], o["id"], o["dir"]))
+            continue
         if rows[y][x] != OBJECT_GLYPHS[o["kind"]]:
             problems.append("%s: %s entry at (%d,%d) sits on %r" % (a["id"], o["kind"], x, y, rows[y][x]))
         near = [(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+        if o["kind"] == "big_chest":
+            near = [(x, y + 1), (x + 1, y + 1)]
+        if o["kind"] == "switch":
+            near = [(x, y)]
         if o["kind"] == "chest":
             if o["item"] not in ITEM_KINDS:
                 problems.append("%s: chest at (%d,%d) holds unknown %r" % (a["id"], x, y, o["item"]))
-            if o.get("hidden") and not torches:
+            reveal = o.get("reveal", "")
+            if reveal == "torches" and not torches:
                 problems.append("%s: hidden chest at (%d,%d) but no torches to reveal it" % (a["id"], x, y))
+            if reveal == "switch" and o.get("flag") not in switch_flags:
+                problems.append("%s: hidden chest at (%d,%d) but no switch for %s" % (a["id"], x, y, o.get("flag")))
             near = [(x, y + 1)]                                   # chests open from below (ALttP)
         if o["kind"] == "heart_piece":
             near = [(x, y)]
@@ -551,9 +612,10 @@ NPCS = {
 OBJECTS = {
     "joe_house": [("chest", 10, 2, {"item": "lantern"})],
     "meadow_north": [("torch", 28, 4, {}), ("torch", 39, 4, {}),
-                     ("chest", 34, 7, {"item": "heart_piece", "hidden": True})],
+                     ("chest", 34, 7, {"item": "heart_piece", "reveal": "torches"})],
     "west_woods": [("cracked_rock", 2, 24, {}), ("rock", 3, 25, {}), ("heart_piece", 2, 25, {})],
-    "east_lake": [("chest", 10, 7, {"item": "small_key"}), ("heart_piece", 21, 22, {})],
+    "east_lake": [("chest", 10, 7, {"item": "small_key"}), ("heavy_rock", 21, 21, {}), ("heart_piece", 21, 22, {}),
+                  ("heavy_rock", 21, 23, {})],
     "south_road": [("rock", 42, 8, {}), ("key_block", 42, 9, {}), ("rock", 42, 10, {}), ("rock", 42, 11, {}),
                    ("chest", 44, 8, {"item": "bow"})],
 }
@@ -563,10 +625,115 @@ WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")
 SIGNS = {
     "el_pueblo": [(20, 10, "sign_pueblo_cross"), (27, 17, "sign_pueblo_south")],
     "meadow_north": [(20, 10, "sign_meadow")],
-    "west_woods": [(18, 11, "sign_woods")],
+    "west_woods": [(18, 11, "sign_woods"), (13, 7, "sign_shrine")],
     "east_lake": [(4, 11, "sign_lake")],
     "south_road": [(21, 4, "sign_south_road")],
 }
+
+
+# The Moss Shrine (dungeon 1). Rooms are one screen each on their own grid; walls are two tiles thick and the
+# doorways sit in the middle of each side (DOORWAYS). Doors are listed per side as (type, id, when): types
+# "open", "locked" (small key), "big" (big key), "shutter" (opens when the flag `when` is set), "boss" (closes
+# behind Joe until the boss falls), "stairs" (the way out). A door shared by two rooms appears in both with the
+# same id, so it blocks from either side.
+D1 = {"id": "d1", "name": "Moss Shrine", "seal": 0, "entrance": "d1_entrance", "boss_room": "d1_boss",
+      "boss_flag": "boss:d1"}
+
+
+def room_grid(doors):
+    """A 24x14 room: floor inside two-tile walls, with each side's doorway carved as floor / door / stairs."""
+    g = Grid(SCREEN[0], SCREEN[1], "=")
+    g.rect(0, 0, g.w - 1, 1, "%")
+    g.rect(0, g.h - 2, g.w - 1, g.h - 1, "%")
+    g.rect(0, 0, 1, g.h - 1, "%")
+    g.rect(g.w - 2, 0, g.w - 1, g.h - 1, "%")
+    objects = []
+    for side, spec in doors.items():
+        kind = spec[0]
+        x, y = DOORWAYS[side]
+        if kind == "stairs":
+            g.rect(x, y, x + 1, y, "s")                          # steps in the inner wall row, wall below them
+            continue
+        g.rect(x, y, x + 1, y + 1, "=" if kind in ("open", "boss") else "[")
+        if kind not in ("open",):
+            obj = {"kind": "door", "cell": [x, y], "dir": side, "type": kind, "id": spec[1], "when": spec[2]}
+            if kind == "boss":
+                obj["type"] = "boss"
+            objects.append(obj)
+    return g, objects
+
+
+def d1_rooms():
+    """(id, grid x, grid y, grid, objects, extra area fields) for every room of the Moss Shrine."""
+    rooms = []
+
+    def add(aid, gx, gy, doors, fill, extra=None):
+        g, objs = room_grid(doors)
+        more = fill(g) or []
+        for kind, x, y, data in more:
+            if kind in ("Z", "G", "Q", "Y", "O", "B", "+", "o", ";"):
+                g.set(x, y, kind)
+                continue
+            if kind == "big_chest":
+                g.piece(x, y, "$")
+            else:
+                g.place([(x, y)], OBJECT_GLYPHS[kind])
+            objs.append(dict({"kind": kind, "cell": [x, y]}, **data))
+        rooms.append((aid, gx, gy, g, objs, extra or {}))
+
+    def entrance(g):
+        return [("+", 5, 4, {}), ("+", 18, 4, {}), ("+", 5, 9, {}), ("+", 18, 9, {}), ("O", 3, 3, {}),
+                ("O", 20, 3, {}), ("Z", 8, 7, {}), ("Z", 15, 7, {}), (";", 9, 10, {}), (";", 14, 3, {})]
+    add("d1_entrance", 1, 3, {"n": ("open",), "s": ("stairs",)}, entrance)
+
+    def hub(g):
+        for x0, y0 in ((3, 3), (17, 3), (3, 9), (17, 9)):
+            g.rect(x0, y0, x0 + 3, y0 + 1, "o")
+        return [("+", 9, 5, {}), ("+", 14, 5, {}), ("+", 9, 8, {}), ("+", 14, 8, {}), ("G", 16, 7, {})]
+    add("d1_hub", 1, 2, {"n": ("big", "d1_hub_north", ""), "s": ("open",), "w": ("open",),
+                         "e": ("locked", "d1_hub_east", "")}, hub)
+
+    def west(g):
+        return [("chest", 4, 3, {"item": "map", "amount": 1, "reveal": ""}), ("+", 17, 4, {}), ("+", 17, 9, {}),
+                ("Z", 6, 5, {}), ("Z", 10, 8, {}), ("G", 14, 5, {}), ("Q", 5, 9, {})]
+    add("d1_west", 0, 2, {"e": ("open",), "n": ("shutter", "d1_west_north", "cleared:d1_west")}, west,
+        {"clear_flag": "cleared:d1_west"})
+
+    def northwest(g):
+        g.rect(4, 6, 7, 6, "o")                                   # pits beside the block's path
+        g.rect(9, 6, 12, 6, "o")
+        return [("push_block", 8, 8, {}), ("switch", 8, 5, {"flag": "switch:d1_northwest", "heavy": True}),
+                ("chest", 15, 4, {"item": "small_key", "amount": 1, "reveal": "switch", "flag": "switch:d1_northwest"}),
+                ("Z", 17, 9, {}), ("Z", 4, 10, {})]
+    add("d1_northwest", 0, 1, {"s": ("shutter", "d1_west_north", "cleared:d1_west")}, northwest)
+
+    def east(g):
+        g.rect(14, 2, 21, 6, "o")                                 # a pit field crossed by a one-tile bridge
+        g.rect(17, 2, 17, 6, "=")
+        return [("switch", 17, 3, {"flag": "switch:d1_east", "heavy": False}),
+                ("chest", 4, 3, {"item": "compass", "amount": 1, "reveal": ""}),
+                ("big_chest", 9, 8, {"item": "glove"}), ("Q", 5, 9, {}), ("Q", 20, 10, {})]
+    add("d1_east", 2, 2, {"w": ("locked", "d1_hub_east", ""), "n": ("shutter", "d1_east_north", "switch:d1_east")},
+        east)
+
+    def northeast(g):
+        g.rect(4, 5, 9, 5, "o")
+        g.rect(14, 5, 19, 5, "o")
+        return [("chest", 12, 3, {"item": "big_key", "amount": 1, "reveal": ""}), ("G", 6, 8, {}), ("G", 17, 8, {}),
+                ("Z", 12, 9, {})]
+    add("d1_northeast", 2, 1, {"s": ("shutter", "d1_east_north", "switch:d1_east")}, northeast)
+
+    def ante(g):
+        return [("torch", 9, 3, {}), ("torch", 14, 3, {}),
+                ("chest", 12, 6, {"item": "gems", "amount": 50, "reveal": "torches"}),
+                ("+", 4, 4, {}), ("+", 19, 4, {}), ("+", 4, 9, {}), ("+", 19, 9, {}), ("Z", 7, 9, {}), ("Z", 16, 9, {}),
+                ("G", 12, 10, {})]
+    add("d1_ante", 1, 1, {"s": ("big", "d1_hub_north", ""), "n": ("open",)}, ante)
+
+    def boss(g):
+        return [("+", 4, 3, {}), ("+", 19, 3, {}), ("+", 4, 10, {}), ("+", 19, 10, {}), ("Y", 11, 6, {})]
+    add("d1_boss", 1, 0, {"s": ("boss", "d1_boss_door", D1["boss_flag"])}, boss, {"boss_flag": D1["boss_flag"]})
+    return rooms
 
 
 def add_people_and_signs(g, aid):
@@ -586,7 +753,7 @@ def add_people_and_signs(g, aid):
         g.place([(x, y)], OBJECT_GLYPHS[kind])
         obj = {"kind": kind, "cell": [x, y]}
         if kind == "chest":
-            obj.update({"item": extra["item"], "amount": extra.get("amount", 1), "hidden": extra.get("hidden", False)})
+            obj.update({"item": extra["item"], "amount": extra.get("amount", 1), "reveal": extra.get("reveal", "")})
         objects.append(obj)
     wares = [{"ware": w, "cell": [x, y]} for x, y, w in WARES.get(aid, [])]
     return {"npcs": npcs, "signs": signs, "objects": objects, "wares": wares}
@@ -610,11 +777,18 @@ def assemble():
         areas.append({"id": aid, "name": name, "kind": "interior", "size_screens": [1, 1],
                       "origin_tiles": [INTERIOR_BASE[0] + i * INTERIOR_STRIDE, INTERIOR_BASE[1]],
                       "rows": rows, "doors": [], "exits": [], **extras})
-    # Pair doors with interiors: the door leads to the cell above the mat; the mat leads below the door.
+    for aid, gx, gy, g, objects, extra in d1_rooms():
+        extras = add_people_and_signs(g, aid)
+        extras["objects"] = objects + extras["objects"]
+        areas.append({"id": aid, "name": D1["name"], "kind": "dungeon", "dungeon": D1["id"], "size_screens": [1, 1],
+                      "origin_tiles": [DUNGEON_BASE[0] + gx * SCREEN[0], DUNGEON_BASE[1] + gy * SCREEN[1]],
+                      "grid": [gx, gy], "rows": g.rows(), "doors": [], "exits": [], **extras, **extra})
+    # Pair doors with what they lead into: the door leads to the cell above the target's mat / stairs; the mat or
+    # stairs lead back below the door.
     for a in list(areas):
         for d in a["doors"]:
             t = next(x for x in areas if x["id"] == d["to"])
-            mats = [[x, y] for y, r in enumerate(t["rows"]) for x, c in enumerate(r) if c == "M"]
+            mats = [[x, y] for y, r in enumerate(t["rows"]) for x, c in enumerate(r) if c in "Ms"]
             d["spawn_cell"] = [mats[0][0], mats[0][1] - 1]
             d["facing"] = "up"
             t["exits"].append({"cells": mats, "to": a["id"], "spawn_cell": [d["cell"][0], d["cell"][1] + 1],
@@ -630,7 +804,8 @@ def write(areas):
     for a in areas:
         with open(os.path.join(OUT_DIR, a["id"] + ".json"), "w", encoding="utf-8", newline="\n") as fh:
             json.dump(a, fh, indent=1)
-    index = {"screen": list(SCREEN), "start": START_AREA, "areas": [a["id"] for a in areas]}
+    index = {"screen": list(SCREEN), "start": START_AREA, "areas": [a["id"] for a in areas],
+             "dungeons": {D1["id"]: {k: v for k, v in D1.items() if k != "id"}}}
     with open(os.path.join(OUT_DIR, "index.json"), "w", encoding="utf-8", newline="\n") as fh:
         json.dump(index, fh, indent=1)
 
@@ -660,7 +835,7 @@ def render(areas):
 
     def paint(img, rows, ox, oy, indoor):
         simple = {".": "grass_a", ",": "grass_b", "*": "flowers", "R": "rock", "f": "fence", "S": "sign",
-                  "_": "floor", "M": "mat"}
+                  "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b", "+": "pillar", "s": "dstairs"}
         for y, r in enumerate(rows):
             for x, g in enumerate(r):
                 px, py = ox + x * TILE, oy + y * TILE
@@ -682,6 +857,23 @@ def render(areas):
                 elif g in "Ww":
                     below = rows[y + 1][x] if y + 1 < len(rows) else ""
                     name = ("wall_shelf" if g == "w" else "wall_face") if below and below not in "Ww" else "wall_top"
+                elif g == "o":
+                    name = nine(rows, x, y, "o", "pit")
+                elif g == "%":
+                    below = rows[y + 1][x] if y + 1 < len(rows) else ""
+                    name = "dwall_face" if below and below != "%" else "dwall_top"
+                elif g == "$":
+                    for tx in range(2):
+                        img.alpha_composite(tile("dfloor"), (px + tx * TILE, py))
+                    for yy in range(4, 12):
+                        for xx in range(4, 28):
+                            img.putpixel((px + xx, py + yy), (208, 136, 64, 255))
+                    continue
+                elif g == "E":
+                    for ty in range(3):
+                        for tx in range(5):
+                            img.alpha_composite(tile("shrine_%d_%d" % (tx, ty)), (px + tx * TILE, py + ty * TILE))
+                    continue
                 elif g in MULTI:
                     pw, ph = MULTI[g]
                     for ty in range(ph):
@@ -697,12 +889,13 @@ def render(areas):
                             img.alpha_composite(tile(n), (px + tx * TILE, py + ty * TILE))
                     continue
                 else:
-                    name = "floor" if indoor else "grass_a"
+                    name = {"dungeon": "dfloor", True: "floor", False: "grass_a"}[indoor]
                 img.alpha_composite(tile(name), (px, py))
                 marks = {"B": (56, 144, 76), "O": (176, 104, 60), "Z": (60, 136, 200), "G": (144, 28, 68),
                          "Q": (224, 104, 56), "P": (255, 255, 255), "N": (248, 208, 64),
                          "C": (208, 136, 64), "L": (248, 112, 32), "k": (88, 88, 104), "l": (176, 176, 196),
-                         "h": (232, 40, 64)}
+                         "h": (232, 40, 64), "[": (124, 76, 36), "@": (200, 160, 48), "&": (124, 124, 140),
+                         "$": (208, 136, 64), "r": (70, 70, 84), "Y": (76, 160, 60)}
                 if g in marks:
                     for yy in range(4, 12):
                         for xx in range(4, 12):
@@ -722,6 +915,14 @@ def render(areas):
     for i, a in enumerate(ins):
         paint(img2, a["rows"], i * 17 * TILE, 0, True)
     img2.save(PREVIEW_IN)
+    rooms = [a for a in areas if a["kind"] == "dungeon"]
+    if rooms:
+        gw = max(a["grid"][0] for a in rooms) + 1
+        gh = max(a["grid"][1] for a in rooms) + 1
+        img3 = Image.new("RGBA", (gw * SCREEN[0] * TILE, gh * SCREEN[1] * TILE), (20, 16, 32, 255))
+        for a in rooms:
+            paint(img3, a["rows"], a["grid"][0] * SCREEN[0] * TILE, a["grid"][1] * SCREEN[1] * TILE, "dungeon")
+        img3.save(PREVIEW_DUNGEON)
 
 
 def main():
@@ -732,9 +933,9 @@ def main():
         print("LINT:", p)
     write(areas)
     render(areas)
-    print("%d areas (%d overworld, %d interiors); %d lint problems"
+    print("%d areas (%d overworld, %d interiors, %d dungeon rooms); %d lint problems"
           % (len(areas), sum(a["kind"] == "overworld" for a in areas), sum(a["kind"] == "interior" for a in areas),
-             len(problems)))
+             sum(a["kind"] == "dungeon" for a in areas), len(problems)))
     return 1 if problems else 0
 
 

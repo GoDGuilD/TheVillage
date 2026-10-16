@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.1.0
+# Last edit date: 2026-10-16
+# Version: 1.1.1
 extends Area2D
 ## `kind` is "heart", a key of GameState.GEM_VALUES, or a permanent kind (heart_piece, heart_container,
 ## small_key) that never expires and does not pop. Detects the Player body layer only; in group "pickup" so the
@@ -26,7 +26,7 @@ const LAYER_PLAYER := 2
 const PICK_RADIUS := 6.0
 const PERMANENT := {"heart_piece": "res://assets/sprites/items/heart_piece.png",
 		"heart_container": "res://assets/sprites/items/heart_container.png",
-		"small_key": "res://assets/sprites/items/small_key.png"}
+		"small_key": "res://assets/sprites/items/small_key.png", "seal": "res://assets/sprites/dungeon/seal.png"}
 
 var kind := "heart"
 var _age := 0.0

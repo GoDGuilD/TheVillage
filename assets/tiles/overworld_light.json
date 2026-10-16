@@ -626,6 +626,241 @@
         8
       ],
       "solid": true
+    },
+    "dfloor": {
+      "cell": [
+        3,
+        9
+      ],
+      "solid": false
+    },
+    "dfloor_b": {
+      "cell": [
+        4,
+        9
+      ],
+      "solid": false
+    },
+    "dwall_top": {
+      "cell": [
+        5,
+        9
+      ],
+      "solid": true
+    },
+    "dwall_face": {
+      "cell": [
+        6,
+        9
+      ],
+      "solid": true
+    },
+    "pillar": {
+      "cell": [
+        7,
+        9
+      ],
+      "solid": true
+    },
+    "dstairs": {
+      "cell": [
+        8,
+        9
+      ],
+      "solid": false,
+      "exit": true
+    },
+    "pit_-1_-1": {
+      "cell": [
+        0,
+        10
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_0_-1": {
+      "cell": [
+        1,
+        10
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_1_-1": {
+      "cell": [
+        2,
+        10
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_-1_0": {
+      "cell": [
+        0,
+        11
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_0_0": {
+      "cell": [
+        1,
+        11
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_1_0": {
+      "cell": [
+        2,
+        11
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_-1_1": {
+      "cell": [
+        0,
+        12
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_0_1": {
+      "cell": [
+        1,
+        12
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "pit_1_1": {
+      "cell": [
+        2,
+        12
+      ],
+      "solid": false,
+      "pit": true
+    },
+    "shrine_0_0": {
+      "cell": [
+        9,
+        9
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_1_0": {
+      "cell": [
+        10,
+        9
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_2_0": {
+      "cell": [
+        11,
+        9
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_3_0": {
+      "cell": [
+        12,
+        9
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_4_0": {
+      "cell": [
+        13,
+        9
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_0_1": {
+      "cell": [
+        9,
+        10
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_1_1": {
+      "cell": [
+        10,
+        10
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_2_1": {
+      "cell": [
+        11,
+        10
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_3_1": {
+      "cell": [
+        12,
+        10
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_4_1": {
+      "cell": [
+        13,
+        10
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_0_2": {
+      "cell": [
+        9,
+        11
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_1_2": {
+      "cell": [
+        10,
+        11
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_2_2": {
+      "cell": [
+        11,
+        11
+      ],
+      "solid": false,
+      "door": true
+    },
+    "shrine_3_2": {
+      "cell": [
+        12,
+        11
+      ],
+      "solid": true,
+      "door": false
+    },
+    "shrine_4_2": {
+      "cell": [
+        13,
+        11
+      ],
+      "solid": true,
+      "door": false
     }
   }
 }

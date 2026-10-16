@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-15
-Version: 5.2.0
+Last edit date: 2026-10-16
+Version: 5.3.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,38 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.0.0] - 2026-10-16 — Phase 6: dungeon framework + the Moss Shrine
+
+### Added
+- The **Moss Shrine** (dungeon 1), entered through a stone shrine in the West Woods: eight one-screen rooms on
+  their own grid (entrance with exit stairs, hub, west, northwest, east, northeast, antechamber, boss room) that
+  scroll into each other like the overworld; Joe steps 40 px in, past the two-tile walls.
+- Doors (`Door`): locked (a small key of this dungeon), big (the big key), shutters (open when a room flag is
+  set: room cleared of enemies, or a floor switch) and the boss door (shuts behind Joe until the boss falls). A
+  door shared by two rooms exists in both.
+- `FloorSwitch` (heavy ones need a block), `PushBlock` (a steady push slides it one tile; presses switches),
+  pits (Joe falls: one heart, back to the room's entry; enemies treat pits as walls via physics layer 9),
+  `BigChest`, chests revealed by a switch, `HeavyRock` (lifted and thrown with the power glove).
+- Dungeon items: map, compass, big key (per dungeon), small keys counted per dungeon (`GameState.key_pools`); the
+  HUD shows the key counter at zero inside a dungeon.
+- `MapScreen` (Tab): dungeon rooms (visited, or all with the map), Joe's room blinking, the boss room with the
+  compass, dungeon items and keys; outside, the overworld areas visited, with their names.
+- Boss: the **Grand Slime** (16 HP, hops at Joe, buds off up to 3 slimes when struck, faster at half health,
+  immune to the boomerang's stun). Then a heart container, then the **first family seal**, then Joe is sent back
+  out in front of the shrine.
+- The **Power Glove** in the shrine's big chest; two heavy rocks now guard the East Lake piece of heart.
+- Generators: `tools/dungeon_art.py` + `gen_tiles.py` v3 (113 cells: dungeon floor, walls, pillar, stairs, pit
+  nine-slice, the shrine facade), `tools/gen_dungeon.py` (doors x4 sides, switch, block, big chest, heavy rock,
+  seal, map/compass/big key/glove icons, the Grand Slime pack), `gen_sfx.py` + fall, shutter, switch_click,
+  block_push, boss_die (42 effects). `gen_areas.py` v3: dungeon rooms, groups, door/switch/block/big-chest objects,
+  lint (doorways, keys per dungeon, big key, glove for heavy rocks, switch-revealed chests); dungeon preview.
+- `tests/test_dungeon.gd` (62 checks), `tools/capture_dungeon.gd`.
+
+### Changed
+- Scrolling works for any group of areas (the overworld, or one dungeon); captions skip room-to-room moves.
+- `GameState` 3.0: key pools, dungeon items, visited areas (saved). `give_item` only auto-equips Y-items.
+- 314 checks in 6 suites, all passing.
 
 ## [6.0.0] - 2026-10-15 — Phase 5: Items I
 

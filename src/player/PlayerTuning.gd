@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 2.3.0
+# Last edit date: 2026-10-16
+# Version: 2.4.0
 class_name PlayerTuning
 extends RefCounted
 
@@ -67,6 +67,11 @@ const TALK_COOLDOWN := 0.15           # s Joe stays still after a conversation (
 # --- Items (item button, Phase 5) -----------------------------------------------------------------------
 const USE_TIME := 0.2                 # s Joe stands in the throw pose after using an item
 const HOLD_HEIGHT := 30.0             # px above the feet where a found item is held up
+
+# --- Dungeons (Phase 6) ---------------------------------------------------------------------------------------
+const PIT_PROBE := Vector2(0, -3)     # the point under Joe that must be over a pit for him to fall
+const FALL_TIME := 0.5                # s spent shrinking into the pit
+const FALL_DAMAGE := 2                # half-hearts lost per fall (one heart)
 
 # --- Health and being hurt ------------------------------------------------------
 const MAX_HP := 6                     # half-heart units: 6 = three hearts, like ALttP's start

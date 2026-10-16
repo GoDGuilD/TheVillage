@@ -1,14 +1,14 @@
 # File: gen_tiles.py
-# Description: Generates the Light World tile atlas (grass, path, water, ledges, cliffs, trees, houses, fence, sign, interiors) with a flag manifest, plus bush/leaf sprites.
+# Description: Generates the Light World tile atlas (grass, path, water, ledges, cliffs, trees, houses, fence, sign, interiors, dungeon stone, pits, stairs, the shrine facade) with a flag manifest, plus bush/leaf sprites.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 2.0.0
+# Last edit date: 2026-10-16
+# Version: 3.0.0
 #
 # Run:  python -I tools/gen_tiles.py   (writes assets/tiles/overworld_light.png + .json, assets/sprites/world/, tmp/tiles_preview.png)
 #
-# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and flags it (solid, ledge, door, exit),
+# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and flags it (solid, ledge, door, exit, pit),
 # so the game builds its TileSet from the manifest at runtime (no hand-made .tres to keep in sync).
 # Multi-cell pieces (2x2 tree, 5x4 houses) are named <piece>_<x>_<y>; the area painter places them by anchor.
 import json
@@ -24,6 +24,7 @@ from palette import (BARK_DARK, BARK_LIGHT, BARK_MID, BUSH_DARK, BUSH_LIGHT, BUS
                      ROCK_MID, SHADOW)
 from sprite_lib import Canvas, upscale
 import terrain_art as ta
+import dungeon_art as da
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TILE_DIR = os.path.join(ROOT, "assets", "tiles")
@@ -31,7 +32,7 @@ SPRITE_DIR = os.path.join(ROOT, "assets", "sprites", "world")
 PREVIEW = os.path.join(ROOT, "tmp", "tiles_preview.png")
 
 T = 16                      # tile size in pixels
-COLS, ROWS = 16, 9          # atlas grid
+COLS, ROWS = 16, 13         # atlas grid
 SEED = 1986                 # fixed seed so regenerating gives identical art
 EDGE = 3                    # width (px) of the grassy lip around a dirt path
 
@@ -175,6 +176,25 @@ def make_atlas():
     ta.table(c, 6 * T, 7 * T, rng, 1); put("table_r", 6, 7, solid=True)
     ta.bed(c, 7 * T, 7 * T, rng, 0); put("bed_t", 7, 7, solid=True)
     ta.bed(c, 7 * T, 8 * T, rng, 1); put("bed_b", 7, 8, solid=True)
+    # Dungeon (rows 9-12): floor, cracked floor, wall top/face, pillar, exit stairs; pit nine-slice in columns 0-2,
+    # rows 10-12 (dx/dy say which sides border floor; pits are not solid to Joe - he falls - but flagged `pit`).
+    da.dfloor(c, 3 * T, 9 * T, rng); put("dfloor", 3, 9)
+    da.dfloor(c, 4 * T, 9 * T, rng, cracked=True); put("dfloor_b", 4, 9)
+    da.dwall_top(c, 5 * T, 9 * T, rng); put("dwall_top", 5, 9, solid=True)
+    da.dwall_face(c, 6 * T, 9 * T, rng); put("dwall_face", 6, 9, solid=True)
+    da.pillar(c, 7 * T, 9 * T, rng); put("pillar", 7, 9, solid=True)
+    da.stairs(c, 8 * T, 9 * T, rng); put("dstairs", 8, 9, exit=True)
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            col, row = 1 + dx, 11 + dy
+            da.pit(c, col * T, row * T, dy == -1, dy == 1, dx == -1, dx == 1)
+            put("pit_%d_%d" % (dx, dy), col, row, pit=True)
+    # The Moss Shrine facade (5x3, door cell walkable) at columns 9-13, rows 9-11.
+    da.shrine(c, 9 * T, 9 * T, rng)
+    for ty in range(da.SHRINE_H):
+        for tx in range(da.SHRINE_W):
+            is_door = (tx, ty) == da.SHRINE_DOOR
+            put("shrine_%d_%d" % (tx, ty), 9 + tx, 9 + ty, solid=not is_door, door=is_door)
     return c, cells
 
 

@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.4.0
+Last edit date: 2026-10-16
+Version: 1.5.0
 -->
 
 # Known issues
@@ -26,3 +26,9 @@ Version: 1.4.0
 - No music; the 37 sound effects have never been auditioned by ear.
 - The 2024 audio in `assets/audio/` has unverified licences.
 - Nothing has been playtested by the owner yet (feel numbers are first guesses).
+- "Moss Shrine", its rooms and the Grand Slime are first drafts (names and layout await the owner); the shrine
+  facade is plain and gets a pass in the polish phase.
+- Push blocks reset when their room is rebuilt (ALttP does the same); the heavy switch stays pressed once pressed.
+- Enemies cannot fall into pits (they treat them as walls); a thrown pot or bomb over a pit does not fall either.
+- Only one dungeon exists, so the overworld map only shows areas already visited and has no markers for dungeons.
+- A dungeon death continues at the current room's entry (ALttP sends you to the dungeon entrance).

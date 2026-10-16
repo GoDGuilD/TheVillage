@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-15
-Version: 2.4.0
+Last edit date: 2026-10-16
+Version: 2.5.0
 -->
 
 # The Village
@@ -64,3 +64,8 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   (`<kind>:<area>:<x>,<y>`). Five suites (252 checks; `test_items.gd` 67).
 - Never name a CanvasItem member `hidden` (built-in signal); type `filter()` results explicitly. After an item-get
   Joe faces down, and item use holds him 0.2 s: tests re-face him and wait ~15 frames between item presses.
+- Phase 6: dungeons are `kind: "dungeon"` areas sharing a `dungeon` id (one scroll group); rooms come from
+  `d1_rooms()` in `gen_areas.py` (doorways, 2x2 doors listed in both rooms). Door/shutter/boss state = GameState
+  flags; keys are per dungeon (`key_pools`). Pits: TileSet flag `pit` + physics layer 9 (enemies only). Six suites
+  (314 checks; `test_dungeon.gd` 62). Never give a variable the name of a method in the same class; a rebuilt
+  room frees its nodes (tests fetch them again); blocks press switches directly, not through Area2D overlaps.

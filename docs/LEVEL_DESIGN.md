@@ -4,8 +4,8 @@ Description: How areas are built, linted and previewed; the glyph table.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.2.0
+Last edit date: 2026-10-16
+Version: 1.3.0
 -->
 
 # Level design
@@ -43,6 +43,12 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `N` | a villager's cell (solid; placed from `NPCS`) | `C` | chest (from `OBJECTS`) |
 | `L` | torch | `k` | cracked rock (bombs break it) |
 | `l` | key block (a small key opens it) | `h` | heart piece lying on the ground |
+| `=` `;` | dungeon floor / cracked floor | `%` | dungeon wall (face or top chosen automatically) |
+| `o` | pit (Joe falls; enemies cannot enter) | `+` | pillar |
+| `s` | exit stairs | `E` | 5x3 shrine entrance (overworld; door at (2,2)) |
+| `[` | door cells (2x2 doorway) | `@` | floor switch |
+| `&` | push block | `$` | big chest (2x1) |
+| `r` | heavy rock (power glove) | `Y` | the dungeon boss |
 
 ## Villagers and signs
 Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
@@ -58,12 +64,23 @@ and sets `flag`. Pages wrap themselves; `\n` forces a break.
 appears once every torch in its area burns. `WARES = {area: [(x, y, ware_id)]}` puts Boni's wares on table cells
 (`ItemDB.WARES` has the prices). Item kinds are listed in `ITEM_KINDS` (mirror of `ItemDB.KINDS`).
 
+## Dungeons
+`d1_rooms()` builds the Moss Shrine: `room_grid(doors)` makes a 24x14 room with two-tile walls and carves each
+side's doorway (`DOORWAYS`: north/south at columns 11-12, west/east at rows 6-7) as open floor, a 2x2 door or the
+exit stairs. Door specs are `(type, id, when)`; a door between two rooms is listed in both with the same id.
+Room extras: `clear_flag` (set when its enemies are gone) and `boss_flag`. Rooms sit at `DUNGEON_BASE` +
+grid x 24 / y 14 tiles; the index carries the dungeon table (`name`, `seal`, `entrance`, `boss_room`, `boss_flag`).
+`tmp/dungeon_d1_preview.png` shows the whole dungeon.
+
 ## Lint
 Sizes, unknown glyphs, multi-cell pieces (fit, fillers covered exactly once), ledge landings, edge openings,
 overlaps between areas, door/exit pairing and spawn cells, reachability from every entrance (ledges are one-way),
 exactly one spawn, and for villagers/signs: glyph and list agree, the text key exists, the villager has a
 sprite, and Joe can stand next to each one (two tiles away for a counter); objects agree with their glyphs,
 chests hold known kinds and are reachable from below, hidden chests have torches, the world has at least as many
-small keys as key blocks, wares sit on tables reachable from below. Reachability treats key blocks and cracked
-rocks as open (they can be opened). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
+small keys as key blocks, wares sit on tables reachable from below. Reachability treats key blocks, cracked
+rocks, doors, push blocks and heavy rocks as open. Dungeons: edge openings only lead into rooms of the same
+dungeon, doors fill their doorway (boss doors start as floor), small keys per dungeon >= locked doors (a shared
+door counts once), a big key exists wherever a big door or big chest does, switch-revealed chests have their
+switch, and heavy rocks need a glove somewhere in the world. Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

@@ -4,8 +4,8 @@ Description: Data files and their shapes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.4.0
+Last edit date: 2026-10-16
+Version: 1.5.0
 -->
 
 # Data model
@@ -21,11 +21,14 @@ Version: 1.4.0
 `{id, name, kind: "overworld"|"interior", size_screens, origin_tiles: [x, y], rows: [...],
 doors: [{cell, to, spawn_cell, facing}], exits: [{cells: [[x, y]...], to, spawn_cell, facing}],
 npcs: [{id, cell, facing, across}], signs: [{cell, text}],
-objects: [{kind: chest|torch|cracked_rock|key_block|heart_piece, cell, item?, amount?, hidden?}],
-wares: [{ware, cell}]}`.
+objects: [{kind: chest|big_chest|torch|cracked_rock|key_block|heart_piece|door|switch|push_block|heavy_rock, cell,
+item?, amount?, reveal? ("" | "torches" | "switch"), flag? (switch flag), heavy?, dir?, type?, id?, when?}],
+wares: [{ware, cell}]}`; dungeon rooms add `dungeon`, `grid`, `clear_flag?`, `boss_flag?`.
+`index.json` adds `dungeons: {<id>: {name, seal, entrance, boss_room, boss_flag}}`.
 
 ## World flags (`GameState.flags`)
-Story: `met_tato`, `met_boni`, `met_janga`, `got_boomerang`. Objects: `chest:<area>:<x>,<y>` (opened),
+Story: `met_tato`, `met_boni`, `met_janga`, `got_boomerang`. Dungeons: `door:<id>` (opened locked/big door),
+`cleared:<room>`, `switch:<room>`, `boss:<dungeon>`, `heart_container:<boss room>`. Objects: `chest:<area>:<x>,<y>` (opened),
 `cracked_rock:...` (broken), `key_block:...` (opened), `heart_piece:...` (taken), `ware:<id>` (sold out).
 Glyphs are listed in `src/world/AreaBuilder.gd` and `docs/LEVEL_DESIGN.md`.
 
@@ -60,8 +63,9 @@ Manifest: `{"<path>": {size, frames, notes}}`. Fonts: `font_5x7.png/.json`, `fon
 
 ## Save file (`user://village_save.json`)
 `{version: 1, area, pos: [x, y] (the entry point of that area), facing: [x, y], hp, max_hp, saved_at,
-state: {gems, magic, keys, bombs, arrows, heart_pieces, items: {id: level}, equipped, seals: [bool x3],
-flags: {name: bool}}}`.
+state: {gems, magic, key_pools: {"": n, <dungeon>: n}, dungeon_items: {<dungeon>: {map, compass, big_key}},
+visited: [area ids], bombs, arrows, heart_pieces, items: {id: level}, equipped, seals: [bool x3],
+flags: {name: bool}}}` (an old save's `keys` becomes the overworld pool).
 A file with another `version` is ignored (treated as no save).
 
 ## Item catalogue (`src/items/ItemDB.gd`)

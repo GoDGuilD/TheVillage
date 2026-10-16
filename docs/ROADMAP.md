@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.4.0
+Last edit date: 2026-10-16
+Version: 1.5.0
 -->
 
 # Roadmap
@@ -21,8 +21,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 3 | Overworld engine | Areas from `tools/gen_areas.py` + lint, autotiled paths/water/ledges/cliffs/walls, ALttP screen-edge scrolling, house doors and exit mats, ledge hops, El Pueblo + four neighbouring areas + four house interiors, `World` as the main scene | Done (30 world checks pass) |
 | 4 | HUD, menus, saves, dialogue | Full HUD (item box, magic meter, keys), area-name captions, item menu, title + pause menus, save/load, NPCs with dialogue boxes (Tato, Boni, Janga), readable signs, Game Over screen | Done (61 UI checks pass) |
 | 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers, Boni's shop stock | Done (67 item checks pass) |
-| 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal | Next |
-| 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, power glove, Caver's keep, Act 1 ending | Planned |
+| 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal (+ the power glove) | Done (62 dungeon checks pass) |
+| 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, the road south opened, Caver's keep, Act 1 ending | Next |
 | 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub | Planned |
 | 9–12 | Umbra, Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (grapple, fire rod, etc.) | Planned |
 | 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
@@ -80,3 +80,13 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] World content: lantern (Joe's house), boomerang (Janga's gift), key (East Lake) -> key block -> bow (South Road), torch chest (North Meadow), cracked rock (West Woods), loose piece (East Lake)
 - [x] `gen_areas.py` objects/wares + lint; 12 new sounds (37 total); `tests/test_items.gd`: 67 checks; `tools/capture_items.gd`
 - [ ] Owner playtest: prices, fuse length, boomerang range, item placement
+
+## Phase 6 detail
+- [x] Dungeon tiles (`tools/dungeon_art.py`): stone floor, walls, pillar, exit stairs, pit nine-slice, the Moss Shrine facade; `tools/gen_dungeon.py`: doors, switch, push block, big chest, heavy rock, seal, dungeon item icons, the Grand Slime
+- [x] Area groups: dungeon rooms scroll into each other; 40 px push past the thick walls; key pools per dungeon
+- [x] Doors: locked / big / shutter (room cleared, switch) / boss; mirrored in both rooms; state from flags
+- [x] Floor switches (heavy = block only), push block, pits (fall = one heart, back to the entry), hidden chests revealed by switches
+- [x] Map, compass, big key, big chest; `MapScreen` for dungeons and the overworld
+- [x] The Grand Slime, heart container, first family seal, the way out; the Power Glove and heavy rocks
+- [x] `gen_areas.py` v3 dungeon rooms + lint; 5 new sounds (42); `tests/test_dungeon.gd`: 62 checks; `tools/capture_dungeon.gd`
+- [ ] Owner playtest: dungeon layout and difficulty, boss tuning, the dungeon's name (Moss Shrine is a placeholder)

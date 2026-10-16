@@ -54,7 +54,7 @@
    ],
    "item": "bow",
    "amount": 1,
-   "hidden": false
+   "reveal": ""
   }
  ],
  "wares": []

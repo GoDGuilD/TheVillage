@@ -15,11 +15,11 @@
   "xxxxxxxxxxxxxxxxxxxxxxxx",
   "Tx..Tx..Tx..Tx..Tx....Tx",
   "xx..xx..xx.,xx..xx,..,xx",
-  "Tx..,..........,..R...Tx",
-  "xx.......BB...,,......xx",
-  "Tx..Tx..........Tx....Tx",
-  "xx..xx..........xx....xx",
-  "Tx,........,..........Tx",
+  "Tx..,...Exxxx..,..R...Tx",
+  "xx......xxxxx.,,......xx",
+  "Tx..Tx..xxxxx...Tx....Tx",
+  "xx..xx.......S..xx....xx",
+  "Tx,...BB...,..........Tx",
   "xx....vvvvvvvvvv..,,..xx",
   "Tx....................Tx",
   "xx............,...S...xx",
@@ -40,7 +40,20 @@
   "TxTxTxTxTxTxTxTxTxTxTxTx",
   "xxxxxxxxxxxxxxxxxxxxxxxx"
  ],
- "doors": [],
+ "doors": [
+  {
+   "cell": [
+    10,
+    6
+   ],
+   "to": "d1_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  }
+ ],
  "exits": [],
  "npcs": [],
  "signs": [
@@ -50,6 +63,13 @@
     11
    ],
    "text": "sign_woods"
+  },
+  {
+   "cell": [
+    13,
+    7
+   ],
+   "text": "sign_shrine"
   }
  ],
  "objects": [

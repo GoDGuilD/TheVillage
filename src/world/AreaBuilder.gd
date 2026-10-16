@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.2.0
+# Last edit date: 2026-10-16
+# Version: 2.0.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -15,6 +15,11 @@ extends RefCounted
 ## Actors on any ground: B bush, O pot, Z slime, G guard, Q rock-spitter, P Joe's spawn (test fields only).
 ## N marks a villager's cell (ground is painted; the World places the Npc from the area's "npcs" list,
 ## and makes each S readable from its "signs" list).
+## Glyphs (dungeons):  =  stone floor   ;  cracked floor   %  dungeon wall (face or top)   o  pit (Joe falls in)
+##                     +  pillar   s  exit stairs   E  5x3 shrine entrance (overworld; door at (2,2))
+## Object cells (ground painted, the World builds the node from the area's "objects"): C chest, L torch,
+## k cracked rock, l key block, h heart piece, [ door, @ floor switch, & push block, $ big chest (2x1), r heavy rock.
+## Y = the dungeon boss.
 ## The source of these rows is tools/gen_areas.py (areas) or TestField.layout (test arenas).
 
 const TILE := 16
@@ -22,15 +27,20 @@ const ATLAS_TEX := preload("res://assets/tiles/overworld_light.png")
 const ATLAS_JSON := "res://assets/tiles/overworld_light.json"
 const LAYER_WORLD := 1
 const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemies/Guard.gd",
-		"Q": "res://src/enemies/Spitter.gd"}
+		"Q": "res://src/enemies/Spitter.gd", "Y": "res://src/enemies/GrandSlime.gd"}
 const GRASS := {".": "grass_a", ",": "grass_b", "*": "flowers"}
-const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat"}
+const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b",
+		"+": "pillar", "s": "dstairs"}
 const WALLS := "Ww"
+const DWALLS := "%"
 const HOUSES := {"H": "red", "J": "blue"}
 const HOUSE_SIZE := Vector2i(5, 4)
 const HOUSE_DOOR := Vector2i(2, 3)
+const SHRINE_SIZE := Vector2i(5, 3)
+const SHRINE_DOOR := Vector2i(2, 2)
+const LAYER_PIT := 256                   # pits are walls for enemies only (Joe walks in and falls)
 # Custom data layers on the TileSet (read by Player and the World).
-const DATA_FLAGS := ["ledge", "door", "exit"]
+const DATA_FLAGS := ["ledge", "door", "exit", "pit"]
 
 static var _tileset: TileSet
 static var _cells: Dictionary = {}       # atlas cell name -> Vector2i
@@ -46,6 +56,9 @@ static func tileset() -> TileSet:
 	ts.add_physics_layer()
 	ts.set_physics_layer_collision_layer(0, LAYER_WORLD)
 	ts.set_physics_layer_collision_mask(0, 0)
+	ts.add_physics_layer()
+	ts.set_physics_layer_collision_layer(1, LAYER_PIT)
+	ts.set_physics_layer_collision_mask(1, 0)
 	for i in DATA_FLAGS.size():
 		ts.add_custom_data_layer()
 		ts.set_custom_data_layer_name(i, DATA_FLAGS[i])
@@ -65,6 +78,9 @@ static func tileset() -> TileSet:
 		if info["solid"]:
 			td.add_collision_polygon(0)
 			td.set_collision_polygon_points(0, 0, square)
+		if info.get("pit", false):
+			td.add_collision_polygon(1)
+			td.set_collision_polygon_points(1, 0, square)
 		for flag in DATA_FLAGS:
 			td.set_custom_data(flag, bool(info.get(flag, false)))
 	_tileset = ts
@@ -73,7 +89,7 @@ static func tileset() -> TileSet:
 
 # Paint `rows` into a new TileMapLayer and create the actors in `actors`.
 # Returns {tiles, bushes, pots, enemies, spawn (Vector2 or null), doors: [Vector2i], exits: [Vector2i]}.
-static func build(rows: Array, actors: Node2D, indoor: bool = false, with_enemies: bool = true, origin: Vector2 = Vector2.ZERO) -> Dictionary:
+static func build(rows: Array, actors: Node2D, indoor: bool = false, with_enemies: bool = true, origin: Vector2 = Vector2.ZERO, dungeon: bool = false) -> Dictionary:
 	var tiles := TileMapLayer.new()
 	tiles.name = "Tiles"
 	tiles.tile_set = tileset()
@@ -84,7 +100,7 @@ static func build(rows: Array, actors: Node2D, indoor: bool = false, with_enemie
 		var row: String = rows[y]
 		for x in row.length():
 			var g := row[x]
-			_paint_cell(tiles, rows, x, y, g, indoor, out)
+			_paint_cell(tiles, rows, x, y, g, indoor, out, dungeon)
 			var at := origin + Vector2(x * TILE + TILE / 2.0, y * TILE + TILE / 2.0)
 			var feet := origin + Vector2(x * TILE + TILE / 2.0, (y + 1) * TILE - 2)
 			if g == "B":
@@ -120,19 +136,32 @@ static func _put(tiles: TileMapLayer, x: int, y: int, cell_name: String) -> void
 	tiles.set_cell(Vector2i(x, y), 0, _cells[cell_name])
 
 
-static func _paint_cell(tiles: TileMapLayer, rows: Array, x: int, y: int, g: String, indoor: bool, out: Dictionary) -> void:
+static func _paint_cell(tiles: TileMapLayer, rows: Array, x: int, y: int, g: String, indoor: bool, out: Dictionary, dungeon: bool = false) -> void:
 	if g == "x":
 		return                                                  # painted by its anchor
 	if GRASS.has(g):
 		_put(tiles, x, y, GRASS[g])
 	elif SIMPLE.has(g):
 		_put(tiles, x, y, SIMPLE[g])
-		if g == "M":
+		if g == "M" or g == "s":
 			out["exits"].append(Vector2i(x, y))
 	elif g == "#":
 		_put(tiles, x, y, _nine(rows, x, y, "#", "path"))
 	elif g == "~":
 		_put(tiles, x, y, _nine(rows, x, y, "~", "water"))
+	elif g == "o":
+		_put(tiles, x, y, _nine(rows, x, y, "o", "pit"))
+	elif g in DWALLS:
+		var under := glyph(rows, x, y + 1)
+		_put(tiles, x, y, "dwall_face" if under != "" and not under in DWALLS else "dwall_top")
+	elif g == "$":                                             # big chest anchor: floor under both of its cells
+		_put(tiles, x, y, "dfloor")
+		_put(tiles, x + 1, y, "dfloor")
+	elif g == "E":
+		for ty in SHRINE_SIZE.y:
+			for tx in SHRINE_SIZE.x:
+				_put(tiles, x + tx, y + ty, "shrine_%d_%d" % [tx, ty])
+		out["doors"].append(Vector2i(x, y) + SHRINE_DOOR)
 	elif g == "v":
 		var l := glyph(rows, x - 1, y) != "v"
 		var r := glyph(rows, x + 1, y) != "v"
@@ -161,7 +190,7 @@ static func _paint_cell(tiles: TileMapLayer, rows: Array, x: int, y: int, g: Str
 		_put(tiles, x, y, "bed_t")
 		_put(tiles, x, y + 1, "bed_b")
 	else:
-		_put(tiles, x, y, "floor" if indoor else "grass_a")      # actors and spawns stand on plain ground
+		_put(tiles, x, y, "dfloor" if dungeon else ("floor" if indoor else "grass_a"))   # actors/objects on plain ground
 
 
 # Nine-slice piece name for a band of `same` glyphs: the lip faces the neighbours that differ.

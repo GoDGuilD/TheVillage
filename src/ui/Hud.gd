@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 2.1.0
+# Last edit date: 2026-10-16
+# Version: 2.2.0
 class_name Hud
 extends CanvasLayer
 ## Reads GameState through its signals; the World feeds Joe's hearts (set_health) and area names (show_caption).
@@ -62,6 +62,7 @@ var keys_shown := 0
 var bombs_shown := -1                    # -1 = counter hidden (no bombs item yet)
 var arrows_shown := -1                   # -1 = counter hidden (no bow yet)
 var caption_shown := ""                  # the last caption text shown (tests)
+var show_zero_keys := false              # inside a dungeon the key counter stays visible at zero (ALttP)
 
 var _hearts: Array[Sprite2D] = []
 var _gem_digits: Array[Sprite2D] = []
@@ -180,11 +181,11 @@ func _set_counter(icon: Sprite2D, digits: Array[Sprite2D], value: int, shown: bo
 		digits[i].texture = _atlas(DIGIT_TEX, int(text[i]), DIGIT_SIZE)
 
 
-# Small keys only matter once Joe holds one (dungeons, Phase 6): the counter hides at zero.
+# Small keys: the counter hides at zero outside dungeons (`show_zero_keys` is set by the World inside one).
 func set_keys(amount: int) -> void:
 	keys_shown = amount
-	_key_icon.visible = amount > 0
-	_key_digit.visible = amount > 0
+	_key_icon.visible = amount > 0 or show_zero_keys
+	_key_digit.visible = _key_icon.visible
 	_key_digit.texture = _atlas(DIGIT_TEX, clampi(amount, 0, 9), DIGIT_SIZE)
 
 

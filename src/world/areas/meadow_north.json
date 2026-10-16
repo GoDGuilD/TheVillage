@@ -61,7 +61,7 @@
    ],
    "item": "heart_piece",
    "amount": 1,
-   "hidden": true
+   "reveal": "torches"
   }
  ],
  "wares": []

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.1.0
+# Last edit date: 2026-10-16
+# Version: 1.2.1
 class_name BaseEnemy
 extends CharacterBody2D
 ## Subclasses set the pack/stat variables in _init() and override _think(delta) (AI) and optionally _anim_base().
@@ -21,6 +21,7 @@ const LAYER_PLAYER_HITBOX := 8
 const LAYER_ENEMY_HITBOX := 16
 const LAYER_ENEMY_HURTBOX := 64
 const LAYER_PROPS := 128
+const LAYER_PIT := 256                   # AreaBuilder.LAYER_PIT
 const KNOCK_TIME := 0.15                 # stun while being pushed back by a hit
 const IFRAMES := 0.3                     # one slash can only hit once
 const HIT_STOP := 0.05                   # freeze for both sides when a hit lands
@@ -43,6 +44,7 @@ var hurt_box: HurtBox
 var contact: HitBox
 var facing := Vector2i.DOWN
 var player: Node2D                       # set by the field so the AI can see Joe
+var stun_immune := false                 # bosses shrug off the boomerang
 
 var _knock_left := 0.0
 var _iframes_left := 0.0
@@ -53,7 +55,7 @@ var _dead := false
 func _ready() -> void:
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	collision_layer = LAYER_ENEMIES
-	collision_mask = LAYER_WORLD | LAYER_PROPS
+	collision_mask = LAYER_WORLD | LAYER_PROPS | LAYER_PIT     # pits are walls to enemies
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()
 	fr.size = FEET_BOX
@@ -170,6 +172,8 @@ func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void
 		return
 	# A "stun" hit (the boomerang) freezes the enemy in place without hurting it, like ALttP.
 	if hurt_box.last_hit != null and hurt_box.last_hit.element == STUN_ELEMENT:
+		if stun_immune:
+			return
 		_iframes_left = IFRAMES
 		freeze(STUN_TIME)
 		HitFlash.flash(sprite)

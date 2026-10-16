@@ -32,9 +32,9 @@
   "Tx.........*..~~~~~~~.Tx",
   "xx.....Tx...*.~~~~~~~.xx",
   "Tx.....xx...,.~~~~~~~.Tx",
-  "xx....*..,....~~~~~~~.xx",
+  "xx....*..,....~~~~~~~rxx",
   "Tx.*.....*B...~~~~~~~hTx",
-  "xx............~~~~~~~,xx",
+  "xx............~~~~~~~rxx",
   "Tx............~~~~~~~.Tx",
   "xx....................xx",
   "TxTxTxTxTxTxTxTxTxTxTxTx",
@@ -61,13 +61,27 @@
    ],
    "item": "small_key",
    "amount": 1,
-   "hidden": false
+   "reveal": ""
+  },
+  {
+   "kind": "heavy_rock",
+   "cell": [
+    21,
+    21
+   ]
   },
   {
    "kind": "heart_piece",
    "cell": [
     21,
     22
+   ]
+  },
+  {
+   "kind": "heavy_rock",
+   "cell": [
+    21,
+    23
    ]
   }
  ],

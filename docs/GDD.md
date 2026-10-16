@@ -4,8 +4,8 @@ Description: Game design document for The Village - the top-down, A Link to the 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-15
-Version: 2.4.0
+Last edit date: 2026-10-16
+Version: 2.5.0
 -->
 
 # Game Design Document — The Village
@@ -72,7 +72,7 @@ direction is taken from the dominant axis (vertical wins a perfect diagonal).
 | Interact / lift / talk | E / Enter | East (B / Circle) — SNES A |
 | Use item (equipped Y-item) | K | West (X / Square) — SNES Y |
 | Dash (Pegasus-style boots, later) | L / Shift | Right stick click |
-| Map | Tab | North (Y / Triangle) — SNES X |
+| Map (dungeon rooms / visited areas) | Tab | North (Y / Triangle) — SNES X |
 | Inventory | I | Left shoulder |
 | Pause | Esc | Start |
 
@@ -109,6 +109,15 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 - **Dark World**: the same grid, re-skinned with the Dark World palette in `tools/palette.py` and re-populated.
   Umbra, Ignis, Tempus and Silva are its four regions.
 - **Dungeons**: 3 Light World (family seals) + 4 Dark World (dimension crystals) + Caver's tower.
+  **Implemented in Phase 6: the Moss Shrine** (name is a placeholder), in the upper West Woods. Eight rooms:
+  entrance -> hub (pits; locked east door, big-key north door) -> west (clear the enemies: map; the shutter opens) ->
+  northwest (push the block onto the heavy switch: a small key appears) -> east (through the locked door; compass;
+  cross the pit bridge to a switch that opens the north shutter; the big chest) -> northeast (big key) -> back to the
+  big chest (Power Glove) -> hub north (big door) -> antechamber (two torches hide 50 gems) -> the boss room.
+  Boss: the Grand Slime - 16 HP, hops at Joe, buds off up to three slimes when struck, faster at half health,
+  immune to the boomerang. Reward: a heart container, then the first family seal, then Joe is outside again.
+  Rules: small keys belong to their dungeon; falling into a pit costs a heart; the map shows every room once found,
+  the compass marks the boss.
 
 ## 7. Items (ALttP equivalents in brackets)
 
@@ -120,7 +129,8 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 | Bow (+10 arrows) | chest behind the key block on the South Road | arrows do 4 damage, stick in walls |
 | Bombs | Boni's shop, 5 for 20 gems | 1.6 s fuse; blast hurts enemies and Joe, cuts bushes, breaks cracked rocks |
 | Small key | chest in East Lake | opens one key block |
-| Pieces of heart | meadow torch chest, behind the woods' cracked rock, by East Lake, Boni (100 gems) | four make a heart container |
+| Pieces of heart | meadow torch chest, behind the woods' cracked rock, by East Lake (behind heavy rocks), Boni (100 gems) | four make a heart container |
+| Power Glove | the Moss Shrine's big chest | lift and throw heavy rocks |
 
 Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems.
 

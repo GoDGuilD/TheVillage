@@ -13,6 +13,23 @@
   "joe_house",
   "tato_house",
   "boni_shop",
-  "janga_house"
- ]
+  "janga_house",
+  "d1_entrance",
+  "d1_hub",
+  "d1_west",
+  "d1_northwest",
+  "d1_east",
+  "d1_northeast",
+  "d1_ante",
+  "d1_boss"
+ ],
+ "dungeons": {
+  "d1": {
+   "name": "Moss Shrine",
+   "seal": 0,
+   "entrance": "d1_entrance",
+   "boss_room": "d1_boss",
+   "boss_flag": "boss:d1"
+  }
+ }
 }

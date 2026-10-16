@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 3.0.0
+# Last edit date: 2026-10-16
+# Version: 3.1.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -361,6 +361,41 @@ def error():
     return np.concatenate([notes([(196.0, 0.09)], 0.5, 0.1), gap, notes([(185.0, 0.12)], 0.5, 0.1)])
 
 
+# --- Phase 6: dungeons ------------------------------------------------------------------
+
+def fall():
+    # A long falling whistle into a pit.
+    sw = sweep(1200, 120, 0.7, 1.4)
+    return pulse(sw, 0.25) * decay(len(sw), 0.45)
+
+
+def shutter():
+    # Iron bars grinding open or shut.
+    sw = sweep(220, 110, 0.35)
+    n = len(sw)
+    grind = bandpass(crush(noise(n), 4), np.full(n, 600.0), 2.0) * np.sin(np.pi * np.arange(n) / n)
+    clank = tri(sw) * decay(n, 0.05)
+    return grind + clank
+
+
+def switch_click():
+    return notes([(880.0, 0.03), (1318.5, 0.08)], 0.5, 0.04)
+
+
+def block_push():
+    n = int(0.3 * SR)
+    return lowpass(noise(n), 700) * np.sin(np.pi * np.arange(n) / n) + 0.3 * tri(np.full(n, 70.0)) * decay(n, 0.2)
+
+
+def boss_die():
+    # A long rumbling burst, then a falling chime.
+    sw = sweep(90, 30, 0.9)
+    n = len(sw)
+    rumble = lowpass(crush(noise(n), 3), 1800) * decay(n, 0.4, 0.003) + tri(sw) * decay(n, 0.5)
+    chime = notes([(1568.0, 0.1), (1318.5, 0.1), (1046.5, 0.1), (784.0, 0.4)], 0.25, 0.15)
+    return np.concatenate([rumble, 0.6 * chime])
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -376,6 +411,8 @@ SFX = {
     "boomerang": (boomerang, -8.0), "arrow_shot": (arrow_shot, -6.0), "arrow_hit": (arrow_hit, -6.0),
     "bomb_place": (bomb_place, -6.5), "explode": (explode, -3.5), "unlock": (unlock, -6.0),
     "lantern": (lantern, -7.0), "shop_buy": (shop_buy, -6.0), "error": (error, -7.0),
+    "fall": (fall, -6.0), "shutter": (shutter, -5.5), "switch_click": (switch_click, -6.5),
+    "block_push": (block_push, -6.5), "boss_die": (boss_die, -3.5),
 }
 
 

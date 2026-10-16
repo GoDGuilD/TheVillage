@@ -5,8 +5,8 @@
   "Author": "Jose-Jorge HERNANDEZ",
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
-  "Last edit date": "2026-10-15",
-  "Version": "1.1.0",
+  "Last edit date": "2026-10-16",
+  "Version": "1.2.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -180,6 +180,52 @@
   "name": "Boni",
   "pages": [
    "You can't carry any more of those!"
+  ]
+ },
+ "get_map": {
+  "pages": [
+   "You got the Map! Press Tab to see every room of this place."
+  ]
+ },
+ "get_compass": {
+  "pages": [
+   "You got the Compass! The map now shows where the master of this place waits."
+  ]
+ },
+ "get_big_key": {
+  "pages": [
+   "You got the Big Key! It opens the big door and the big chest of this place."
+  ]
+ },
+ "get_glove": {
+  "pages": [
+   "You got the Power Glove! Now you can lift heavy rocks. Stand in front of one and press the action button."
+  ]
+ },
+ "get_seal": {
+  "pages": [
+   "You got the first Family Seal! Its violet stone is warm, like a hand on your shoulder.",
+   "Two more seals wait somewhere in the valley."
+  ]
+ },
+ "locked_door": {
+  "pages": [
+   "The door is locked. A small key from this place would open it."
+  ]
+ },
+ "big_door": {
+  "pages": [
+   "A big lock bars the way. It needs this place's Big Key."
+  ]
+ },
+ "big_chest_locked": {
+  "pages": [
+   "The big chest is locked. It needs this place's Big Key."
+  ]
+ },
+ "sign_shrine": {
+  "pages": [
+   "MOSS SHRINE\nThe old guardians kept a family seal here."
   ]
  }
 }

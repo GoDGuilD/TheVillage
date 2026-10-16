@@ -4,8 +4,8 @@ Description: Configuration parameters.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.4.0
+Last edit date: 2026-10-16
+Version: 1.5.0
 -->
 
 # Configuration
@@ -19,6 +19,9 @@ Version: 1.4.0
 | `src/world/World.gd` | Scroll time and push, door fade time, Game Over delay, dialogue box placement threshold |
 | `src/items/ItemDB.gd` | Item names/icons/texts, lantern magic cost, Boni's wares (amounts, prices, one-time) |
 | `src/items/Boomerang.gd`, `Arrow.gd`, `Bomb.gd`, `ItemUse.gd` | Range and speeds, arrow damage, fuse and blast radius/damage, bombs at once |
+| `tools/gen_areas.py` (`D1`, `d1_rooms()`) | The Moss Shrine: rooms, doors, keys, switches, the boss room |
+| `src/enemies/GrandSlime.gd` | Boss HP, hop speed/time, rest times, minion cap |
+| `src/world/World.gd` (dungeons) | 40 px dungeon push, boss reward delay, reward positions |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

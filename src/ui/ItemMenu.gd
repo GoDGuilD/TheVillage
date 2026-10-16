@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.1.0
+# Last edit date: 2026-10-16
+# Version: 1.2.0
 class_name ItemMenu
 extends CanvasLayer
 ## Slots follow GameState.ITEM_ORDER; an item shows once found (icons in assets/ui/items/, Phase 5).
@@ -15,6 +15,7 @@ signal closed
 const SLOT_TEX := preload("res://assets/ui/menu/slot.png")
 const SWORD_TEX := preload("res://assets/ui/menu/icon_sword.png")
 const SHIELD_TEX := preload("res://assets/ui/menu/icon_shield.png")
+const GLOVE_TEX := preload("res://assets/ui/items/glove.png")
 const SEAL_EMPTY_TEX := preload("res://assets/ui/menu/seal_empty.png")
 const SEAL_FULL_TEX := preload("res://assets/ui/menu/seal_full.png")
 const PIECES_TEX := preload("res://assets/ui/menu/heart_pieces.png")
@@ -46,6 +47,8 @@ var _name: PixelText
 var _icons: Array[Sprite2D] = []
 var _seals: Array[Sprite2D] = []
 var _pieces: Sprite2D
+var _glove_icon: Sprite2D
+var _glove_label: PixelText
 
 
 func _ready() -> void:
@@ -72,6 +75,8 @@ func _ready() -> void:
 	_label("SWORD", PANEL_POS + EQUIP_OFFSET + Vector2(22, 4), UiTheme.TEXT)
 	_sprite(SHIELD_TEX, PANEL_POS + EQUIP_OFFSET + Vector2(0, EQUIP_STEP), false)
 	_label("SHIELD", PANEL_POS + EQUIP_OFFSET + Vector2(22, 4 + EQUIP_STEP), UiTheme.TEXT)
+	_glove_icon = _sprite(GLOVE_TEX, PANEL_POS + EQUIP_OFFSET + Vector2(0, EQUIP_STEP * 2), false)
+	_glove_label = _label("GLOVE", PANEL_POS + EQUIP_OFFSET + Vector2(22, 4 + EQUIP_STEP * 2), UiTheme.TEXT)
 	_label("FAMILY SEALS", PANEL_POS + SEALS_OFFSET + Vector2(0, -14), UiTheme.GOLD)
 	for i in GameState.SEAL_COUNT:
 		_seals.append(_sprite(SEAL_EMPTY_TEX, PANEL_POS + SEALS_OFFSET + Vector2(i * SEAL_STEP, 0), false))
@@ -126,6 +131,8 @@ func _refresh() -> void:
 	for i in _seals.size():
 		_seals[i].texture = SEAL_FULL_TEX if GameState.seals[i] else SEAL_EMPTY_TEX
 	_highlight.position = _slot_pos(selected) - Vector2.ONE * HIGHLIGHT_GROW
+	_glove_icon.visible = GameState.has_item("glove")
+	_glove_label.visible = _glove_icon.visible
 	var pieces := AtlasTexture.new()
 	pieces.atlas = PIECES_TEX
 	pieces.region = Rect2(GameState.heart_pieces * PIECES_FRAME.x, 0, PIECES_FRAME.x, PIECES_FRAME.y)

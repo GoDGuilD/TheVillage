@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.1
+# Last edit date: 2026-10-16
+# Version: 1.1.0
 class_name UiTheme
 extends RefCounted
 
@@ -16,6 +16,13 @@ const GOLD := Color("#f8d040")
 const DISABLED := Color("#585c88")
 const DIM_TEXT := Color("#8890b8")
 const LIFE_RED := Color("#f05050")
+
+# Map screen (rooms / areas as boxes).
+const MAP_ROOM := Color("#5a6c62")       # visited
+const MAP_KNOWN := Color("#2c3830")      # shown by the dungeon map but not visited yet
+const MAP_EDGE := Color("#8ca28c")
+const MAP_HERE := Color("#f8d040")       # Joe's room (blinks)
+const MAP_BOSS := Color("#e83850")       # the boss room, once the compass is found
 
 # Full-screen overlays.
 const DIM := Color(0.02, 0.02, 0.08, 0.6)            # behind pause / item menus

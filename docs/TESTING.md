@@ -4,8 +4,8 @@ Description: How the game is tested.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.4.0
+Last edit date: 2026-10-16
+Version: 1.5.0
 -->
 
 # Testing
@@ -17,8 +17,9 @@ F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 6
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_world.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_ui.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_items.gd
+F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_dungeon.gd
 ```
-Each must end `RESULT: N passed, 0 failed`. Current count: **252 checks** in 5 suites (36 + 56 + 32 + 61 + 67).
+Each must end `RESULT: N passed, 0 failed`. Current count: **314 checks** in 6 suites (36 + 56 + 32 + 61 + 67 + 62).
 Run them with a `timeout` wrapper: a script that fails to compile (e.g. a new `class_name` before `--import`)
 makes Godot wait forever instead of failing.
 
@@ -37,6 +38,11 @@ makes Godot wait forever instead of failing.
   boomerang (one at a time, stun, return, fetch), the shop (no gems, NO, buy, full bag, one-time ware), bombs
   (count, two at a time, blast, cracked rock, heart piece behind it, hurts Joe), heart containers, HUD/menu
   read-outs, save -> load keeps items, chests and blocks.
+- `test_dungeon.gd`: dungeon data, shrine door and stairs, room scroll and the 40 px push, pits, per-dungeon keys,
+  locked door, clearing the west room's shutter (and it staying open), the push block onto the heavy switch,
+  switch shutter, map screen with map and compass, big key / big chest / big door, the Grand Slime (minions,
+  no stun, defeat, door, heart container, seal, way out, empty room afterwards), heavy rocks with the glove,
+  save -> load keeps dungeon progress.
 
 ## Level lint
 `python -I tools/gen_areas.py` must print `0 lint problems` (it checks sizes, glyphs, multi-cell pieces, ledge
@@ -54,6 +60,7 @@ landings, edge openings, door pairing, reachability and the single spawn).
   mode); read constants through the instance (`world.pause_menu.ITEM_SAVE`).
 - After an item-get Joe faces down (ALttP pose): face him again before the next interact in a test. Item use
   holds Joe in `use` for 0.2 s - wait ~15 frames between two item presses.
+- A rebuilt room frees its nodes: fetch doors/switches/blocks again after `_enter`.
 - Read autoloads in tests through nodes (`root.get_node("Audio")`), never by name.
 - UI tests point `SaveGame.path` at `user://test_village_save.json` and delete it afterwards.
 
@@ -62,4 +69,5 @@ Headless runs cannot render. Windowed captures: `tools/capture_field.gd` (combat
 `tmp/field_*.png`) and `tools/capture_world.gd` (house, village, a scroll mid-slide, every neighbouring area, the
 ledge hop; `tmp/world_*.png`) and `tools/capture_ui.gd` (title, HUD + caption, Tato, a sign, Boni, pause menu,
 item menu, Game Over; `tmp/ui_*.png`) and `tools/capture_items.gd` (lantern item-get, torches, boomerang,
-arrow, bomb fuse and blast, Boni's counter, key nook, item menu; `tmp/items_*.png`). Joe's hurt box is switched off during captures.
+arrow, bomb fuse and blast, Boni's counter, key nook, item menu; `tmp/items_*.png`) and `tools/capture_dungeon.gd`
+(shrine, rooms, shutter, block, map, glove, boss, reward; `tmp/dungeon_*.png`). Joe's hurt box is switched off during captures.

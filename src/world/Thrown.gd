@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.0
+# Last edit date: 2026-10-16
+# Version: 1.0.1
 extends CharacterBody2D
 ## The body (and its HitBox) moves along the ground; only the sprite rises and falls, ALttP style.
 
@@ -87,6 +87,9 @@ func _break() -> void:
 		Audio.sfx("shatter")
 		Juice.play_fx("shards", global_position, get_parent())
 		BaseEnemy.spawn_drop(get_parent(), global_position)
+	elif kind == "rock":
+		Audio.sfx("shatter", 0.7)
+		Juice.play_fx("poof", global_position, get_parent())
 	else:
 		Audio.sfx("bush_cut")
 		Juice.play_fx("poof", global_position, get_parent())

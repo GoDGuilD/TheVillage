@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.5.0
+# Version: 1.6.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -256,3 +256,32 @@ STONE_DARK    = _hex("#4c4c5c")    # torch bases, key blocks
 STONE_MID     = _hex("#7c7c90")
 STONE_LIGHT   = _hex("#b0b0c4")
 CRACK         = _hex("#282834")
+
+# --- Dungeons (Phase 6: the Moss Shrine - mossy green-grey stone, ALttP Eastern Palace mood) --------
+DSTONE_DARK   = _hex("#2c3830")    # dungeon wall tops / deep joints
+DSTONE_MID    = _hex("#56685a")    # wall faces
+DSTONE_LIGHT  = _hex("#8ca28c")
+DFLOOR_DARK   = _hex("#3c4a44")    # floor tiles
+DFLOOR_MID    = _hex("#5a6c62")
+DFLOOR_LIGHT  = _hex("#74887a")
+MOSS          = _hex("#4c8c3c")
+MOSS_LIGHT    = _hex("#7cbc5c")
+PIT_DEEP      = _hex("#06080a")
+PIT_LIP       = _hex("#20282a")
+DOOR_WOOD_D   = _hex("#4c2c14")    # locked doors
+DOOR_WOOD_M   = _hex("#7c4c24")
+DOOR_IRON     = _hex("#9098a8")
+BIGDOOR_RED   = _hex("#8c2030")    # big key door
+SHUTTER_D     = _hex("#38404c")    # shutters (iron bars)
+SHUTTER_M     = _hex("#6c7484")
+SWITCH_UP     = _hex("#c8a030")
+SWITCH_DOWN   = _hex("#7c6418")
+GSLIME_DARK   = _hex("#285c1c")    # the boss - the Grand Slime (moss-green jelly)
+GSLIME_MID    = _hex("#4ca03c")
+GSLIME_LIGHT  = _hex("#a8e080")
+GSLIME_CORE   = _hex("#e0c040")
+GLOVE_DARK    = _hex("#6c3c1c")    # the power glove
+GLOVE_MID     = _hex("#b0703c")
+GLOVE_LIGHT   = _hex("#e0a870")
+MAP_PAPER     = _hex("#e8d8a8")
+MAP_INK       = _hex("#7c5c34")

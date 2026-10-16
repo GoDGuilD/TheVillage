@@ -55,7 +55,7 @@
    ],
    "item": "lantern",
    "amount": 1,
-   "hidden": false
+   "reveal": ""
   }
  ],
  "wares": []

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.0
+# Last edit date: 2026-10-16
+# Version: 1.1.0
 class_name Chest
 extends StaticBody2D
 ## Talkable (group "talkable"): the World sees a Chest and runs the item-get sequence instead of a conversation.
@@ -20,6 +20,13 @@ var amount := 1
 var flag := ""                           # GameState flag set once opened
 var opened := false
 var concealed := false
+var reveal_by := ""                      # "" / "torches" / "switch": what makes a concealed chest appear
+var reveal_flag := ""                    # the switch flag for reveal == "switch"
+var needs_big_key := false               # big chests (BigChest)
+var tex_path := TEX                      # sprite and body size (BigChest overrides them in _init)
+var frame_size := FRAME
+var body_size := SIZE
+var sprite_offset := Vector2.ZERO
 
 var _sprite: AnimatedSprite2D
 var _shape: CollisionShape2D
@@ -40,14 +47,15 @@ func _ready() -> void:
 	add_to_group("chest")
 	_shape = CollisionShape2D.new()
 	var r := RectangleShape2D.new()
-	r.size = SIZE
+	r.size = body_size
 	_shape.shape = r
 	add_child(_shape)
 	var frames := SpriteStrips.new_frames()
-	SpriteStrips.add_strip(frames, "chest", TEX, FRAME, 1.0, false)
+	SpriteStrips.add_strip(frames, "chest", tex_path, frame_size, 1.0, false)
 	_sprite = AnimatedSprite2D.new()
 	_sprite.sprite_frames = frames
 	_sprite.animation = "chest"
+	_sprite.offset = sprite_offset
 	add_child(_sprite)
 	_refresh()
 

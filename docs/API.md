@@ -4,8 +4,8 @@ Description: Internal scripting API of the main classes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 2.1.0
+Last edit date: 2026-10-16
+Version: 2.2.0
 -->
 
 # API
@@ -13,15 +13,16 @@ Version: 2.1.0
 The game has no network API; this is the internal API other scripts and tests rely on.
 
 ## Player (`src/player/Player.gd`)
-- Signals: `health_changed(current, maximum)`, `died`, `talk_requested(target)`, `item_collected(kind)`.
+- Signals: `health_changed(current, maximum)`, `died`, `talk_requested(target)`, `item_collected(kind)`, `fell`.
 - Properties: `facing: Vector2i`, `health`, `sprite`, `sword: HitBox`, `spin_box: HitBox`, `hurt_box`, `fsm`
-  (states `idle walk hop attack charge spin lift carry throw use hold hurt dead`), `held_sprite`, `used_item`, `charged`, `carrying` (`""`, `"pot"`, `"bush"`),
+  (states `idle walk hop attack charge spin lift carry throw use hold fall hurt dead`), `held_sprite`, `used_item`, `charged`, `carrying` (`""`, `"pot"`, `"bush"`),
   `_input_override` (tests).
 - Calls: `is_invincible()`, `is_dead()`, `is_hopping()`, `freeze(seconds)`, `unfreeze()`, `blocks_from(source_position)`, `liftable_in_front()`, `talkable_in_front()`,
-  `revive(at)`, `collect(kind)`, `hold_up(texture)`, `end_hold()`.
+  `revive(at)`, `collect(kind)`, `hold_up(texture)`, `end_hold()`, `is_falling()`, `respawn_after_fall(at, facing)`.
 
 ## Enemies (`src/enemies/`)
-- `BaseEnemy`: signal `defeated(at)`; `player` (set by the field), `health`, `facing`, `freeze()`, `is_dead()`;
+- `GrandSlime` (boss): `is_boss`, `minions`, `angry()`.
+- `BaseEnemy`: `stun_immune`; signal `defeated(at)`; `player` (set by the field), `health`, `facing`, `freeze()`, `is_dead()`;
   static `spawn_drop(parent, at)`.
 - `Guard.chasing`, `Spitter.spit()` / `shots`, `EnemyRock.deflect()` / `deflected`.
 
@@ -33,7 +34,8 @@ The game has no network API; this is the internal API other scripts and tests re
   `cell_feet(id, [x, y])`, `overworld_at(point)`, `camera_target(point, rect)`; `_enter(id, feet, facing)` is the
   instant (test) move; `save_game() -> bool`, `quit_to_title()`, `can_open_menu()`, `box_at_top(screen_pos)`,
   `say(key)`, `item_get(kind, amount)`, `grant(kind, amount) -> bool` (true = new heart container), `buy(ware_node)`,
-  static `object_flag(kind, area, cell)`, `item_gets` (tests).
+  static `object_flag(kind, area, cell)`, `item_gets` (tests); dungeons: `dungeons`, `map_screen`, `group_of(id)`,
+  `area_at(point, group)`, `dungeon_of(id)`, `leave_dungeon()`, `falls` (tests).
 
 ## AreaBuilder (`src/world/AreaBuilder.gd`, static)
 - `tileset()`, `build(rows, actors, indoor, with_enemies, origin) -> {tiles, bushes, pots, enemies, spawn, doors,
@@ -47,6 +49,10 @@ The game has no network API; this is the internal API other scripts and tests re
 - `Chest` (`setup(kind, amount, flag, opened, concealed)`, `reveal()`, `open()`, `can_open()`, `kind`, `opened`,
   `concealed`), `Torch` (signal `lit_up`; `light()`, `lit`, `flame_point()`), `CrackedRock` (signal `broken`;
   `blast()`, group `bombable`), `KeyBlock` (`unlock()`), `ShopItem` (`setup(ware)`, `price()`, `sold_out()`).
+- `Door` (`setup(id, type, dir, when, open)`, `open_door()`, `close_door()`, `flag()`, `door_id`, `type`, `when`,
+  `is_open`), `FloorSwitch` (signal `pressed_down(flag)`; `press()`, `pressed`, `heavy`; group `floor_switch`),
+  `PushBlock` (signal `moved`; `push(dir, delta)`, `try_move(dir)`, `pushes`), `BigChest` (a Chest with
+  `needs_big_key`), `HeavyRock` (liftable with the glove). `Chest` adds `reveal_by`, `reveal_flag`.
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 
@@ -54,7 +60,8 @@ The game has no network API; this is the internal API other scripts and tests re
 - `GameState`: signals `gems_changed`, `magic_changed(current, maximum)`, `keys_changed`, `equipped_changed(item)`;
   `gems`, `magic`, `keys`, `items`, `equipped`, `seals`, `flags`; `add_gems()`, `use_magic() -> bool`, `add_magic()`,
   `add_keys()`, `add_ammo(kind, n) -> int`, `use_ammo(kind) -> bool`, `ammo_full()`, `add_heart_piece() -> bool`,
-  `bombs`, `arrows`, `heart_pieces`, signal `ammo_changed`, `give_item()`, `has_item()`, `equip()`, `set_flag()`, `has_flag()`, `seal_count()`, `roll_drop()`,
+  `bombs`, `arrows`, `heart_pieces`, signal `ammo_changed`, `key_pool`, `key_pools`, `set_key_pool()`,
+  `dungeon_items`, `has_dungeon_item()`, `give_dungeon_item()`, `visited`, `give_item()`, `has_item()`, `equip()`, `set_flag()`, `has_flag()`, `seal_count()`, `roll_drop()`,
   `snapshot()`, `restore(data)`, `reset()`; `MAX_MAGIC`, `ITEM_ORDER`, `SEAL_COUNT`, `GEM_VALUES`.
 - `Audio`: `sfx(name, pitch, volume_db, jitter)`, `played_recently(name, n)`, `history`, `last_sfx`.
 - `Juice`: `shake(px, seconds)`, `hit_stop(actors, seconds)`, `play_fx(name, pos, parent)`, `fx_count`,
@@ -76,10 +83,12 @@ The game has no network API; this is the internal API other scripts and tests re
   `picked(choice)`; `open()`, `is_ready_to_choose()`, `menu`; choices `CONTINUE`, `SAVE_CONTINUE`, `SAVE_QUIT`).
 - `MenuList`: signals `chosen(index)`, `cancelled`, `moved(index)`; `set_items([{label, enabled}])`, `confirm()`,
   `selected`, `items`, `active`. `PixelText`: `make()`, `measure()`, `line_height()`, `wrap(text, max_px)`.
+- `MapScreen`: signal `closed`; `open(areas, current, dungeons)`, `close()`, `is_open`, `shown_rooms`, `here`,
+  `boss_marked`. `Hud.show_zero_keys`.
 - `TitleScreen`: `menu`, `menu_items()`, `start_game(continue_save)`.
 
 ## Items (`src/items/`)
-- `ItemDB` (static): `KINDS`, `USES`, `WARES`, `LANTERN_MAGIC`, `has()`, `display_name()`, `icon()`, `text_key()`.
+- `ItemDB` (static): `KINDS`, `DUNGEON_ITEMS`, `USES`, `WARES`, `LANTERN_MAGIC`, `has()`, `display_name()`, `icon()`, `text_key()`.
 - `ItemUse` (static): `use(player, item, aim) -> bool`, `torch_near(tree, at)`.
 - `Boomerang` (signal `returned`; `direction`, `owner_node`, `coming_back`, `carried`, `turn_back()`; group
   `boomerang`), `Arrow` (`direction`, `stuck`; group `arrow`), `Bomb` (signal `exploded`; `fuse_left`, `explode()`;

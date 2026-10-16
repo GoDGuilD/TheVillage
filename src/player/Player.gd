@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 2.3.0
+# Last edit date: 2026-10-16
+# Version: 2.4.1
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -17,6 +17,7 @@ signal health_changed(current: int, maximum: int)
 signal died
 signal talk_requested(target: Node2D)   # interact pressed facing a villager or sign (the World opens the box)
 signal item_collected(kind: String)       # touched a pickup the World handles (heart piece, container, key)
+signal fell                               # dropped into a pit (the World takes a heart and puts him back)
 
 const SPRITE_DIR := "res://assets/sprites/joe/"
 const SHADOW_TEX := preload("res://assets/sprites/joe/joe_shadow.png")
@@ -222,6 +223,12 @@ func _walk(dir: Vector2, delta: float, speed: float = PlayerTuning.WALK_SPEED) -
 	velocity = dir.normalized() * speed if dir != Vector2.ZERO else Vector2.ZERO
 	var before := global_position
 	move_and_slide()
+	# Tell what he bumps into (push blocks slide after a steady push along a single axis).
+	if dir != Vector2.ZERO and (dir.x == 0.0) != (dir.y == 0.0):
+		for i in get_slide_collision_count():
+			var other := get_slide_collision(i).get_collider()
+			if other != null and other.has_method("push"):
+				other.call("push", dir.normalized(), delta)
 	var axis_only := (dir.x == 0.0) != (dir.y == 0.0)
 	if axis_only and get_slide_collision_count() > 0 and global_position.distance_to(before) < 0.01:
 		_try_corner_nudge(dir.normalized(), delta)
@@ -308,7 +315,17 @@ func state_idle_enter() -> void:
 	_play("idle")
 
 
+# True (and falling starts) when Joe's feet are over a pit.
+func _check_pit() -> bool:
+	if not AreaBuilder.flag_at(get_tree(), global_position + PlayerTuning.PIT_PROBE, "pit"):
+		return false
+	fsm.transition_to("fall")
+	return true
+
+
 func state_idle_update(delta: float) -> void:
+	if _check_pit():
+		return
 	if _wants_attack():
 		fsm.transition_to("attack")
 		return
@@ -332,6 +349,8 @@ func state_walk_update(delta: float) -> void:
 		return
 	_update_facing(dir)
 	_play("walk")
+	if _check_pit():
+		return
 	_walk(dir, delta)
 	# Walking south into a ledge hops down it (ALttP); ledges are solid from every other side.
 	if dir.y > 0.0 and absf(dir.x) < PlayerTuning.HOP_MAX_SIDEWAYS and get_slide_collision_count() > 0 			and AreaBuilder.flag_at(get_tree(), global_position + Vector2(0, PlayerTuning.LEDGE_PROBE), "ledge"):
@@ -539,6 +558,42 @@ func state_hold_update(_delta: float) -> void:
 	pass
 
 
+# --- states: falling ----------------------------------------------------------------------------
+
+func state_fall_enter() -> void:
+	velocity = Vector2.ZERO
+	_timer = PlayerTuning.FALL_TIME
+	sword.set_active(false)
+	if carrying != "":
+		_release_carried(DROP_TRAVEL)
+	_play("hurt")
+	Audio.sfx("fall")
+	var tw := sprite.create_tween()
+	tw.tween_property(sprite, "scale", Vector2.ZERO, PlayerTuning.FALL_TIME)
+
+
+func state_fall_update(delta: float) -> void:
+	if _timer <= 0.0:
+		return
+	_timer -= delta
+	if _timer <= 0.0:
+		fell.emit()
+
+
+func is_falling() -> bool:
+	return fsm.current_state == "fall"
+
+
+# Back on solid floor at `at` after a fall (the World has already taken the damage).
+func respawn_after_fall(at: Vector2, face: Vector2i) -> void:
+	global_position = at
+	velocity = Vector2.ZERO
+	facing = face
+	sprite.scale = Vector2.ONE
+	_iframes_left = PlayerTuning.IFRAMES
+	fsm.transition_to("idle")
+
+
 # --- states: lifting and throwing -------------------------------------------------------
 
 func state_lift_enter() -> void:
@@ -704,6 +759,7 @@ func revive(at: Vector2) -> void:
 	facing = Vector2i.DOWN
 	health.heal(health.max_health)
 	_iframes_left = 0.0
+	sprite.scale = Vector2.ONE
 	sprite.visible = true
 	fsm.transition_to("idle")
 

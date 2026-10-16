@@ -1,0 +1,90 @@
+{
+ "id": "d1_east",
+ "name": "Moss Shrine",
+ "kind": "dungeon",
+ "dungeon": "d1",
+ "size_screens": [
+  1,
+  1
+ ],
+ "origin_tiles": [
+  2048,
+  28
+ ],
+ "grid": [
+  2,
+  2
+ ],
+ "rows": [
+  "%%%%%%%%%%%[[%%%%%%%%%%%",
+  "%%%%%%%%%%%[[%%%%%%%%%%%",
+  "%%============ooo=oooo%%",
+  "%%==C=========ooo@oooo%%",
+  "%%============ooo=oooo%%",
+  "%%============ooo=oooo%%",
+  "[[============ooo=oooo%%",
+  "[[====================%%",
+  "%%=======$x===========%%",
+  "%%===Q================%%",
+  "%%==================Q=%%",
+  "%%====================%%",
+  "%%%%%%%%%%%%%%%%%%%%%%%%",
+  "%%%%%%%%%%%%%%%%%%%%%%%%"
+ ],
+ "doors": [],
+ "exits": [],
+ "npcs": [],
+ "signs": [],
+ "objects": [
+  {
+   "kind": "door",
+   "cell": [
+    0,
+    6
+   ],
+   "dir": "w",
+   "type": "locked",
+   "id": "d1_hub_east",
+   "when": ""
+  },
+  {
+   "kind": "door",
+   "cell": [
+    11,
+    0
+   ],
+   "dir": "n",
+   "type": "shutter",
+   "id": "d1_east_north",
+   "when": "switch:d1_east"
+  },
+  {
+   "kind": "switch",
+   "cell": [
+    17,
+    3
+   ],
+   "flag": "switch:d1_east",
+   "heavy": false
+  },
+  {
+   "kind": "chest",
+   "cell": [
+    4,
+    3
+   ],
+   "item": "compass",
+   "amount": 1,
+   "reveal": ""
+  },
+  {
+   "kind": "big_chest",
+   "cell": [
+    9,
+    8
+   ],
+   "item": "glove"
+  }
+ ],
+ "wares": []
+}

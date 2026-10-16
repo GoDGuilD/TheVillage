@@ -4,8 +4,8 @@ Description: Log of every gotcha met, internal or external.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.3.0
+Last edit date: 2026-10-16
+Version: 1.4.0
 -->
 
 # Bugs and gotchas
@@ -22,3 +22,6 @@ Version: 1.3.0
 - [External] **A member named `hidden` breaks any CanvasItem script** - Symptom: "Member 'hidden' redefined (original in native class 'StaticBody2D')" and every script depending on `Chest` failed to compile. Root cause: CanvasItem already has a `hidden` signal. Fix: the chest's flag is `concealed`. File: `src/world/Chest.gd`.
 - [External] **`Array.filter()` result cannot be inferred** - Symptom: World.gd failed to parse ("Cannot infer the type of 'torches'"), which hung the headless world suite. Root cause: `filter()` returns an untyped Array; `:=` needs a known type (warnings are errors here). Fix: declare `var torches: Array = ...`. File: `src/world/World.gd`.
 - [Internal] **`HurtBox.recheck()` errored with monitoring off** - Symptom: "Can't find overlapping areas when monitoring is off" when Joe's i-frames ended in tests and captures (hurt box switched off). Root cause: `recheck()` called `get_overlapping_areas()` unconditionally. Fix: return early while `monitoring` is false. File: `src/combat/HurtBox.gd`.
+- [Internal] **A member variable named like a method breaks the class** - Symptom: "Could not parse global class 'Chest'" and every script using Chest/BigChest failed. Root cause: Chest got a `reveal` variable next to its `reveal()` method. Fix: the variable is `reveal_by`. File: `src/world/Chest.gd`.
+- [External] **A tweened static body did not trigger an Area2D switch** - Symptom: the push block slid across the heavy floor switch without pressing it (headless runs). Root cause: overlap reporting between an Area2D and a StaticBody2D teleported by a tween is not reliable frame to frame. Fix: the block presses any switch it comes to rest on directly (group `floor_switch`, distance check). File: `src/world/PushBlock.gd`.
+- [Internal] **The family seal was grabbed the instant it appeared** - Symptom: after the heart container the seal's moment was skipped. Root cause: the seal spawned on the container's spot, where Joe was standing. Fix: it appears 32 px higher (`SEAL_DROP`). File: `src/world/World.gd`.

@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 3.0.0
+# Last edit date: 2026-10-16
+# Version: 4.0.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -17,6 +17,9 @@ extends Node2D
 ## SaveGame.pending, applied here before the first area is built.
 ## Opened chests, broken rocks, opened key blocks, taken heart pieces and sold-out wares are GameState flags named
 ## "<kind>:<area>:<x>,<y>" (wares: "ware:<id>"), so they survive area changes and saves.
+## Dungeon rooms scroll into each other like overworld areas (same "group"). Doors read their state from flags:
+## "door:<id>" (opened locked/big doors), the room flags "cleared:<room>" / "switch:<room>" (shutters), and the
+## dungeon's "boss:<dungeon>" (the boss door shuts behind Joe until then).
 
 signal area_entered(area_id: String)
 
@@ -27,6 +30,10 @@ const PICKUP_SCRIPT := preload("res://src/world/Pickup.gd")
 const SHOP_CHOICES := ["BUY", "NO"]
 const BOW_ARROWS := 10                   # the bow comes with a quiver
 const CONTAINER_HP := 2                  # half-heart units a heart container adds
+const DUNGEON_PUSH := 40.0               # px Joe walks into a dungeon room on a scroll (past the 2-tile wall)
+const BOSS_REWARD_DELAY := 1.2           # s after the boss falls before the heart container appears
+const REWARD_DROP := Vector2(0, 8)       # heart container position relative to the room's centre
+const SEAL_DROP := Vector2(0, -24)       # the seal appears above it (not under Joe, who just took the heart)
 const TILE := 16
 const VIEW := Vector2(384, 216)
 const SCROLL_TIME := 0.6                 # seconds the camera takes to slide to the next area
@@ -47,6 +54,9 @@ var dialogue: DialogueBox
 var pause_menu: PauseMenu
 var item_menu: ItemMenu
 var game_over: GameOver
+var map_screen: MapScreen
+var dungeons: Dictionary = {}            # dungeon id -> {name, seal, entrance, boss_room, boss_flag}
+var falls := 0                           # pit falls (tests)
 var talking: Node2D = null               # the villager or sign in the current conversation
 var item_gets := 0                       # item-get sequences run (tests)
 var _after_dialogue := Callable()        # runs once the current box closes (gift hand-over, end of item-get)
@@ -64,6 +74,7 @@ var _area_override := ""                 # tests may start somewhere else
 var _spawn_override = null
 var _facing_override := Vector2i.DOWN
 var _save_to_apply: Dictionary = {}
+var _last_area := ""                     # the area before the current one (captions skip room-to-room moves)
 
 
 func _ready() -> void:
@@ -84,11 +95,12 @@ func _ready() -> void:
 	player.died.connect(_on_player_died)
 	player.talk_requested.connect(_on_talk_requested)
 	player.item_collected.connect(func(kind: String) -> void: item_get(kind))
+	player.fell.connect(_on_fell)
 	hud = Hud.new()
 	add_child(hud)
 	player.health_changed.connect(hud.set_health)
 	hud.set_health(player.health.current_health, player.health.max_health)
-	area_entered.connect(func(aid: String) -> void: hud.show_caption(String(areas[aid]["name"]).to_upper()))
+	area_entered.connect(_on_area_entered)
 	_build_overlays()
 	_take_pending_save()
 	var first := _area_override if _area_override != "" else start_area
@@ -114,6 +126,8 @@ func _build_overlays() -> void:
 	game_over = GameOver.new()
 	add_child(game_over)
 	game_over.picked.connect(_on_game_over_picked)
+	map_screen = MapScreen.new()
+	add_child(map_screen)
 	var layer := CanvasLayer.new()
 	layer.layer = UiTheme.LAYER_FADE
 	add_child(layer)
@@ -152,6 +166,7 @@ func start_at(area_id: String, feet: Vector2) -> void:
 func _load_index() -> void:
 	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(AREA_DIR + "index.json"))
 	start_area = String(index["start"])
+	dungeons = index.get("dungeons", {})
 	for aid in index["areas"]:
 		areas[aid] = JSON.parse_string(FileAccess.get_file_as_string(AREA_DIR + String(aid) + ".json"))
 
@@ -184,10 +199,27 @@ func _spawn_point(area_id: String) -> Vector2:
 
 # The overworld area containing a global point, or "".
 func overworld_at(p: Vector2) -> String:
+	return area_at(p, "overworld")
+
+
+# Areas that scroll into each other: the overworld, or the rooms of one dungeon. Interiors have no group ("").
+func group_of(area_id: String) -> String:
+	var a: Dictionary = areas[area_id]
+	if a["kind"] == "overworld":
+		return "overworld"
+	return String(a.get("dungeon", ""))
+
+
+# The area of `group` containing a global point, or "".
+func area_at(p: Vector2, group: String) -> String:
 	for aid in areas:
-		if areas[aid]["kind"] == "overworld" and rect_of(aid).has_point(p):
+		if group_of(aid) == group and rect_of(aid).has_point(p):
 			return aid
 	return ""
+
+
+func dungeon_of(area_id: String) -> String:
+	return String(areas[area_id].get("dungeon", ""))
 
 
 # --- building ----------------------------------------------------------------------------
@@ -198,10 +230,18 @@ func _build(area_id: String) -> Dictionary:
 	actors.name = "Area_" + area_id
 	actors.y_sort_enabled = true
 	_actors.add_child(actors)
-	var built := AreaBuilder.build(data["rows"], actors, data["kind"] == "interior", true, origin_of(area_id))
+	var built := AreaBuilder.build(data["rows"], actors, data["kind"] == "interior", true, origin_of(area_id),
+			data["kind"] == "dungeon")
 	_ground.add_child(built["tiles"])
-	for e in built["enemies"]:
+	var boss_flag := String(data.get("boss_flag", ""))
+	for e in built["enemies"].duplicate():
 		e.player = player
+		if e.get("is_boss"):
+			if GameState.has_flag(boss_flag):
+				built["enemies"].erase(e)                 # already beaten: the room stays empty
+				e.queue_free()
+			else:
+				e.defeated.connect(func(_at: Vector2) -> void: _on_boss_defeated(area_id))
 	var origin := origin_of(area_id)
 	for n in data.get("npcs", []):
 		var npc := Npc.new()
@@ -223,8 +263,11 @@ func _build(area_id: String) -> Dictionary:
 		item.setup(ware_id)
 		item.position = origin + (Vector2(float(w["cell"][0]), float(w["cell"][1])) + Vector2(0.5, 0.5)) * TILE
 		actors.add_child(item)
-	return {"id": area_id, "data": data, "tiles": built["tiles"], "actors": actors, "rect": rect_of(area_id),
+	var rec := {"id": area_id, "data": data, "tiles": built["tiles"], "actors": actors, "rect": rect_of(area_id),
 			"bushes": built["bushes"], "pots": built["pots"], "enemies": built["enemies"]}
+	if boss_flag != "" and GameState.has_flag(boss_flag):
+		_spawn_boss_reward(rec)                           # came back before taking the reward
+	return rec
 
 
 # One chest / torch / cracked rock / key block / heart piece from the area data (skipped once used up).
@@ -234,10 +277,36 @@ func _build_object(area_id: String, o: Dictionary, actors: Node2D) -> void:
 	var flag := object_flag(String(o["kind"]), area_id, cell)
 	var node: Node2D = null
 	match String(o["kind"]):
-		"chest":
-			var chest := Chest.new()
-			chest.setup(String(o["item"]), int(o.get("amount", 1)), flag, GameState.has_flag(flag), bool(o.get("hidden", false)))
+		"chest", "big_chest":
+			var chest: Chest = BigChest.new() if o["kind"] == "big_chest" else Chest.new()
+			var reveal := String(o.get("reveal", ""))
+			var reveal_flag := String(o.get("flag", ""))
+			var concealed := reveal != "" and not (reveal == "switch" and GameState.has_flag(reveal_flag))
+			chest.setup(String(o["item"]), int(o.get("amount", 1)), flag, GameState.has_flag(flag), concealed)
+			chest.reveal_by = reveal
+			chest.reveal_flag = reveal_flag
+			if o["kind"] == "big_chest":
+				at += Vector2(TILE / 2.0, 0)                # centred on its two cells
 			node = chest
+		"door":
+			var door := Door.new()
+			var dtype := String(o["type"])
+			var when := String(o.get("when", ""))
+			var opened := true if dtype == "boss" else (GameState.has_flag(when) if dtype == "shutter"
+					else GameState.has_flag("door:" + String(o["id"])))
+			door.setup(String(o["id"]), dtype, String(o["dir"]), when, opened)
+			at += Vector2(TILE / 2.0, TILE / 2.0)            # centred on its 2x2 doorway
+			node = door
+		"switch":
+			var sw := FloorSwitch.new()
+			var sflag := String(o["flag"])
+			sw.setup(sflag, bool(o.get("heavy", false)), GameState.has_flag(sflag))
+			sw.pressed_down.connect(_on_switch)
+			node = sw
+		"push_block":
+			node = PushBlock.new()
+		"heavy_rock":
+			node = HeavyRock.new()
 		"torch":
 			var torch := Torch.new()
 			torch.lit_up.connect(_on_torch_lit)
@@ -279,6 +348,8 @@ func _free(rec: Dictionary) -> void:
 
 
 func _enter(area_id: String, feet: Vector2, facing: Vector2i = Vector2i.DOWN) -> void:
+	if not current.is_empty():
+		_last_area = current_id()
 	_free(current)
 	current = _build(area_id)
 	if player.health.is_alive():
@@ -330,11 +401,13 @@ func _physics_process(_delta: float) -> void:
 		return
 	var feet := player.global_position
 	var data: Dictionary = current["data"]
-	if data["kind"] == "overworld" and not current["rect"].has_point(feet):
-		var next := overworld_at(feet)
+	var group := group_of(current_id())
+	if group != "" and not current["rect"].has_point(feet):
+		var next := area_at(feet, group)
 		if next != "":
 			_scroll_to(next)
 		return
+	_check_room_cleared()
 	var cell := Vector2i(((feet - current["rect"].position) / TILE).floor())
 	for d in data["doors"]:
 		if cell == Vector2i(int(d["cell"][0]), int(d["cell"][1])) and player.facing == Vector2i.UP:
@@ -353,7 +426,9 @@ func _scroll_to(next_id: String) -> void:
 	var old := current
 	old["actors"].process_mode = Node.PROCESS_MODE_DISABLED
 	var dir := _edge_direction(old["rect"], player.global_position)
-	var to_feet := player.global_position + dir * SCROLL_PUSH
+	var push := DUNGEON_PUSH if areas[next_id]["kind"] == "dungeon" else SCROLL_PUSH
+	var to_feet := player.global_position + dir * push
+	_last_area = old["id"]
 	current = _build(next_id)
 	current["actors"].process_mode = Node.PROCESS_MODE_DISABLED
 	player.freeze(SCROLL_TIME * 4.0)
@@ -406,6 +481,9 @@ func _on_talk_requested(target: Node2D) -> void:
 		return
 	if target is Chest:
 		_open_chest(target)
+		return
+	if target is Door:
+		_open_door(target)
 		return
 	if target is KeyBlock:
 		_use_key(target)
@@ -462,6 +540,10 @@ func item_get(kind: String, amount: int = 1) -> void:
 	if new_heart and kind == "heart_piece":
 		pages.append_array(DialogueData.pages_for(ItemDB.text_key("heart_container"), GameState))
 	_after_dialogue = func() -> void: player.end_hold()
+	if kind == "seal":
+		_after_dialogue = func() -> void:
+			player.end_hold()
+			leave_dungeon()
 	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
 	dialogue.open(pages, "", box_at_top(on_screen))
 
@@ -490,6 +572,13 @@ func grant(kind: String, amount: int = 1) -> bool:
 		"heart_container":
 			_add_container()
 			return true
+		"map", "compass", "big_key":
+			GameState.give_dungeon_item(dungeon_of(current_id()), kind)
+		"glove":
+			GameState.give_item(kind)
+		"seal":
+			var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
+			GameState.seals[int(info.get("seal", 0))] = true
 	return false
 
 
@@ -497,9 +586,13 @@ func _add_container() -> void:
 	_set_hearts(player.health.max_health + CONTAINER_HP, player.health.max_health + CONTAINER_HP)
 
 
-# Chests open from below (Joe facing up), once.
+# Chests open from below (Joe facing up), once; a big chest also needs this dungeon's big key.
 func _open_chest(chest: Chest) -> void:
 	if not chest.can_open() or player.facing != Vector2i.UP:
+		return
+	if chest.needs_big_key and not GameState.has_dungeon_item(dungeon_of(current_id()), "big_key"):
+		Audio.sfx("error")
+		say("big_chest_locked")
 		return
 	chest.open()
 	GameState.set_flag(chest.flag)
@@ -514,6 +607,25 @@ func _use_key(block: KeyBlock) -> void:
 	GameState.add_keys(-1)
 	GameState.set_flag(block.flag)
 	block.unlock()
+
+
+# A locked door takes a small key of this dungeon; a big door needs the big key (kept, as in ALttP).
+func _open_door(door: Door) -> void:
+	if door.is_open:
+		return
+	if door.type == "locked":
+		if GameState.keys <= 0:
+			say("locked_door")
+			return
+		GameState.add_keys(-1)
+	elif door.type == "big":
+		if not GameState.has_dungeon_item(dungeon_of(current_id()), "big_key"):
+			say("big_door")
+			return
+	else:
+		return
+	GameState.set_flag(door.flag())
+	door.open_door()
 
 
 func _offer_ware(item: ShopItem) -> void:
@@ -562,11 +674,112 @@ func _on_torch_lit() -> void:
 	var torches: Array = current["actors"].get_children().filter(func(n: Node) -> bool: return n is Torch)
 	if torches.any(func(t: Node) -> bool: return not t.lit):
 		return
+	_reveal_chests(func(c: Chest) -> bool: return c.reveal_by == "torches")
+
+
+func _reveal_chests(which: Callable) -> void:
 	for n in current["actors"].get_children():
-		if n is Chest and n.concealed:
+		if n is Chest and n.concealed and which.call(n):
 			n.reveal()
 			Juice.play_fx("poof", n.global_position, current["actors"])
 			Audio.sfx("unlock")
+
+
+# --- dungeons ------------------------------------------------------------------------------------------
+
+func _on_area_entered(aid: String) -> void:
+	GameState.visited[aid] = true
+	var dungeon := dungeon_of(aid)
+	hud.show_zero_keys = dungeon != ""
+	GameState.set_key_pool(dungeon)
+	# Moving from room to room of the same dungeon keeps quiet; entering it (or any other area) shows the name.
+	if dungeon == "" or _last_area == "" or dungeon_of(_last_area) != dungeon:
+		hud.show_caption(String(areas[aid]["name"]).to_upper())
+	# The boss door shuts behind Joe until the boss falls.
+	var boss_flag := String(areas[aid].get("boss_flag", ""))
+	if boss_flag != "" and not GameState.has_flag(boss_flag):
+		for n in current["actors"].get_children():
+			if n is Door and n.type == "boss":
+				n.close_door()
+
+
+# Rooms with a clear flag remember being emptied of enemies (their shutters open, now and later).
+func _check_room_cleared() -> void:
+	var flag := String(current["data"].get("clear_flag", ""))
+	if flag == "" or GameState.has_flag(flag):
+		return
+	for e in current["enemies"]:
+		if is_instance_valid(e) and not e.is_dead():
+			return
+	GameState.set_flag(flag)
+	_open_doors_when(flag)
+
+
+func _open_doors_when(flag: String) -> void:
+	for n in current["actors"].get_children():
+		if n is Door and n.when == flag:
+			n.open_door()
+
+
+func _on_switch(flag: String) -> void:
+	GameState.set_flag(flag)
+	_open_doors_when(flag)
+	_reveal_chests(func(c: Chest) -> bool: return c.reveal_by == "switch" and c.reveal_flag == flag)
+
+
+func _on_fell() -> void:
+	falls += 1
+	Audio.sfx("hurt")
+	player.health.take_damage(PlayerTuning.FALL_DAMAGE)
+	if player.health.is_alive():
+		player.respawn_after_fall(entry_point, entry_facing)
+		_snap_camera()
+
+
+func _on_boss_defeated(room: String) -> void:
+	var flag := String(areas[room].get("boss_flag", ""))
+	GameState.set_flag(flag)
+	Audio.sfx("boss_die")
+	Juice.shake(4.0, 0.6)
+	for e in current["actors"].get_children():
+		if e is BaseEnemy and not e.is_dead() and not e.get("is_boss"):
+			Juice.play_fx("poof", e.global_position, current["actors"])
+			e.queue_free()                                    # the boss's brood dies with it
+	_open_doors_when(flag)
+	await get_tree().create_timer(BOSS_REWARD_DELAY).timeout
+	if current_id() == room:
+		_spawn_boss_reward(current)
+
+
+# After the boss: first a heart container, then the family seal (each only until it is taken).
+func _spawn_boss_reward(rec: Dictionary) -> void:
+	var room := String(rec["id"])
+	var container_flag := "heart_container:" + room
+	var at: Vector2 = rec["rect"].get_center() + REWARD_DROP
+	var info: Dictionary = dungeons.get(dungeon_of(room), {})
+	if not GameState.has_flag(container_flag):
+		var c: Area2D = PICKUP_SCRIPT.new()
+		c.kind = "heart_container"
+		c.position = at
+		c.collected.connect(func(_k: String) -> void:
+			GameState.set_flag(container_flag)
+			_spawn_boss_reward.call_deferred(rec))
+		rec["actors"].add_child.call_deferred(c)
+	elif not GameState.seals[int(info.get("seal", 0))]:
+		var seal: Area2D = PICKUP_SCRIPT.new()
+		seal.kind = "seal"
+		seal.position = at - REWARD_DROP + SEAL_DROP
+		rec["actors"].add_child.call_deferred(seal)
+
+
+# Back out to the overworld in front of the dungeon's entrance (after the seal).
+func leave_dungeon() -> void:
+	var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
+	var entrance: Dictionary = areas.get(String(info.get("entrance", "")), {})
+	if entrance.is_empty() or entrance["exits"].is_empty():
+		return
+	var e: Dictionary = entrance["exits"][0]
+	_warp(String(e["to"]), cell_feet(String(e["to"]), e["spawn_cell"]), FACINGS[String(e["facing"])])
 
 
 # --- menus ------------------------------------------------------------------------------------------
@@ -574,7 +787,7 @@ func _on_torch_lit() -> void:
 # True when nothing else owns the screen (no scroll, fade, conversation, menu or death in progress).
 func can_open_menu() -> bool:
 	return not transitioning and not dialogue.is_open and not pause_menu.is_open and not item_menu.is_open \
-			and not game_over.is_open and not player.is_dead()
+			and not game_over.is_open and not map_screen.is_open and not player.is_dead() and not player.is_falling()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -586,6 +799,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("inventory"):
 		get_viewport().set_input_as_handled()
 		item_menu.open()
+	elif event.is_action_pressed("map"):
+		get_viewport().set_input_as_handled()
+		map_screen.open(areas, current_id(), dungeons)
 
 
 # Write the save file: the current area, where Joe entered it, his hearts and the GameState snapshot.
