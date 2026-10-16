@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.3.0
+Version: 1.4.0
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -47,18 +47,20 @@ behaviour is verified by headless scripted test suites.</p>
 <ul>
 <li><b>Start:</b> open the editor, import the project folder, press F5. The title screen opens; NEW GAME starts in Joe's house, CONTINUE loads the save.</li>
 <li><b>Stop:</b> close the game window (or F8 in the editor).</li>
-<li><b>Verify:</b> run the four test suites; each must end with <code>0 failed</code> (185 checks today):</li>
+<li><b>Verify:</b> run the five test suites; each must end with <code>0 failed</code> (252 checks today):</li>
 </ul>
 <pre>Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_player.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_combat.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_world.gd
-Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_ui.gd</pre>
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_ui.gd
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_items.gd</pre>
 <p>Level lint (must print <code>0 lint problems</code>):</p>
 <pre>python -I tools/gen_areas.py</pre>
 <p>Visual checks (open a window, write <code>tmp/field_*.png</code>, <code>tmp/world_*.png</code>, <code>tmp/ui_*.png</code>):</p>
 <pre>Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_field.gd
 Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_world.gd
-Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_ui.gd</pre>
+Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_ui.gd
+Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_items.gd</pre>
 
 <h2>4. Logs and monitoring</h2>
 <p>The game writes Godot's standard log to <code>%APPDATA%\Godot\app_userdata\The Village\logs\godot.log</code>.
@@ -74,6 +76,7 @@ resets the game to a fresh start; the title screen then offers only NEW GAME.</p
 <tr><td><code>src/player/PlayerTuning.gd</code></td><td>Walk speed, corner nudge, sword, spin attack, shield, lift/throw, health, hurt and invincibility times</td></tr>
 <tr><td><code>src/core/GameState.gd</code></td><td>Drop table, gem values, magic and key limits, item order</td></tr>
 <tr><td><code>assets/data/dialogue.json</code></td><td>Every villager line and sign text</td></tr>
+<tr><td><code>src/items/ItemDB.gd</code></td><td>Item names, shop prices and amounts</td></tr>
 <tr><td><code>src/ui/DialogueBox.gd</code>, <code>src/ui/UiTheme.gd</code></td><td>Text speed, box layout, UI colours</td></tr>
 <tr><td><code>tools/gen_areas.py</code></td><td>The world map: every area and interior (regenerate after editing)</td></tr>
 <tr><td><code>tools/palette.py</code></td><td>All colours of generated art</td></tr>
@@ -85,6 +88,7 @@ python -I tools/gen_enemies.py
 python -I tools/gen_props.py
 python -I tools/gen_ui.py
 python -I tools/gen_npcs.py
+python -I tools/gen_items.py
 python -I tools/gen_sfx.py
 python -I tools/gen_areas.py
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --import</pre>

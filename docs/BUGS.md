@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.2.1
+Version: 1.3.0
 -->
 
 # Bugs and gotchas
@@ -19,3 +19,6 @@ Version: 1.2.1
 - [External] **`round()` breaks typed variables** - Symptom: every suite failed to compile with "The variable type is being inferred from a Variant value" at `Hud.gd:171`. Root cause: in Godot 4 the global `round()` returns a Variant, and this project treats inference warnings as errors. Fix: use `roundf()` (or `Vector2.round()`) wherever the result feeds a `:=` variable. File: `src/ui/Hud.gd`, `DialogueBox.gd`, `TitleScreen.gd`.
 - [External] **A test naming an autoload-using class fails to compile** - Symptom: `test_ui.gd` failed with "Identifier not found: Audio" in `PauseMenu.gd`, which cascaded into a half-built World (no pause menu, no fade) and 13 failures. Root cause: in `-s` mode the test script is compiled before autoloads are registered, so any class it names statically (`PauseMenu.ITEM_SAVE`) must compile without them. Fix: read the constant through the instance (`world.pause_menu.ITEM_SAVE`). File: `tests/test_ui.gd`.
 - [Internal] **Villager lint accepted Joe standing two tiles away** - Symptom: a villager boxed in by rocks still passed the lint (found by a deliberate mutation). Root cause: the counter rule (talk from two tiles away) was applied to every villager in every direction, so a reachable cell beyond a wall counted. Fix: only villagers marked `across` get the two-tile reach, and only along their facing. File: `tools/gen_areas.py`.
+- [External] **A member named `hidden` breaks any CanvasItem script** - Symptom: "Member 'hidden' redefined (original in native class 'StaticBody2D')" and every script depending on `Chest` failed to compile. Root cause: CanvasItem already has a `hidden` signal. Fix: the chest's flag is `concealed`. File: `src/world/Chest.gd`.
+- [External] **`Array.filter()` result cannot be inferred** - Symptom: World.gd failed to parse ("Cannot infer the type of 'torches'"), which hung the headless world suite. Root cause: `filter()` returns an untyped Array; `:=` needs a known type (warnings are errors here). Fix: declare `var torches: Array = ...`. File: `src/world/World.gd`.
+- [Internal] **`HurtBox.recheck()` errored with monitoring off** - Symptom: "Can't find overlapping areas when monitoring is off" when Joe's i-frames ended in tests and captures (hurt box switched off). Root cause: `recheck()` called `get_overlapping_areas()` unconditionally. Fix: return early while `monitoring` is false. File: `src/combat/HurtBox.gd`.

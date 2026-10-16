@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.4.0
+# Version: 1.5.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -221,3 +221,38 @@ DRESS_MID     = _hex("#c84c78")
 DRESS_LIGHT   = _hex("#f08cac")
 TUNIC_DARK    = _hex("#7c6c20")    # village boy
 TUNIC_MID     = _hex("#c0a838")
+
+# --- Items, chests and puzzle props (Phase 5) ------------------------------------------
+CHEST_DARK    = _hex("#5c3418")    # chest wood
+CHEST_MID     = _hex("#9c5c28")
+CHEST_LIGHT   = _hex("#d08840")
+CHEST_BAND    = _hex("#c8a030")    # gold bands and lock
+CHEST_INSIDE  = _hex("#281408")
+BOOM_DARK     = _hex("#1c3c8c")    # the boomerang (blue, red tips)
+BOOM_MID      = _hex("#3c70d8")
+BOOM_LIGHT    = _hex("#90c0ff")
+BOOM_TIP      = _hex("#e04040")
+BOW_DARK      = _hex("#6c3c18")
+BOW_MID       = _hex("#a86830")
+BOW_STRING    = _hex("#e8e0c8")
+ARROW_SHAFT   = _hex("#c09060")
+ARROW_FLETCH  = _hex("#e85050")
+BOMB_DARK     = _hex("#141c38")
+BOMB_MID      = _hex("#28386c")
+BOMB_LIGHT    = _hex("#7088c8")
+FUSE          = _hex("#d0b080")
+BOOM_FLASH    = _hex("#ff6040")    # a bomb about to burst flashes this colour
+BLAST_CORE    = _hex("#fffce8")    # explosion
+BLAST_HOT     = _hex("#f8e050")
+BLAST_MID     = _hex("#f08030")
+BLAST_DARK    = _hex("#a03020")
+LANTERN_BRASS = _hex("#c89838")
+LANTERN_DARK  = _hex("#7c5818")
+LANTERN_GLASS = _hex("#fff0a0")
+FLAME_CORE    = _hex("#fff8c0")
+FLAME_MID     = _hex("#f8b030")
+FLAME_EDGE    = _hex("#e05018")
+STONE_DARK    = _hex("#4c4c5c")    # torch bases, key blocks
+STONE_MID     = _hex("#7c7c90")
+STONE_LIGHT   = _hex("#b0b0c4")
+CRACK         = _hex("#282834")

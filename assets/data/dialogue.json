@@ -6,8 +6,8 @@
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
   "Last edit date": "2026-10-15",
-  "Version": "1.0.0",
-  "Format": "entry = {name?, pages: [...], once?: [...], flag?}. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
+  "Version": "1.1.0",
+  "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
   "name": "Tato",
@@ -42,8 +42,17 @@
    "Until then, remember what your father taught us: hold the sword after a swing, then let go for a spin!"
   ],
   "pages": [
-   "Walk off a ledge to hop down. You can't climb back up the same way, so look for a ramp."
-  ]
+   "Walk off a ledge to hop down. You can't climb back up the same way, so look for a ramp.",
+   "Boni sells bombs now. Some rocks around here look cracked... just saying."
+  ],
+  "gift": {
+   "item": "boomerang",
+   "flag": "got_boomerang",
+   "pages": [
+    "It's done! Your father's old boomerang - I mended the edge and balanced it again.",
+    "Throw it with the item button. It stuns what it hits and brings back whatever it touches."
+   ]
+  }
  },
  "villager_woman": {
   "name": "Marta",
@@ -58,21 +67,119 @@
   ]
  },
  "sign_pueblo_cross": {
-  "pages": ["EL PUEBLO\nNorth: the meadow.  West: the woods.\nEast: the lake.  South: the old road."]
+  "pages": [
+   "EL PUEBLO\nNorth: the meadow.  West: the woods.\nEast: the lake.  South: the old road."
+  ]
  },
  "sign_pueblo_south": {
-  "pages": ["West: Boni's Shop.\nEast: Janga's house."]
+  "pages": [
+   "West: Boni's Shop.\nEast: Janga's house."
+  ]
  },
  "sign_meadow": {
-  "pages": ["NORTH MEADOW\nMind the slimes. They hop when you come close."]
+  "pages": [
+   "NORTH MEADOW\nMind the slimes. They hop when you come close."
+  ]
  },
  "sign_woods": {
-  "pages": ["WEST WOODS\nThe ledge only goes one way."]
+  "pages": [
+   "WEST WOODS\nThe ledge only goes one way."
+  ]
  },
  "sign_lake": {
-  "pages": ["EAST LAKE\nNo swimming. Do not feed the rock-spitters."]
+  "pages": [
+   "EAST LAKE\nNo swimming. Do not feed the rock-spitters."
+  ]
  },
  "sign_south_road": {
-  "pages": ["SOUTH ROAD\nClosed by order of Caver.\nThe boulders are too heavy to lift."]
+  "pages": [
+   "SOUTH ROAD\nClosed by order of Caver.\nThe boulders are too heavy to lift."
+  ]
+ },
+ "get_lantern": {
+  "pages": [
+   "You got the Lantern! Use it to light torches. Each flame costs a little magic."
+  ]
+ },
+ "get_boomerang": {
+  "pages": [
+   "You got the Boomerang! Equip it in the item menu (I) and throw it with the item button (K)."
+  ]
+ },
+ "get_bow": {
+  "pages": [
+   "You got the Bow, and ten arrows! Shoot with the item button. Boni sells more arrows."
+  ]
+ },
+ "get_bombs": {
+  "pages": [
+   "You got Bombs! Set one down with the item button and stand back. Cracked rocks won't stop them."
+  ]
+ },
+ "get_arrows": {
+  "pages": [
+   "You got arrows!"
+  ]
+ },
+ "get_small_key": {
+  "pages": [
+   "You got a small key! It opens one locked block."
+  ]
+ },
+ "get_heart_piece": {
+  "pages": [
+   "You got a Piece of Heart! Collect four to make a new heart container."
+  ]
+ },
+ "get_heart_container": {
+  "pages": [
+   "Your life grew by one heart!"
+  ]
+ },
+ "get_gems": {
+  "pages": [
+   "You found gems!"
+  ]
+ },
+ "locked": {
+  "pages": [
+   "It's locked. A small key would open it."
+  ]
+ },
+ "shop_bombs": {
+  "name": "Boni",
+  "pages": [
+   "Bombs! Five of them for 20 gems. Want them?"
+  ]
+ },
+ "shop_arrows": {
+  "name": "Boni",
+  "pages": [
+   "Ten arrows for 15 gems. Want them?"
+  ]
+ },
+ "shop_heart_piece": {
+  "name": "Boni",
+  "pages": [
+   "A Piece of Heart. I only have the one... 100 gems. Want it?"
+  ]
+ },
+ "shop_thanks": {
+  "name": "Boni",
+  "pages": [
+   "Thank you, Joe!"
+  ]
+ },
+ "shop_no_gems": {
+  "name": "Boni",
+  "pages": [
+   "Oh... you don't have enough gems for that."
+  ]
+ },
+ "shop_full": {
+  "name": "Boni",
+  "pages": [
+   "You can't carry any more of those!"
+  ]
  }
 }

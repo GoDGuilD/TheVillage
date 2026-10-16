@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 2.3.0
+Version: 2.4.0
 -->
 
 # Game Design Document — The Village
@@ -70,7 +70,7 @@ direction is taken from the dominant axis (vertical wins a perfect diagonal).
 | Move | WASD / arrows | D-pad / left stick |
 | Sword | J / Space | South (A / Cross) — SNES B |
 | Interact / lift / talk | E / Enter | East (B / Circle) — SNES A |
-| Use item | K | West (X / Square) — SNES Y |
+| Use item (equipped Y-item) | K | West (X / Square) — SNES Y |
 | Dash (Pegasus-style boots, later) | L / Shift | Right stick click |
 | Map | Tab | North (Y / Triangle) — SNES X |
 | Inventory | I | Left shoulder |
@@ -110,7 +110,21 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
   Umbra, Ignis, Tempus and Silva are its four regions.
 - **Dungeons**: 3 Light World (family seals) + 4 Dark World (dimension crystals) + Caver's tower.
 
-## 7. Items (planned; ALttP equivalents in brackets)
+## 7. Items (ALttP equivalents in brackets)
+
+**Implemented in Phase 5:**
+| Item | Where | Use |
+|---|---|---|
+| Lantern | chest in Joe's house | a flame in front (2 of 32 magic); lights torches |
+| Boomerang | Janga's gift (second talk) | up to 6 tiles, straight or diagonal; stuns enemies 2 s; fetches pickups |
+| Bow (+10 arrows) | chest behind the key block on the South Road | arrows do 4 damage, stick in walls |
+| Bombs | Boni's shop, 5 for 20 gems | 1.6 s fuse; blast hurts enemies and Joe, cuts bushes, breaks cracked rocks |
+| Small key | chest in East Lake | opens one key block |
+| Pieces of heart | meadow torch chest, behind the woods' cracked rock, by East Lake, Boni (100 gems) | four make a heart container |
+
+Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems.
+
+**Planned:**
 Sword and shield, boomerang, bow, bombs, lantern, hookshot-style grapple, dash boots [Pegasus Boots], power
 glove (lift rocks), flippers, Moon Mirror [Magic Mirror], hammer, fire rod and ice rod, bottles. The lore's
 original weapons (sword, shield, boomerang, staff, bow, explosives) are all on this list.

@@ -4,14 +4,17 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.0
 class_name DialogueBox
 extends CanvasLayer
 ## open(pages, speaker, at_top) shows the text; confirm (interact / attack / ui_accept) first completes the page
 ## being typed, then turns to the next box, and closes after the last one (emitting `closed`).
 ## The box sits at the bottom of the screen unless Joe stands in the lower part, then at the top (ALttP).
+## With `choices` (e.g. ["BUY", "NO"]) the last box ends in a small menu; picking a row emits `answered(index)`
+## and closes the box (cancel picks the last row).
 
 signal closed
+signal answered(index: int)
 
 const MORE_TEX := "res://assets/ui/menu/more.png"
 const MORE_FRAME := Vector2i(7, 6)
@@ -27,11 +30,16 @@ const BLIP_EVERY := 3                    # letters between two text blips
 const NAME_OFFSET := Vector2(8, -7)      # name plate relative to the box's top-left corner
 const NAME_PAD := Vector2(6, 3)
 const ADVANCE_ACTIONS := ["interact", "attack", "ui_accept"]
+const CHOICE_WIDTH := 56.0               # room kept on the right of the last box for the choice menu
+const CHOICE_OFFSET := Vector2(-52, 10)  # menu position relative to the box's top-right corner
 
 var is_open := false
 var boxes: Array = []                    # each box = Array[String] of up to LINES wrapped lines
 var box_index := 0
 var shown_chars := 0.0                   # letters of the current box revealed so far
+var choices: Array = []
+var last_answer := -1
+var choice_menu: MenuList
 
 var _root: Control
 var _lines: Array[PixelText] = []
@@ -50,9 +58,11 @@ func _ready() -> void:
 
 
 # Show `pages` (each wraps itself and may fill several boxes). Pauses the tree until the last box is closed.
-func open(pages: Array, speaker: String = "", at_top: bool = false) -> void:
+func open(pages: Array, speaker: String = "", at_top: bool = false, options: Array = []) -> void:
 	boxes = []
-	var width := int(BOX_SIZE.x - PAD.x * 2.0)
+	choices = options
+	last_answer = -1
+	var width := int(BOX_SIZE.x - PAD.x * 2.0 - (CHOICE_WIDTH if not options.is_empty() else 0.0))
 	for page in pages:
 		var lines := PixelText.wrap(String(page), width)
 		for i in range(0, lines.size(), LINES):
@@ -88,6 +98,13 @@ func _build(speaker: String, y: float) -> void:
 	_more.position = pos + BOX_SIZE - Vector2(MORE_FRAME) - Vector2(8, 5)
 	_more.play("bob")
 	_root.add_child(_more)
+	choice_menu = MenuList.new()
+	choice_menu.position = pos + Vector2(BOX_SIZE.x, 0) + CHOICE_OFFSET
+	choice_menu.visible = false
+	choice_menu.active = false
+	_root.add_child(choice_menu)
+	choice_menu.chosen.connect(_answer)
+	choice_menu.cancelled.connect(func() -> void: _answer(choices.size() - 1))
 
 
 func _show_box(i: int) -> void:
@@ -121,6 +138,24 @@ func _render() -> void:
 		_lines[i].text = full.substr(0, clampi(left, 0, full.length()))
 		left -= full.length()
 	_more.visible = not is_typing() and box_index < boxes.size() - 1
+	var asking := not choices.is_empty() and not is_typing() and box_index == boxes.size() - 1
+	if asking and not choice_menu.visible:
+		var rows := []
+		for c in choices:
+			rows.append({"label": String(c), "enabled": true})
+		choice_menu.set_items(rows)
+		choice_menu.visible = true
+		choice_menu.active = true
+
+
+func is_asking() -> bool:
+	return is_open and choice_menu != null and choice_menu.active
+
+
+func _answer(index: int) -> void:
+	last_answer = index
+	close()
+	answered.emit(index)
 
 
 func _process(delta: float) -> void:
@@ -135,7 +170,7 @@ func _process(delta: float) -> void:
 
 # Confirm pressed: finish the typing, else next box, else close.
 func advance() -> void:
-	if not is_open:
+	if not is_open or is_asking():
 		return
 	if is_typing():
 		shown_chars = float(_box_chars)
@@ -143,19 +178,21 @@ func advance() -> void:
 	elif box_index < boxes.size() - 1:
 		Audio.sfx("menu_move")
 		_show_box(box_index + 1)
-	else:
+	elif choices.is_empty():
 		close()
 
 
 func close() -> void:
 	is_open = false
+	if choice_menu != null:
+		choice_menu.active = false
 	_root.visible = false
 	get_tree().paused = false
 	closed.emit()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_open or event.is_echo():
+	if not is_open or event.is_echo() or is_asking():
 		return
 	for a in ADVANCE_ACTIONS:
 		if event.is_action_pressed(a):

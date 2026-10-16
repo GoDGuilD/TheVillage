@@ -1,10 +1,10 @@
 # File: Hud.gd
-# Description: The ALttP-style HUD - magic meter and equipped-item box top-left, gem and key counters beside them, "- LIFE -" and the heart rows top-right - plus the area-name caption.
+# Description: The ALttP-style HUD - magic meter and equipped-item box top-left, gem, bomb, arrow and key counters beside them, "- LIFE -" and the heart rows top-right - plus the area-name caption.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.0.0
+# Version: 2.1.0
 class_name Hud
 extends CanvasLayer
 ## Reads GameState through its signals; the World feeds Joe's hearts (set_health) and area names (show_caption).
@@ -17,6 +17,8 @@ const MAGIC_FRAME_TEX := preload("res://assets/ui/hud/magic_frame.png")
 const MAGIC_FILL_TEX := preload("res://assets/ui/hud/magic_fill.png")
 const ITEM_BOX_TEX := preload("res://assets/ui/hud/item_box.png")
 const KEY_TEX := preload("res://assets/ui/hud/key.png")
+const BOMB_TEX := preload("res://assets/ui/hud/bomb_small.png")
+const ARROW_TEX := preload("res://assets/ui/hud/arrow_small.png")
 const ITEM_ICON_DIR := "res://assets/ui/items/"
 const HEART_SIZE := Vector2i(9, 8)
 const DIGIT_SIZE := Vector2i(5, 7)
@@ -32,8 +34,13 @@ const ITEM_BOX_POS := Vector2(22, 7)
 const GEM_POS := Vector2(54, 6)
 const GEM_DIGITS_POS := Vector2(66, 10)
 const GEM_DIGITS := 3
-const KEY_POS := Vector2(88, 8)
-const KEY_DIGIT_POS := Vector2(97, 10)
+const BOMB_POS := Vector2(84, 8)
+const BOMB_DIGITS_POS := Vector2(93, 10)
+const ARROW_POS := Vector2(106, 8)
+const ARROW_DIGITS_POS := Vector2(116, 10)
+const AMMO_DIGITS := 2
+const KEY_POS := Vector2(130, 8)
+const KEY_DIGIT_POS := Vector2(139, 10)
 const DIGIT_STEP := 4.0                  # digits overlap their outlines by one pixel
 const LIFE_LABEL_POS := Vector2(334, 4)  # centre of "- LIFE -"
 const HEARTS_POS := Vector2(290, 13)
@@ -52,11 +59,17 @@ var hearts_shown := ""                   # e.g. "FFH" - tests read it
 var gems_shown := 0
 var magic_shown := 0
 var keys_shown := 0
+var bombs_shown := -1                    # -1 = counter hidden (no bombs item yet)
+var arrows_shown := -1                   # -1 = counter hidden (no bow yet)
 var caption_shown := ""                  # the last caption text shown (tests)
 
 var _hearts: Array[Sprite2D] = []
 var _gem_digits: Array[Sprite2D] = []
 var _key_icon: Sprite2D
+var _bomb_icon: Sprite2D
+var _arrow_icon: Sprite2D
+var _bomb_digits: Array[Sprite2D] = []
+var _arrow_digits: Array[Sprite2D] = []
 var _key_digit: Sprite2D
 var _magic_fill: Sprite2D
 var _item_icon: Sprite2D
@@ -77,6 +90,11 @@ func _ready() -> void:
 	_sprite(_atlas(GEM_TEX, 0, GEM_SIZE), GEM_POS)
 	for i in GEM_DIGITS:
 		_gem_digits.append(_sprite(null, GEM_DIGITS_POS + Vector2(i * DIGIT_STEP, 0)))
+	_bomb_icon = _sprite(BOMB_TEX, BOMB_POS)
+	_arrow_icon = _sprite(ARROW_TEX, ARROW_POS)
+	for i in AMMO_DIGITS:
+		_bomb_digits.append(_sprite(null, BOMB_DIGITS_POS + Vector2(i * DIGIT_STEP, 0)))
+		_arrow_digits.append(_sprite(null, ARROW_DIGITS_POS + Vector2(i * DIGIT_STEP, 0)))
 	_key_icon = _sprite(KEY_TEX, KEY_POS)
 	_key_digit = _sprite(null, KEY_DIGIT_POS)
 	add_child(PixelText.make("- LIFE -", LIFE_LABEL_POS, UiTheme.LIFE_RED, PixelText.FONT_LARGE, PixelText.Align.CENTER))
@@ -85,10 +103,13 @@ func _ready() -> void:
 	GameState.magic_changed.connect(set_magic)
 	GameState.keys_changed.connect(set_keys)
 	GameState.equipped_changed.connect(set_item)
+	GameState.equipped_changed.connect(func(_i: String) -> void: set_ammo(GameState.bombs, GameState.arrows))
+	GameState.ammo_changed.connect(set_ammo)
 	set_gems(GameState.gems)
 	set_magic(GameState.magic, GameState.MAX_MAGIC)
 	set_keys(GameState.keys)
 	set_item(GameState.equipped)
+	set_ammo(GameState.bombs, GameState.arrows)
 
 
 func _sprite(tex: Texture2D, pos: Vector2) -> Sprite2D:
@@ -138,6 +159,25 @@ func set_magic(current: int, maximum: int) -> void:
 	_magic_fill.region_rect = Rect2(0, h - shown, MAGIC_FILL_TEX.get_width(), shown)
 	_magic_fill.position = MAGIC_POS + MAGIC_FILL_OFFSET + Vector2(0, h - shown)
 	_magic_fill.visible = shown > 0
+
+
+# Bomb and arrow counters appear once Joe owns bombs / the bow (ALttP shows them always; here they would be noise
+# before the first item).
+func set_ammo(bombs: int, arrows: int) -> void:
+	var show_bombs := GameState.has_item("bombs")
+	var show_arrows := GameState.has_item("bow")
+	bombs_shown = bombs if show_bombs else -1
+	arrows_shown = arrows if show_arrows else -1
+	_set_counter(_bomb_icon, _bomb_digits, bombs, show_bombs)
+	_set_counter(_arrow_icon, _arrow_digits, arrows, show_arrows)
+
+
+func _set_counter(icon: Sprite2D, digits: Array[Sprite2D], value: int, shown: bool) -> void:
+	icon.visible = shown
+	var text := str(clampi(value, 0, 99)).pad_zeros(digits.size())
+	for i in digits.size():
+		digits[i].visible = shown
+		digits[i].texture = _atlas(DIGIT_TEX, int(text[i]), DIGIT_SIZE)
 
 
 # Small keys only matter once Joe holds one (dungeons, Phase 6): the counter hides at zero.

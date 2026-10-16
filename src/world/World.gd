@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.0.0
+# Version: 3.0.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -15,12 +15,18 @@ extends Node2D
 ## Talking, the pause and item menus and Game Over pause the tree; their CanvasLayers keep processing.
 ## A save stores the area and the point where Joe entered it; the title screen hands a loaded save over through
 ## SaveGame.pending, applied here before the first area is built.
+## Opened chests, broken rocks, opened key blocks, taken heart pieces and sold-out wares are GameState flags named
+## "<kind>:<area>:<x>,<y>" (wares: "ware:<id>"), so they survive area changes and saves.
 
 signal area_entered(area_id: String)
 
 const AREA_DIR := "res://src/world/areas/"
 const PLAYER_SCENE := preload("res://src/player/Player.tscn")
 const TITLE_SCENE := "res://src/ui/TitleScreen.tscn"
+const PICKUP_SCRIPT := preload("res://src/world/Pickup.gd")
+const SHOP_CHOICES := ["BUY", "NO"]
+const BOW_ARROWS := 10                   # the bow comes with a quiver
+const CONTAINER_HP := 2                  # half-heart units a heart container adds
 const TILE := 16
 const VIEW := Vector2(384, 216)
 const SCROLL_TIME := 0.6                 # seconds the camera takes to slide to the next area
@@ -42,6 +48,9 @@ var pause_menu: PauseMenu
 var item_menu: ItemMenu
 var game_over: GameOver
 var talking: Node2D = null               # the villager or sign in the current conversation
+var item_gets := 0                       # item-get sequences run (tests)
+var _after_dialogue := Callable()        # runs once the current box closes (gift hand-over, end of item-get)
+var _offer: Node2D = null                # the ware Boni is offering
 var transitioning := false
 var transitions := 0                     # screen scrolls + door warps done (tests)
 var entry_point := Vector2.ZERO          # where Joe entered the current area (respawn point, save point)
@@ -74,6 +83,7 @@ func _ready() -> void:
 	_actors.add_child(player)
 	player.died.connect(_on_player_died)
 	player.talk_requested.connect(_on_talk_requested)
+	player.item_collected.connect(func(kind: String) -> void: item_get(kind))
 	hud = Hud.new()
 	add_child(hud)
 	player.health_changed.connect(hud.set_health)
@@ -92,6 +102,7 @@ func _build_overlays() -> void:
 	dialogue = DialogueBox.new()
 	add_child(dialogue)
 	dialogue.closed.connect(_on_dialogue_closed)
+	dialogue.answered.connect(_on_answered)
 	pause_menu = PauseMenu.new()
 	add_child(pause_menu)
 	pause_menu.save_requested.connect(func() -> void: pause_menu.show_saved(save_game()))
@@ -202,8 +213,62 @@ func _build(area_id: String) -> Dictionary:
 		post.setup(String(sgn["text"]))
 		post.position = origin + (Vector2(float(sgn["cell"][0]), float(sgn["cell"][1])) + Vector2(0.5, 0.5)) * TILE
 		actors.add_child(post)
+	for o in data.get("objects", []):
+		_build_object(area_id, o, actors)
+	for w in data.get("wares", []):
+		var ware_id := String(w["ware"])
+		if bool(ItemDB.WARES[ware_id]["once"]) and GameState.has_flag("ware:" + ware_id):
+			continue
+		var item := ShopItem.new()
+		item.setup(ware_id)
+		item.position = origin + (Vector2(float(w["cell"][0]), float(w["cell"][1])) + Vector2(0.5, 0.5)) * TILE
+		actors.add_child(item)
 	return {"id": area_id, "data": data, "tiles": built["tiles"], "actors": actors, "rect": rect_of(area_id),
 			"bushes": built["bushes"], "pots": built["pots"], "enemies": built["enemies"]}
+
+
+# One chest / torch / cracked rock / key block / heart piece from the area data (skipped once used up).
+func _build_object(area_id: String, o: Dictionary, actors: Node2D) -> void:
+	var cell: Array = o["cell"]
+	var at := origin_of(area_id) + (Vector2(float(cell[0]), float(cell[1])) + Vector2(0.5, 0.5)) * TILE
+	var flag := object_flag(String(o["kind"]), area_id, cell)
+	var node: Node2D = null
+	match String(o["kind"]):
+		"chest":
+			var chest := Chest.new()
+			chest.setup(String(o["item"]), int(o.get("amount", 1)), flag, GameState.has_flag(flag), bool(o.get("hidden", false)))
+			node = chest
+		"torch":
+			var torch := Torch.new()
+			torch.lit_up.connect(_on_torch_lit)
+			node = torch
+		"cracked_rock":
+			if GameState.has_flag(flag):
+				return
+			var rock := CrackedRock.new()
+			rock.flag = flag
+			rock.broken.connect(func(_r: Node2D) -> void: GameState.set_flag(flag))
+			node = rock
+		"key_block":
+			if GameState.has_flag(flag):
+				return
+			var block := KeyBlock.new()
+			block.flag = flag
+			node = block
+		"heart_piece":
+			if GameState.has_flag(flag):
+				return
+			var piece: Area2D = PICKUP_SCRIPT.new()
+			piece.kind = "heart_piece"
+			piece.collected.connect(func(_k: String) -> void: GameState.set_flag(flag))
+			node = piece
+	if node != null:
+		node.position = at
+		actors.add_child(node)
+
+
+static func object_flag(kind: String, area_id: String, cell: Array) -> String:
+	return "%s:%s:%d,%d" % [kind, area_id, int(cell[0]), int(cell[1])]
 
 
 func _free(rec: Dictionary) -> void:
@@ -339,10 +404,24 @@ func _warp(area_id: String, feet: Vector2, facing: Vector2i) -> void:
 func _on_talk_requested(target: Node2D) -> void:
 	if transitioning or dialogue.is_open or not is_instance_valid(target):
 		return
+	if target is Chest:
+		_open_chest(target)
+		return
+	if target is KeyBlock:
+		_use_key(target)
+		return
+	if target is ShopItem:
+		_offer_ware(target)
+		return
 	var key := String(target.call("talk", player.global_position))
-	var pages := DialogueData.pages_for(key, GameState)
+	var conv := DialogueData.conversation(key, GameState)
+	var pages: Array = conv["pages"]
 	if pages.is_empty():
 		return
+	if String(conv["gift"]) != "":
+		var gift := String(conv["gift"])
+		var amount := int(conv["amount"])
+		_after_dialogue = func() -> void: item_get(gift, amount)
 	talking = target
 	# ALttP: the box goes to the top when Joe stands in the lower part of the screen.
 	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
@@ -359,6 +438,135 @@ func _on_dialogue_closed() -> void:
 		talking.call("rest")
 	talking = null
 	player.freeze(PlayerTuning.TALK_COOLDOWN)
+	if _after_dialogue.is_valid():
+		var next := _after_dialogue
+		_after_dialogue = Callable()
+		next.call()
+
+
+# Show a text box for a dialogue key (no speaker change, no gift handling).
+func say(key: String) -> void:
+	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
+	dialogue.open(DialogueData.pages_for(key, GameState), DialogueData.speaker(key), box_at_top(on_screen))
+
+
+# --- items, chests, keys, shop ------------------------------------------------------------------------
+
+# ALttP's item-get: grant it, Joe holds it up over his head, fanfare, its text; he lowers it when the box closes.
+func item_get(kind: String, amount: int = 1) -> void:
+	item_gets += 1
+	var new_heart := grant(kind, amount)
+	player.hold_up(ItemDB.icon(kind))
+	Audio.sfx("heart_piece" if kind == "heart_piece" and not new_heart else "item_get")
+	var pages: Array = DialogueData.pages_for(ItemDB.text_key(kind), GameState)
+	if new_heart and kind == "heart_piece":
+		pages.append_array(DialogueData.pages_for(ItemDB.text_key("heart_container"), GameState))
+	_after_dialogue = func() -> void: player.end_hold()
+	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
+	dialogue.open(pages, "", box_at_top(on_screen))
+
+
+# Apply `kind` to Joe / GameState. Returns true if Joe gained a heart container.
+func grant(kind: String, amount: int = 1) -> bool:
+	match kind:
+		"lantern", "boomerang":
+			GameState.give_item(kind)
+		"bow":
+			GameState.give_item(kind)
+			GameState.add_ammo("arrows", BOW_ARROWS)
+		"bombs":
+			GameState.give_item(kind)
+			GameState.add_ammo("bombs", amount)
+		"arrows":
+			GameState.add_ammo("arrows", amount)
+		"small_key":
+			GameState.add_keys(amount)
+		"gems":
+			GameState.add_gems(amount)
+		"heart_piece":
+			if GameState.add_heart_piece():
+				_add_container()
+				return true
+		"heart_container":
+			_add_container()
+			return true
+	return false
+
+
+func _add_container() -> void:
+	_set_hearts(player.health.max_health + CONTAINER_HP, player.health.max_health + CONTAINER_HP)
+
+
+# Chests open from below (Joe facing up), once.
+func _open_chest(chest: Chest) -> void:
+	if not chest.can_open() or player.facing != Vector2i.UP:
+		return
+	chest.open()
+	GameState.set_flag(chest.flag)
+	Audio.sfx("chest_open")
+	item_get(chest.kind, chest.amount)
+
+
+func _use_key(block: KeyBlock) -> void:
+	if GameState.keys <= 0:
+		say(block.talk(player.global_position))
+		return
+	GameState.add_keys(-1)
+	GameState.set_flag(block.flag)
+	block.unlock()
+
+
+func _offer_ware(item: ShopItem) -> void:
+	_offer = item
+	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
+	var key := item.talk(player.global_position)
+	dialogue.open(DialogueData.pages_for(key, GameState), DialogueData.speaker(key), box_at_top(on_screen), SHOP_CHOICES)
+
+
+func _on_answered(index: int) -> void:
+	var item := _offer
+	_offer = null
+	if index == 0 and is_instance_valid(item):
+		buy(item)
+
+
+# Pay for a ware (if Joe can afford it and has room) and hand it over.
+func buy(item: ShopItem) -> bool:
+	var w: Dictionary = ItemDB.WARES[item.ware]
+	var kind := String(w["kind"])
+	var amount := int(w["amount"])
+	if GameState.gems < item.price():
+		Audio.sfx("error")
+		say("shop_no_gems")
+		return false
+	var is_ammo := kind == "arrows" or (kind == "bombs" and GameState.has_item("bombs"))
+	if is_ammo and GameState.ammo_full(kind):
+		Audio.sfx("error")
+		say("shop_full")
+		return false
+	GameState.add_gems(-item.price())
+	Audio.sfx("shop_buy")
+	if bool(w["once"]):
+		GameState.set_flag("ware:" + item.ware)
+		item.sold_out()
+	if is_ammo:
+		grant(kind, amount)
+		say("shop_thanks")
+	else:
+		item_get(kind, amount)
+	return true
+
+
+# A torch caught fire: when every torch of the area burns, hidden chests appear.
+func _on_torch_lit() -> void:
+	var torches: Array = current["actors"].get_children().filter(func(n: Node) -> bool: return n is Torch)
+	if torches.any(func(t: Node) -> bool: return not t.lit):
+		return
+	for n in current["actors"].get_children():
+		if n is Chest and n.concealed:
+			n.reveal()
+			Juice.play_fx("poof", n.global_position, current["actors"])
+			Audio.sfx("unlock")
 
 
 # --- menus ------------------------------------------------------------------------------------------

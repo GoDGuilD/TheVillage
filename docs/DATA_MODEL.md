@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.3.0
+Version: 1.4.0
 -->
 
 # Data model
@@ -20,7 +20,13 @@ Version: 1.3.0
 `index.json`: `{screen: [24, 14], start: "joe_house", areas: [ids]}`. Each `<id>.json`:
 `{id, name, kind: "overworld"|"interior", size_screens, origin_tiles: [x, y], rows: [...],
 doors: [{cell, to, spawn_cell, facing}], exits: [{cells: [[x, y]...], to, spawn_cell, facing}],
-npcs: [{id, cell, facing, across}], signs: [{cell, text}]}`.
+npcs: [{id, cell, facing, across}], signs: [{cell, text}],
+objects: [{kind: chest|torch|cracked_rock|key_block|heart_piece, cell, item?, amount?, hidden?}],
+wares: [{ware, cell}]}`.
+
+## World flags (`GameState.flags`)
+Story: `met_tato`, `met_boni`, `met_janga`, `got_boomerang`. Objects: `chest:<area>:<x>,<y>` (opened),
+`cracked_rock:...` (broken), `key_block:...` (opened), `heart_piece:...` (taken), `ware:<id>` (sold out).
 Glyphs are listed in `src/world/AreaBuilder.gd` and `docs/LEVEL_DESIGN.md`.
 
 ## Field layout (`TestField.layout`)
@@ -39,8 +45,10 @@ Array of equal-length strings; glyphs: `.` `,` `*` grass, `#` path, `R` rock, `T
 Weights: nothing 50, heart 20, green gem 22, blue gem 6, red gem 2. Gem values 1 / 5 / 20.
 
 ## Dialogue (`assets/data/dialogue.json`)
-`{"_header": {...}, "<key>": {name?, pages: [..], once?: [..], flag?}}` - keys are villager ids and sign keys.
-`DialogueData.pages_for(key, GameState)` returns `once` the first time (and sets `flag`), `pages` afterwards.
+`{"_header": {...}, "<key>": {name?, pages: [..], once?: [..], flag?, gift?: {item, amount?, flag, pages}}}` -
+keys are villager ids, sign keys, `get_<kind>` item texts, `shop_*` offers/answers and `locked`.
+`DialogueData.conversation(key, GameState)` returns `{pages, gift, amount}`: `once` the first time (sets `flag`),
+then the gift's pages once (sets the gift's flag; the World runs the item-get), then `pages`.
 
 ## Villager sprites (`assets/sprites/npcs/npcs.json`)
 `{frame: [32, 32], feet: [16, 29], fps: 2, npcs: [ids]}` with strips `<id>_idle_<down|up|side>.png` (2 frames;
@@ -52,8 +60,14 @@ Manifest: `{"<path>": {size, frames, notes}}`. Fonts: `font_5x7.png/.json`, `fon
 
 ## Save file (`user://village_save.json`)
 `{version: 1, area, pos: [x, y] (the entry point of that area), facing: [x, y], hp, max_hp, saved_at,
-state: {gems, magic, keys, items: {id: level}, equipped, seals: [bool x3], flags: {name: bool}}}`.
+state: {gems, magic, keys, bombs, arrows, heart_pieces, items: {id: level}, equipped, seals: [bool x3],
+flags: {name: bool}}}`.
 A file with another `version` is ignored (treated as no save).
+
+## Item catalogue (`src/items/ItemDB.gd`)
+`KINDS = {kind: {name, icon, text}}` for lantern, boomerang, bow, bombs, arrows, small_key, heart_piece,
+heart_container, gems; `USES` (what an item spends); `WARES = {id: {kind, amount, price, text, once}}`.
+Item effects: `assets/sprites/vfx/vfx_items.json` (same format as `vfx_manifest.json`).
 
 ## Planned
 Both worlds' explored screens (map, Phase 8); settings (volume, language) in Phase 14.

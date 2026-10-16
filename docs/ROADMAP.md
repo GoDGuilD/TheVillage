@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.3.0
+Version: 1.4.0
 -->
 
 # Roadmap
@@ -20,8 +20,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 2 | Combat core & game feel | Spin attack (hold to charge), shield blocking, first enemies (Caver's guard, rock-spitter, slime), enemy knockback + hit flash + death puff, heart/gem drops, lift-and-throw pots and bushes, hit-stop and screen shake, `Audio` autoload with 15 generated SFX, minimal HUD (hearts + gems), respawn on death | Done (56 combat checks pass) |
 | 3 | Overworld engine | Areas from `tools/gen_areas.py` + lint, autotiled paths/water/ledges/cliffs/walls, ALttP screen-edge scrolling, house doors and exit mats, ledge hops, El Pueblo + four neighbouring areas + four house interiors, `World` as the main scene | Done (30 world checks pass) |
 | 4 | HUD, menus, saves, dialogue | Full HUD (item box, magic meter, keys), area-name captions, item menu, title + pause menus, save/load, NPCs with dialogue boxes (Tato, Boni, Janga), readable signs, Game Over screen | Done (61 UI checks pass) |
-| 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers, Boni's shop stock | Next |
-| 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal | Planned |
+| 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers, Boni's shop stock | Done (67 item checks pass) |
+| 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal | Next |
 | 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, power glove, Caver's keep, Act 1 ending | Planned |
 | 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub | Planned |
 | 9–12 | Umbra, Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (grapple, fire rod, etc.) | Planned |
@@ -70,3 +70,13 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] `gen_areas.py` lint for villagers and signs; 7 new sounds (25 total)
 - [x] `tests/test_ui.gd`: 61 checks; `tools/capture_ui.gd`
 - [ ] Owner review: dialogue lines (the story is still a draft), the title subtitle, text speed, menu layout
+
+## Phase 5 detail
+- [x] `tools/gen_items.py`: item icons, chest, boomerang, arrow, bomb, torches, cracked rock, key block, heart piece/container, small key, explosion and flame effects
+- [x] `ItemDB` + `ItemUse`: lantern (lights torches, 2 magic), boomerang (stun, fetch, one at a time), bow (4-damage arrows), bombs (fuse, blast for enemies and Joe, cracked rocks, two at a time)
+- [x] Item-get sequence (Joe holds it up, fanfare, text); chests open from below; hidden chests appear when every torch of the area burns
+- [x] Small keys and key blocks; heart pieces (4 = a container) and heart containers; HUD bomb/arrow counters; item menu counts and heart quarters
+- [x] Boni's shop: wares on the counter with prices, BUY / NO choice, not-enough-gems and full-bag answers, one-time piece of heart
+- [x] World content: lantern (Joe's house), boomerang (Janga's gift), key (East Lake) -> key block -> bow (South Road), torch chest (North Meadow), cracked rock (West Woods), loose piece (East Lake)
+- [x] `gen_areas.py` objects/wares + lint; 12 new sounds (37 total); `tests/test_items.gd`: 67 checks; `tools/capture_items.gd`
+- [ ] Owner playtest: prices, fuse length, boomerang range, item placement

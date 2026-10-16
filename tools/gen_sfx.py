@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.0.0
+# Version: 3.0.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -293,6 +293,74 @@ def game_over():
     return np.concatenate(parts)
 
 
+# --- Phase 5: items, chests, shop -----------------------------------------------------
+
+def item_get():
+    # The "you got it" fanfare: a rising arpeggio that lands on a held chord tone.
+    return notes([(523.3, 0.09), (659.3, 0.09), (784.0, 0.09), (1046.5, 0.09), (784.0, 0.09), (1046.5, 0.45)],
+                 0.25, 0.18)
+
+
+def heart_piece():
+    return notes([(784.0, 0.07), (987.8, 0.07), (1174.7, 0.07), (1568.0, 0.25)], 0.125, 0.12)
+
+
+def chest_open():
+    # Lid creak up, then a soft thud.
+    n = int(0.28 * SR)
+    creak = pulse(sweep(160, 420, 0.28), 0.18) * np.sin(np.pi * np.arange(n) / n) ** 2 * 0.5
+    thud = tri(sweep(120, 60, 0.28)) * decay(n, 0.04)
+    return creak + thud
+
+
+def boomerang():
+    # A short airy whirr (replayed while the boomerang flies).
+    n = int(0.18 * SR)
+    wob = 0.5 + 0.5 * np.sin(2 * np.pi * 22 * np.arange(n) / SR)
+    return bandpass(noise(n), np.full(n, 1400.0), 3.0) * wob * np.sin(np.pi * np.arange(n) / n)
+
+
+def arrow_shot():
+    n = int(0.12 * SR)
+    return whoosh(2400, 900, 0.12, 4.0, 0.3, (900, 500)) * decay(n, 0.08)
+
+
+def arrow_hit():
+    n = int(0.08 * SR)
+    return tri(sweep(500, 200, 0.08)) * decay(n, 0.03) + 0.3 * crush(noise(n), 3) * decay(n, 0.01)
+
+
+def bomb_place():
+    n = int(0.08 * SR)
+    return tri(sweep(220, 160, 0.08)) * decay(n, 0.03)
+
+
+def explode():
+    # Big crushed-noise burst with a falling low body.
+    n = int(0.6 * SR)
+    body = tri(sweep(120, 35, 0.6)) * decay(n, 0.2)
+    return 0.9 * lowpass(crush(noise(n), 3), 2500) * decay(n, 0.18, 0.003) + body
+
+
+def unlock():
+    return notes([(1318.5, 0.04), (1046.5, 0.04), (1568.0, 0.1)], 0.5, 0.05)
+
+
+def lantern():
+    n = int(0.25 * SR)
+    return bandpass(noise(n), sweep(400, 2200, 0.25), 2.0) * np.sin(np.pi * np.arange(n) / n)
+
+
+def shop_buy():
+    return notes([(1568.0, 0.05), (2093.0, 0.05), (2637.0, 0.12)], 0.25, 0.07)
+
+
+def error():
+    # A low double buzz: not enough gems / magic / ammo.
+    gap = np.zeros(int(0.03 * SR))
+    return np.concatenate([notes([(196.0, 0.09)], 0.5, 0.1), gap, notes([(185.0, 0.12)], 0.5, 0.1)])
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -304,6 +372,10 @@ SFX = {
     "menu_move": (menu_move, -8.0), "menu_select": (menu_select, -6.5), "menu_back": (menu_back, -6.5),
     "text_blip": (text_blip, -9.0), "pause": (pause, -6.0), "save_done": (save_done, -6.0),
     "game_over": (game_over, -5.0),
+    "item_get": (item_get, -5.5), "heart_piece": (heart_piece, -6.0), "chest_open": (chest_open, -5.5),
+    "boomerang": (boomerang, -8.0), "arrow_shot": (arrow_shot, -6.0), "arrow_hit": (arrow_hit, -6.0),
+    "bomb_place": (bomb_place, -6.5), "explode": (explode, -3.5), "unlock": (unlock, -6.0),
+    "lantern": (lantern, -7.0), "shop_buy": (shop_buy, -6.0), "error": (error, -7.0),
 }
 
 

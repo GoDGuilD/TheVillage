@@ -55,5 +55,29 @@
    "across": true
   }
  ],
- "signs": []
+ "signs": [],
+ "objects": [],
+ "wares": [
+  {
+   "ware": "bombs",
+   "cell": [
+    5,
+    4
+   ]
+  },
+  {
+   "ware": "arrows",
+   "cell": [
+    9,
+    4
+   ]
+  },
+  {
+   "ware": "heart_piece",
+   "cell": [
+    11,
+    4
+   ]
+  }
+ ]
 }

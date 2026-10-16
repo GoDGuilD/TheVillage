@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
 Last edit date: 2026-10-15
-Version: 2.3.0
+Version: 2.4.0
 -->
 
 # The Village
@@ -58,3 +58,9 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   constants through the instance. Use `roundf()`, not `round()`, for typed variables (warnings are errors).
 - Menus read `_unhandled_input`: tests drive them with `Input.parse_input_event` or `confirm()`/`advance()`; UI
   tests and captures set `SaveGame.path` to a throw-away file so the player's save is never touched.
+- Phase 5: items live in `src/items/` (`ItemDB` catalogue + wares, `ItemUse` for the item button). Chests, key
+  blocks and wares are talkables the World dispatches on by class; `World.item_get(kind)` is the one item-get path.
+  World objects come from `OBJECTS`/`WARES` in `gen_areas.py`; their state is GameState flags
+  (`<kind>:<area>:<x>,<y>`). Five suites (252 checks; `test_items.gd` 67).
+- Never name a CanvasItem member `hidden` (built-in signal); type `filter()` results explicitly. After an item-get
+  Joe faces down, and item use holds him 0.2 s: tests re-face him and wait ~15 frames between item presses.

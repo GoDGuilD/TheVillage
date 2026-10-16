@@ -13,7 +13,7 @@
  "rows": [
   "WWWWWWWWWWWWWWWW",
   "WWWwWWWWWWWwWWWW",
-  "W______________W",
+  "W_________C____W",
   "W_D__________O_W",
   "W_x__________O_W",
   "W_____Kx_______W",
@@ -45,5 +45,18 @@
   }
  ],
  "npcs": [],
- "signs": []
+ "signs": [],
+ "objects": [
+  {
+   "kind": "chest",
+   "cell": [
+    10,
+    2
+   ],
+   "item": "lantern",
+   "amount": 1,
+   "hidden": false
+  }
+ ],
+ "wares": []
 }

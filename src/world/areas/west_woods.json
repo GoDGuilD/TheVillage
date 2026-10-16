@@ -35,8 +35,8 @@
   "xx.,.....,............xx",
   "Tx......Tx,.,.Tx....,.Tx",
   "xx......xx....xx.,....xx",
-  "Tx....................Tx",
-  "xx....................xx",
+  "Txk...................Tx",
+  "xxhR..................xx",
   "TxTxTxTxTxTxTxTxTxTxTxTx",
   "xxxxxxxxxxxxxxxxxxxxxxxx"
  ],
@@ -51,5 +51,22 @@
    ],
    "text": "sign_woods"
   }
- ]
+ ],
+ "objects": [
+  {
+   "kind": "cracked_rock",
+   "cell": [
+    2,
+    24
+   ]
+  },
+  {
+   "kind": "heart_piece",
+   "cell": [
+    2,
+    25
+   ]
+  }
+ ],
+ "wares": []
 }

@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.3.0
+Version: 1.4.0
 -->
 
 # Configuration
@@ -15,8 +15,10 @@ Version: 1.3.0
 | `project.godot` | 384x216 viewport, integer scaling, autoloads (GameState, Audio, Juice), input map (keyboard + SNES-layout gamepad), physics layer names, renderer |
 | `src/player/PlayerTuning.gd` | Every feel number for Joe (walk, nudge, sword box, charge/spin, shield cone, lift/throw, hurt, i-frames, health) |
 | Enemy scripts (`src/enemies/*.gd`) | Each enemy's speeds, ranges and timings as constants at the top; HP/damage in `_init()` |
-| `src/core/GameState.gd` | Drop table weights, gem values, magic/key limits, the item order of the item menu |
+| `src/core/GameState.gd` | Drop table weights, gem values, magic/key/bomb/arrow limits, pieces per heart, item-menu order |
 | `src/world/World.gd` | Scroll time and push, door fade time, Game Over delay, dialogue box placement threshold |
+| `src/items/ItemDB.gd` | Item names/icons/texts, lantern magic cost, Boni's wares (amounts, prices, one-time) |
+| `src/items/Boomerang.gd`, `Arrow.gd`, `Bomb.gd`, `ItemUse.gd` | Range and speeds, arrow damage, fuse and blast radius/damage, bombs at once |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

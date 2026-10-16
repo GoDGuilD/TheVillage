@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.2.0
+# Version: 2.3.0
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -16,6 +16,7 @@ extends CharacterBody2D
 signal health_changed(current: int, maximum: int)
 signal died
 signal talk_requested(target: Node2D)   # interact pressed facing a villager or sign (the World opens the box)
+signal item_collected(kind: String)       # touched a pickup the World handles (heart piece, container, key)
 
 const SPRITE_DIR := "res://assets/sprites/joe/"
 const SHADOW_TEX := preload("res://assets/sprites/joe/joe_shadow.png")
@@ -43,6 +44,8 @@ var fsm: StateMachine
 var charged := false                      # spin attack ready (sword glinting)
 var carrying := ""                        # kind of the lifted object ("pot", "bush") or ""
 var carried_sprite: Sprite2D
+var held_sprite: Sprite2D                 # a found item held over his head (state "hold")
+var used_item := ""                       # the Y-item used last (tests)
 
 var _sword_shape: CollisionShape2D
 var _manifest: Dictionary = {}
@@ -234,6 +237,14 @@ func _try_corner_nudge(step: Vector2, delta: float) -> void:
 				return
 
 
+# Item button with a Y-item equipped: use it (state "use"). Returns true if it did.
+func _try_item() -> bool:
+	if not Input.is_action_just_pressed("item") or GameState.equipped == "":
+		return false
+	fsm.transition_to("use")
+	return true
+
+
 func _wants_attack() -> bool:
 	return Input.is_action_just_pressed("attack") or _attack_buffer > 0.0
 
@@ -301,7 +312,7 @@ func state_idle_update(delta: float) -> void:
 	if _wants_attack():
 		fsm.transition_to("attack")
 		return
-	if _try_lift():
+	if _try_lift() or _try_item():
 		return
 	if _move_input() != Vector2.ZERO:
 		fsm.transition_to("walk")
@@ -313,7 +324,7 @@ func state_walk_update(delta: float) -> void:
 	if _wants_attack():
 		fsm.transition_to("attack")
 		return
-	if _try_lift():
+	if _try_lift() or _try_item():
 		return
 	var dir := _move_input()
 	if dir == Vector2.ZERO:
@@ -477,6 +488,55 @@ func _on_animation_finished() -> void:
 		fsm.transition_to("charge")
 		return
 	fsm.transition_to("walk" if _move_input() != Vector2.ZERO else "idle")
+
+
+# --- states: items ------------------------------------------------------------------------------
+
+# Use the equipped Y-item (boomerang / bow / bombs / lantern) in the throw pose.
+func state_use_enter() -> void:
+	velocity = Vector2.ZERO
+	_timer = PlayerTuning.USE_TIME
+	sprite.flip_h = facing.x < 0
+	sprite.play("throw_%s" % _dir_name())
+	used_item = GameState.equipped
+	ItemUse.use(self, used_item, _move_input())
+
+
+func state_use_update(delta: float) -> void:
+	_timer -= delta
+	if _timer <= 0.0:
+		fsm.transition_to("idle")
+
+
+# Hold a found item over his head, facing the camera (ALttP's item-get pose). The World ends it.
+func hold_up(texture: Texture2D) -> void:
+	facing = Vector2i.DOWN
+	fsm.transition_to("hold")
+	if is_instance_valid(held_sprite):
+		held_sprite.queue_free()
+	held_sprite = Sprite2D.new()
+	held_sprite.texture = texture
+	held_sprite.position = Vector2(0, -PlayerTuning.HOLD_HEIGHT)
+	held_sprite.z_index = 1
+	add_child(held_sprite)
+
+
+func end_hold() -> void:
+	if is_instance_valid(held_sprite):
+		held_sprite.queue_free()
+	held_sprite = null
+	if fsm.current_state == "hold":
+		fsm.transition_to("idle")
+
+
+func state_hold_enter() -> void:
+	velocity = Vector2.ZERO
+	sprite.flip_h = false
+	sprite.play("carry_down")
+
+
+func state_hold_update(_delta: float) -> void:
+	pass
 
 
 # --- states: lifting and throwing -------------------------------------------------------
@@ -656,3 +716,5 @@ func collect(kind: String) -> void:
 	elif GameState.GEM_VALUES.has(kind):
 		GameState.add_gems(int(GameState.GEM_VALUES[kind]))
 		Audio.sfx("pickup_gem")
+	else:
+		item_collected.emit(kind)            # heart piece / container / key: the World runs the item-get

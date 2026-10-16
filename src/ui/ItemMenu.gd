@@ -1,10 +1,10 @@
 # File: ItemMenu.gd
-# Description: The item menu (I / left shoulder) - ALttP's subscreen: a 5x2 grid of Y-item slots with a cursor that equips found items, Joe's equipment and the three family seals.
+# Description: The item menu (I / left shoulder) - ALttP's subscreen: a 5x2 grid of Y-item slots with a cursor that equips found items, Joe's equipment, the three family seals and the heart pieces toward the next container.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.0
 class_name ItemMenu
 extends CanvasLayer
 ## Slots follow GameState.ITEM_ORDER; an item shows once found (icons in assets/ui/items/, Phase 5).
@@ -17,6 +17,9 @@ const SWORD_TEX := preload("res://assets/ui/menu/icon_sword.png")
 const SHIELD_TEX := preload("res://assets/ui/menu/icon_shield.png")
 const SEAL_EMPTY_TEX := preload("res://assets/ui/menu/seal_empty.png")
 const SEAL_FULL_TEX := preload("res://assets/ui/menu/seal_full.png")
+const PIECES_TEX := preload("res://assets/ui/menu/heart_pieces.png")
+const PIECES_FRAME := Vector2i(14, 13)
+const PIECES_OFFSET := Vector2(176, 116)
 const ITEM_ICON_DIR := "res://assets/ui/items/"
 const PANEL_POS := Vector2(32, 26)
 const PANEL_SIZE := Vector2(320, 164)
@@ -42,6 +45,7 @@ var _highlight: NinePatchRect
 var _name: PixelText
 var _icons: Array[Sprite2D] = []
 var _seals: Array[Sprite2D] = []
+var _pieces: Sprite2D
 
 
 func _ready() -> void:
@@ -71,6 +75,8 @@ func _ready() -> void:
 	_label("FAMILY SEALS", PANEL_POS + SEALS_OFFSET + Vector2(0, -14), UiTheme.GOLD)
 	for i in GameState.SEAL_COUNT:
 		_seals.append(_sprite(SEAL_EMPTY_TEX, PANEL_POS + SEALS_OFFSET + Vector2(i * SEAL_STEP, 0), false))
+	_label("HEART PIECES", PANEL_POS + PIECES_OFFSET + Vector2(0, -14), UiTheme.GOLD)
+	_pieces = _sprite(null, PANEL_POS + PIECES_OFFSET, false)
 
 
 func _label(text: String, pos: Vector2, color: Color) -> PixelText:
@@ -120,8 +126,24 @@ func _refresh() -> void:
 	for i in _seals.size():
 		_seals[i].texture = SEAL_FULL_TEX if GameState.seals[i] else SEAL_EMPTY_TEX
 	_highlight.position = _slot_pos(selected) - Vector2.ONE * HIGHLIGHT_GROW
+	var pieces := AtlasTexture.new()
+	pieces.atlas = PIECES_TEX
+	pieces.region = Rect2(GameState.heart_pieces * PIECES_FRAME.x, 0, PIECES_FRAME.x, PIECES_FRAME.y)
+	_pieces.texture = pieces
 	var item_id: String = GameState.ITEM_ORDER[selected]
-	_name.text = item_id.replace("_", " ").to_upper() if GameState.has_item(item_id) else "-"
+	_name.text = item_label(item_id)
+
+
+# Name of a slot's item with its count where it has one ("BOMBS x5"), or "-" while not found.
+func item_label(item_id: String) -> String:
+	if not GameState.has_item(item_id):
+		return "-"
+	var label := ItemDB.display_name(item_id)
+	if item_id == "bombs":
+		label += " x%d" % GameState.bombs
+	elif item_id == "bow":
+		label += " x%d" % GameState.arrows
+	return label
 
 
 # Move the cursor by one slot (wraps inside the grid).

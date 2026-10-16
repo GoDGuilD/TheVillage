@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.0
 class_name BaseEnemy
 extends CharacterBody2D
 ## Subclasses set the pack/stat variables in _init() and override _think(delta) (AI) and optionally _anim_base().
@@ -25,6 +25,8 @@ const KNOCK_TIME := 0.15                 # stun while being pushed back by a hit
 const IFRAMES := 0.3                     # one slash can only hit once
 const HIT_STOP := 0.05                   # freeze for both sides when a hit lands
 const KILL_SHAKE := Vector2(1.0, 0.12)   # (pixels, seconds) of camera shake on a kill
+const STUN_ELEMENT := "stun"             # HitBox.element of hits that only stun (boomerang)
+const STUN_TIME := 2.0                   # seconds a stunned enemy stays frozen
 const FEET_BOX := Vector2(10, 6)
 
 # Set by subclasses in _init().
@@ -165,6 +167,13 @@ func is_dead() -> bool:
 
 func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void:
 	if _dead or _iframes_left > 0.0:
+		return
+	# A "stun" hit (the boomerang) freezes the enemy in place without hurting it, like ALttP.
+	if hurt_box.last_hit != null and hurt_box.last_hit.element == STUN_ELEMENT:
+		_iframes_left = IFRAMES
+		freeze(STUN_TIME)
+		HitFlash.flash(sprite)
+		Audio.sfx("shield_block", 1.4)
 		return
 	_iframes_left = IFRAMES
 	health.take_damage(damage)

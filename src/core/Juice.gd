@@ -4,11 +4,11 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.0
 extends Node
 
 const FX_DIR := "res://assets/sprites/vfx/"
-const FX_MANIFEST := "vfx_manifest.json"
+const FX_MANIFESTS := ["vfx_manifest.json", "vfx_items.json"]   # gen_props.py / gen_items.py
 const FX_Z := 60                          # effects draw over actors
 
 # Debug/test counters.
@@ -82,9 +82,10 @@ func play_fx(fx_name: String, world_pos: Vector2, parent: Node = null) -> void:
 func _ensure_index() -> void:
 	if not _fx_index.is_empty():
 		return
-	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FX_DIR + FX_MANIFEST))
-	for key in manifest:
-		_fx_index[String(key).trim_suffix(".png")] = manifest[key]
+	for file in FX_MANIFESTS:
+		var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FX_DIR + file))
+		for key in manifest:
+			_fx_index[String(key).trim_suffix(".png")] = manifest[key]
 
 
 # Where world-space effects go: the running scene, or the root when none is set (headless tests).

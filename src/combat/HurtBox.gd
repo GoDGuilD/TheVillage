@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-12
 # Last edit date: 2026-10-12
-# Version: 1.1.0
+# Version: 1.2.0
 class_name HurtBox
 extends Area2D
 ## Layers: PlayerHurtBox = 6, EnemyHurtBox = 7. Set `collision_mask` to the opposing HitBox layer.
@@ -26,6 +26,8 @@ func _on_area_entered(area: Area2D) -> void:
 
 # Re-apply any HitBox still overlapping (e.g. when invincibility ends while touching an enemy).
 func recheck() -> void:
+	if not monitoring:                       # switched off (scripted captures/tests): nothing to re-check
+		return
 	for area in get_overlapping_areas():
 		if area is HitBox:
 			_receive(area)

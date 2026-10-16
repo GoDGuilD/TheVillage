@@ -1,10 +1,10 @@
 # File: GameState.gd
-# Description: Autoload holding run-wide state - gems, magic, small keys, items, family seals, story flags - plus the drop table, and the snapshot/restore used by saves.
+# Description: Autoload holding run-wide state - gems, magic, small keys, bombs/arrows, heart pieces, items, family seals, story flags - plus the drop table, and the snapshot/restore used by saves.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.0.0
+# Version: 2.1.0
 extends Node
 ## Keep it data + small helpers only. Joe's own hearts live on his HealthComponent (the World copies them in and
 ## out of saves). Items are listed here so the item menu can show their slots; they are found from Phase 5 on.
@@ -13,11 +13,15 @@ signal gems_changed(amount: int)
 signal magic_changed(current: int, maximum: int)
 signal keys_changed(amount: int)
 signal equipped_changed(item: String)
+signal ammo_changed(bombs: int, arrows: int)
 
 const MAX_GEMS := 999
 const MAX_MAGIC := 32                    # one pixel of the HUD meter per unit
 const MAX_KEYS := 9
 const SEAL_COUNT := 3                    # the three family seals of the Light World dungeons
+const MAX_BOMBS := 10
+const MAX_ARROWS := 30
+const PIECES_PER_HEART := 4             # four heart pieces make a heart container
 # Y-button items in item-menu order (ALttP's subscreen); names match their future icon files.
 const ITEM_ORDER := ["boomerang", "bow", "bombs", "lantern", "grapple",
 		"fire_rod", "ice_rod", "hammer", "moon_mirror", "bottle"]
@@ -28,6 +32,9 @@ const GEM_VALUES := {"gem_green": 1, "gem_blue": 5, "gem_red": 20}
 var gems := 0
 var magic := MAX_MAGIC
 var keys := 0
+var bombs := 0
+var arrows := 0
+var heart_pieces := 0                    # 0..3 pieces toward the next container
 var items: Dictionary = {}               # item id -> level/count (absent = not found)
 var equipped := ""                       # the item in the HUD box ("" = none)
 var seals: Array = [false, false, false]
@@ -59,6 +66,38 @@ func add_magic(amount: int) -> void:
 func add_keys(amount: int) -> void:
 	keys = clampi(keys + amount, 0, MAX_KEYS)
 	keys_changed.emit(keys)
+
+
+# Add bombs or arrows (clamped to the bag size); returns how many actually fit.
+func add_ammo(kind: String, amount: int) -> int:
+	var before := bombs if kind == "bombs" else arrows
+	if kind == "bombs":
+		bombs = clampi(bombs + amount, 0, MAX_BOMBS)
+	else:
+		arrows = clampi(arrows + amount, 0, MAX_ARROWS)
+	ammo_changed.emit(bombs, arrows)
+	return (bombs if kind == "bombs" else arrows) - before
+
+
+# Spend one bomb / arrow; false if there is none.
+func use_ammo(kind: String) -> bool:
+	if (bombs if kind == "bombs" else arrows) <= 0:
+		return false
+	add_ammo(kind, -1)
+	return true
+
+
+func ammo_full(kind: String) -> bool:
+	return bombs >= MAX_BOMBS if kind == "bombs" else arrows >= MAX_ARROWS
+
+
+# One more heart piece; returns true when it completes a container (the counter wraps to 0).
+func add_heart_piece() -> bool:
+	heart_pieces += 1
+	if heart_pieces >= PIECES_PER_HEART:
+		heart_pieces = 0
+		return true
+	return false
 
 
 func has_item(item: String) -> bool:
@@ -109,7 +148,8 @@ func roll_drop() -> String:
 
 # Everything a save needs from this autoload.
 func snapshot() -> Dictionary:
-	return {"gems": gems, "magic": magic, "keys": keys, "items": items.duplicate(), "equipped": equipped,
+	return {"gems": gems, "magic": magic, "keys": keys, "bombs": bombs, "arrows": arrows,
+			"heart_pieces": heart_pieces, "items": items.duplicate(), "equipped": equipped,
 			"seals": seals.duplicate(), "flags": flags.duplicate()}
 
 
@@ -118,6 +158,9 @@ func restore(data: Dictionary) -> void:
 	gems = clampi(int(data.get("gems", 0)), 0, MAX_GEMS)
 	magic = clampi(int(data.get("magic", MAX_MAGIC)), 0, MAX_MAGIC)
 	keys = clampi(int(data.get("keys", 0)), 0, MAX_KEYS)
+	bombs = clampi(int(data.get("bombs", 0)), 0, MAX_BOMBS)
+	arrows = clampi(int(data.get("arrows", 0)), 0, MAX_ARROWS)
+	heart_pieces = clampi(int(data.get("heart_pieces", 0)), 0, PIECES_PER_HEART - 1)
 	items = Dictionary(data.get("items", {})).duplicate()
 	equipped = String(data.get("equipped", ""))
 	var s: Array = data.get("seals", [])
@@ -140,3 +183,4 @@ func _emit_all() -> void:
 	magic_changed.emit(magic, MAX_MAGIC)
 	keys_changed.emit(keys)
 	equipped_changed.emit(equipped)
+	ammo_changed.emit(bombs, arrows)

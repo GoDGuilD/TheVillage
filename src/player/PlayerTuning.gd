@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 2.2.0
+# Version: 2.3.0
 class_name PlayerTuning
 extends RefCounted
 
@@ -63,6 +63,10 @@ const TALK_REACH := 16.0              # px in front of Joe where the talk probe 
 const TALK_PROBE_UP := Vector2(0, -6) # probe raised from the feet to tile-centre height
 const TALK_RADIUS := 11.0             # how close a villager's or sign's talk point must be to the probe
 const TALK_COOLDOWN := 0.15           # s Joe stays still after a conversation (the closing press must not re-open it)
+
+# --- Items (item button, Phase 5) -----------------------------------------------------------------------
+const USE_TIME := 0.2                 # s Joe stands in the throw pose after using an item
+const HOLD_HEIGHT := 30.0             # px above the feet where a found item is held up
 
 # --- Health and being hurt ------------------------------------------------------
 const MAX_HP := 6                     # half-heart units: 6 = three hearts, like ALttP's start

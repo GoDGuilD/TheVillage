@@ -4,9 +4,11 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.0.0
+# Version: 1.1.0
 extends Area2D
-## `kind` is "heart" or a key of GameState.GEM_VALUES. Detects the Player body layer only.
+## `kind` is "heart", a key of GameState.GEM_VALUES, or a permanent kind (heart_piece, heart_container,
+## small_key) that never expires and does not pop. Detects the Player body layer only; in group "pickup" so the
+## boomerang can carry it back to Joe.
 
 signal collected(kind: String)
 
@@ -22,6 +24,9 @@ const GEM_FRAME := Vector2i(10, 14)
 const GEM_FPS := 3.0
 const LAYER_PLAYER := 2
 const PICK_RADIUS := 6.0
+const PERMANENT := {"heart_piece": "res://assets/sprites/items/heart_piece.png",
+		"heart_container": "res://assets/sprites/items/heart_container.png",
+		"small_key": "res://assets/sprites/items/small_key.png"}
 
 var kind := "heart"
 var _age := 0.0
@@ -37,7 +42,13 @@ func _ready() -> void:
 	circle.radius = PICK_RADIUS
 	shape.shape = circle
 	add_child(shape)
-	if kind == "heart":
+	add_to_group("pickup")
+	if PERMANENT.has(kind):
+		var p := Sprite2D.new()
+		p.texture = load(PERMANENT[kind])
+		_sprite = p
+		_age = POP_TIME                              # no pop: it was lying here all along
+	elif kind == "heart":
 		var s := Sprite2D.new()
 		s.texture = load(PROP_DIR + "heart.png")
 		_sprite = s
@@ -54,6 +65,10 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_age += delta
+	if PERMANENT.has(kind):
+		for b in get_overlapping_bodies():
+			_on_body_entered(b)
+		return
 	# Pop: a small parabola on the sprite only (the pickup area stays on the ground).
 	var t := clampf(_age / POP_TIME, 0.0, 1.0)
 	_sprite.position.y = -POP_HEIGHT * 4.0 * t * (1.0 - t)
@@ -68,7 +83,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_body_entered(body: Node) -> void:
-	if _age < ARM_TIME or is_queued_for_deletion() or not body.has_method("collect"):
+	if (_age < ARM_TIME and not PERMANENT.has(kind)) or is_queued_for_deletion() or not body.has_method("collect"):
 		return
 	body.collect(kind)
 	collected.emit(kind)

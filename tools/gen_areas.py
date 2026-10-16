@@ -1,10 +1,10 @@
 # File: gen_areas.py
-# Description: Builds every overworld area and house interior as ASCII rows with their villagers and signs, lints them (sizes, multi-cell pieces, edge openings, reachability, ledges, doors, dialogue keys) and writes src/world/areas/*.json plus a rendered world preview.
+# Description: Builds every overworld area and house interior as ASCII rows with their villagers, signs, chests, torches, cracked rocks, key blocks, heart pieces and shop wares, lints them (sizes, pieces, openings, reachability, ledges, doors, dialogue keys, item kinds, keys vs locks) and writes src/world/areas/*.json plus a preview.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.2.0
+# Version: 2.0.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -38,12 +38,18 @@ SEED = 1987
 
 MULTI = {"T": (2, 2), "H": (5, 4), "J": (5, 4), "K": (2, 1), "D": (1, 2)}
 HOUSE_DOOR = (2, 3)
-SOLID = set("R~v^fSTHJWwKDN")    # N = a villager standing on that cell (solid body)
-ACTORS = set("BOZGQP")
+SOLID = set("R~v^fSTHJWwKDNCLkl")  # N villager, C chest, L torch, k cracked rock, l key block (all solid bodies)
+ACTORS = set("BOZGQPh")           # h = a heart piece lying on the ground
+OPENABLE = set("kl")               # solid until a bomb / a small key opens them (reachability treats them as open)
 GROUND = set(".,*#_M")
 VALID = SOLID | ACTORS | GROUND | {"x"}
 ENEMIES = set("ZGQ")
 FACING_STEP = {"down": (0, 1), "up": (0, -1), "left": (-1, 0), "right": (1, 0)}
+# Everything a chest, gift or ware may hand out - mirrors ItemDB.KINDS in src/items/ItemDB.gd (test_items.gd
+# checks that every kind used by the areas exists there).
+ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "heart_piece", "heart_container", "gems"}
+WARE_IDS = {"bombs", "arrows", "heart_piece"}                       # ItemDB.WARES
+OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h"}
 OPEN_LO, OPEN_HI = 10, 14         # edge openings are 4 tiles wide, centred on each side of a screen pair
 # Openings: north/south at columns 22..25 of a 2-screen-wide area, east/west at rows 12..15 of a 2-screen-tall one.
 
@@ -407,7 +413,9 @@ def lint_world(areas, problems):
     # Reachability: everything that matters must be reachable from some entry of its area.
     spawns = 0
     for a in areas:
-        rows, solid = a["rows"], solids[a["id"]]
+        rows = a["rows"]
+        solid = [[solids[a["id"]][y][x] and rows[y][x] not in OPENABLE for x in range(len(rows[0]))]
+                 for y in range(len(rows))]
         src = list(entries[a["id"]])
         for y, r in enumerate(rows):
             for x, g in enumerate(r):
@@ -437,8 +445,46 @@ def lint_world(areas, problems):
             pass
         # Villagers and signs: glyphs match the lists, the text exists, and Joe can stand next to each one.
         lint_talkers(a, solid, seen, problems)
+        lint_objects(a, seen, problems)
     if spawns != 1:
         problems.append("world: %d 'P' spawns (need exactly 1)" % spawns)
+    keys = sum(1 for a in areas for o in a.get("objects", []) if o.get("item") == "small_key")
+    locks = sum(1 for a in areas for o in a.get("objects", []) if o["kind"] == "key_block")
+    if keys < locks:
+        problems.append("world: %d key blocks but only %d small keys" % (locks, keys))
+
+
+def lint_objects(a, seen, problems):
+    """Objects and wares: glyphs agree with the lists, contents exist, and Joe can use each one."""
+    rows = a["rows"]
+    listed = {tuple(o["cell"]): o for o in a.get("objects", [])}
+    for y, r in enumerate(rows):
+        for x, g in enumerate(r):
+            if g in OBJECT_GLYPHS.values() and (x, y) not in listed:
+                problems.append("%s: %s at (%d,%d) has no object entry" % (a["id"], g, x, y))
+    torches = [o for o in a.get("objects", []) if o["kind"] == "torch"]
+    for (x, y), o in listed.items():
+        if rows[y][x] != OBJECT_GLYPHS[o["kind"]]:
+            problems.append("%s: %s entry at (%d,%d) sits on %r" % (a["id"], o["kind"], x, y, rows[y][x]))
+        near = [(x + dx, y + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+        if o["kind"] == "chest":
+            if o["item"] not in ITEM_KINDS:
+                problems.append("%s: chest at (%d,%d) holds unknown %r" % (a["id"], x, y, o["item"]))
+            if o.get("hidden") and not torches:
+                problems.append("%s: hidden chest at (%d,%d) but no torches to reveal it" % (a["id"], x, y))
+            near = [(x, y + 1)]                                   # chests open from below (ALttP)
+        if o["kind"] == "heart_piece":
+            near = [(x, y)]
+        if not any(p in seen for p in near):
+            problems.append("%s: nobody can reach the %s at (%d,%d)" % (a["id"], o["kind"], x, y))
+    for w in a.get("wares", []):
+        x, y = w["cell"]
+        if w["ware"] not in WARE_IDS:
+            problems.append("%s: unknown ware %r" % (a["id"], w["ware"]))
+        if rows[y][x] not in "Kx":
+            problems.append("%s: ware %s at (%d,%d) is not on a table" % (a["id"], w["ware"], x, y))
+        if (x, y + 1) not in seen:
+            problems.append("%s: nobody can reach the ware at (%d,%d)" % (a["id"], x, y))
 
 
 def lint_talkers(a, solid, seen, problems):
@@ -500,6 +546,19 @@ NPCS = {
     "boni_shop": [(7, 3, "boni", "down", True)],
     "janga_house": [(11, 4, "janga", "down", False)],
 }
+# Objects: area -> [(kind, x, y, extra)]. kind "rock" just puts an R (walls for a nook); chests carry
+# {"item", "amount"?, "hidden"?} - a hidden chest appears once every torch of its area burns.
+OBJECTS = {
+    "joe_house": [("chest", 10, 2, {"item": "lantern"})],
+    "meadow_north": [("torch", 28, 4, {}), ("torch", 39, 4, {}),
+                     ("chest", 34, 7, {"item": "heart_piece", "hidden": True})],
+    "west_woods": [("cracked_rock", 2, 24, {}), ("rock", 3, 25, {}), ("heart_piece", 2, 25, {})],
+    "east_lake": [("chest", 10, 7, {"item": "small_key"}), ("heart_piece", 21, 22, {})],
+    "south_road": [("rock", 42, 8, {}), ("key_block", 42, 9, {}), ("rock", 42, 10, {}), ("rock", 42, 11, {}),
+                   ("chest", 44, 8, {"item": "bow"})],
+}
+# Boni's wares on her counter (table cells): area -> [(x, y, ware id)].
+WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")]}
 # Signs: area -> [(x, y, dialogue id)].
 SIGNS = {
     "el_pueblo": [(20, 10, "sign_pueblo_cross"), (27, 17, "sign_pueblo_south")],
@@ -519,7 +578,18 @@ def add_people_and_signs(g, aid):
     for x, y, text in SIGNS.get(aid, []):
         g.place([(x, y)], "S")
         signs.append({"cell": [x, y], "text": text})
-    return {"npcs": npcs, "signs": signs}
+    objects = []
+    for kind, x, y, extra in OBJECTS.get(aid, []):
+        if kind == "rock":
+            g.place([(x, y)], "R")
+            continue
+        g.place([(x, y)], OBJECT_GLYPHS[kind])
+        obj = {"kind": kind, "cell": [x, y]}
+        if kind == "chest":
+            obj.update({"item": extra["item"], "amount": extra.get("amount", 1), "hidden": extra.get("hidden", False)})
+        objects.append(obj)
+    wares = [{"ware": w, "cell": [x, y]} for x, y, w in WARES.get(aid, [])]
+    return {"npcs": npcs, "signs": signs, "objects": objects, "wares": wares}
 
 
 def assemble():
@@ -630,7 +700,9 @@ def render(areas):
                     name = "floor" if indoor else "grass_a"
                 img.alpha_composite(tile(name), (px, py))
                 marks = {"B": (56, 144, 76), "O": (176, 104, 60), "Z": (60, 136, 200), "G": (144, 28, 68),
-                         "Q": (224, 104, 56), "P": (255, 255, 255), "N": (248, 208, 64)}
+                         "Q": (224, 104, 56), "P": (255, 255, 255), "N": (248, 208, 64),
+                         "C": (208, 136, 64), "L": (248, 112, 32), "k": (88, 88, 104), "l": (176, 176, 196),
+                         "h": (232, 40, 64)}
                 if g in marks:
                     for yy in range(4, 12):
                         for xx in range(4, 12):

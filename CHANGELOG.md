@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 5.1.0
+Version: 5.2.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,39 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [6.0.0] - 2026-10-15 — Phase 5: Items I
+
+### Added
+- Y-items on the item button (K / gamepad West): **lantern** (a flame in front that lights torches; 2 magic),
+  **boomerang** (flies up to 6 tiles straight or diagonal, stuns enemies, fetches pickups, one at a time),
+  **bow** (arrows for 4 damage that stick in walls), **bombs** (1.6 s fuse, blast hurts enemies and Joe, cuts
+  bushes, breaks cracked rocks; two at a time). New `src/items/`: `ItemDB` (catalogue, wares), `ItemUse`,
+  `Boomerang`, `Arrow`, `Bomb`.
+- The item-get sequence: Joe holds the item over his head, fanfare, its text; chests, gifts and pickups all use it.
+- World objects: `Chest` (opens from below; can be hidden until every torch of its area burns), `Torch`,
+  `CrackedRock` (bombable), `KeyBlock` (spends a small key), `ShopItem` (Boni's wares with prices), heart pieces
+  lying in the world. Opened/broken/taken things are remembered as GameState flags.
+- Content: the lantern in Joe's house chest; Janga hands over the boomerang on the second talk (dialogue `gift`);
+  a small key in an East Lake chest opens a key block on the South Road, guarding the bow; two torches in North
+  Meadow reveal a chest with a piece of heart; a cracked rock in West Woods hides another; one lies by East Lake;
+  Boni sells bombs (5 for 20), arrows (10 for 15) and one piece of heart (100).
+- Heart pieces (four make a container) and heart containers (+1 heart, full refill).
+- Dialogue boxes can end in a choice menu (BUY / NO).
+- HUD bomb and arrow counters (once owned); the item menu shows counts and the heart-piece quarters.
+- `GameState`: bombs, arrows, heart pieces; `add_ammo`, `use_ammo`, `ammo_full`, `add_heart_piece`; saved.
+- Generators: `tools/gen_items.py` (icons, world sprites, explosion and flame effects); `gen_sfx.py` adds
+  item_get, heart_piece, chest_open, boomerang, arrow_shot, arrow_hit, bomb_place, explode, unlock, lantern,
+  shop_buy, error (37 effects). `gen_areas.py`: `OBJECTS` and `WARES` tables, glyphs `C L k l h`, lint for item
+  kinds, hidden chests without torches, keys vs key blocks, reachability (key blocks and cracked rocks count as
+  openable), wares on tables.
+- `tests/test_items.gd` (67 checks), `tools/capture_items.gd`.
+
+### Changed
+- Enemies hit by a `stun` HitBox (the boomerang) freeze for 2 s instead of taking damage.
+- `Juice` reads a second effects manifest (`vfx_items.json`); `Pickup` gains permanent kinds (heart piece,
+  heart container, small key) and the `pickup` group; `HurtBox.recheck()` does nothing while monitoring is off.
+- 252 checks in 5 suites, all passing.
 
 ## [5.0.0] - 2026-10-15 — Phase 4: HUD, menus, saves, dialogue
 

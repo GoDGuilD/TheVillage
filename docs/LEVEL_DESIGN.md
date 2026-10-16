@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-15
-Version: 1.1.0
+Version: 1.2.0
 -->
 
 # Level design
@@ -40,7 +40,9 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `M` | exit mat | `K` / `D` | 2x1 table / 1x2 bed |
 | `B` `O` | bush, pot | `Z` `G` `Q` | slime, guard, rock-spitter |
 | `P` | Joe's spawn (exactly one in the world) | `x` | filler of a multi-cell piece |
-| `N` | a villager's cell (solid; placed from `NPCS`) | | |
+| `N` | a villager's cell (solid; placed from `NPCS`) | `C` | chest (from `OBJECTS`) |
+| `L` | torch | `k` | cracked rock (bombs break it) |
+| `l` | key block (a small key opens it) | `h` | heart piece lying on the ground |
 
 ## Villagers and signs
 Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
@@ -50,9 +52,18 @@ Two tables at the top of the assembly section of `gen_areas.py` place them after
 The text lives in `assets/data/dialogue.json`: `{name?, pages, once?, flag?}` - `once` is said the first time
 and sets `flag`. Pages wrap themselves; `\n` forces a break.
 
+## Objects and wares
+`OBJECTS = {area: [(kind, x, y, extra)]}` with kinds `chest` (`{"item", "amount"?, "hidden"?}`), `torch`,
+`cracked_rock`, `key_block`, `heart_piece` and `rock` (just an `R`, handy for walling a nook). A hidden chest
+appears once every torch in its area burns. `WARES = {area: [(x, y, ware_id)]}` puts Boni's wares on table cells
+(`ItemDB.WARES` has the prices). Item kinds are listed in `ITEM_KINDS` (mirror of `ItemDB.KINDS`).
+
 ## Lint
 Sizes, unknown glyphs, multi-cell pieces (fit, fillers covered exactly once), ledge landings, edge openings,
 overlaps between areas, door/exit pairing and spawn cells, reachability from every entrance (ledges are one-way),
 exactly one spawn, and for villagers/signs: glyph and list agree, the text key exists, the villager has a
-sprite, and Joe can stand next to each one (two tiles away for a counter). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
+sprite, and Joe can stand next to each one (two tiles away for a counter); objects agree with their glyphs,
+chests hold known kinds and are reachable from below, hidden chests have torches, the world has at least as many
+small keys as key blocks, wares sit on tables reachable from below. Reachability treats key blocks and cracked
+rocks as open (they can be opened). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

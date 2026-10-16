@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-15
-Version: 5.1.0
+Version: 5.2.0
 -->
 
 # Architecture
@@ -21,16 +21,18 @@ src/
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
   enemies/   BaseEnemy, Slime, Guard, Spitter, EnemyRock
+  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
-             tiles + actors), TestField (test arenas), Npc, SignPost, Bush, Pot, Thrown, Pickup
+             tiles + actors), TestField (test arenas), Npc, SignPost, Chest, Torch, CrackedRock, KeyBlock, ShopItem, Bush, Pot,
+             Thrown, Pickup
     areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
   ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, GameOver, MenuList, PixelText,
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd
-tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd
+tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -73,11 +75,23 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd
   World applies it before building the first area (area, entry point, facing, hearts, GameState snapshot). Saves
   are made at the current area's entry point, so a loaded game never starts mid-fight.
 
+- **Items.** The item button puts Joe in state `use` (0.2 s throw pose) and calls `ItemUse.use(player, item, aim)`,
+  which spends ammo/magic and spawns a `Boomerang` / `Arrow` / `Bomb` into Joe's parent, or lights a `Torch`.
+  The boomerang's HitBox has `element = "stun"` (BaseEnemy freezes instead of taking damage); bombs carry two
+  HitBoxes (PlayerHitBox for enemies and bushes, EnemyHitBox for Joe) and call `blast()` on group `bombable`.
+- **Interactions.** Chests, key blocks and shop wares are talkables too; the World dispatches on their class
+  (`Chest` -> item-get, `KeyBlock` -> spend a key or "locked", `ShopItem` -> BUY / NO offer) before plain talk.
+  `item_get(kind)` grants via `grant()`, has Joe `hold_up()` the icon and shows the kind's text; the dialogue's
+  `_after_dialogue` callable lowers it (and hands over a villager's gift after their lines).
+- **Persistence of the world.** Opened chests, broken cracked rocks, opened key blocks, taken heart pieces and
+  sold-out wares are GameState flags (`<kind>:<area>:<x>,<y>`, `ware:<id>`), consulted when an area is built.
+
 ## Player state machine
 `idle` / `walk` → `attack` (sword live on the manifest's hit window; a press buffers a chained slash; holding
 continues into) → `charge` (shuffle, facing locked, glint when charged) → `spin` (circle hit box) → `idle`.
 `walk` → `hop` (walking south into a ledge: a 0.35 s arc to the first open cell past it, no collision).
 `idle` / `walk` → `lift` (interact on a liftable; a talkable in front takes priority) → `carry` → `throw` → `idle`.
+`idle` / `walk` → `use` (item button) → `idle`; any → `hold` (item-get pose, ended by the World).
 Any state → `hurt` on a hit (knockback, then `idle`; i-frames and blinking run outside the state machine) or →
 `dead` at zero health (the World shows Game Over; a test field revives Joe at its spawn). A hit-stop pauses the state machine and the animation for a few frames.
 
