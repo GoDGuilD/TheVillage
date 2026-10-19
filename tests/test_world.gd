@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 1.1.3
+# Last edit date: 2026-10-20
+# Version: 1.1.4
 # Run:  Godot_console --headless --fixed-fps 60 --path . -s tests/test_world.gd   (must end "0 failed")
 extends SceneTree
 
@@ -84,7 +84,7 @@ func _cell_of(area: String) -> Vector2i:
 # --- tests -------------------------------------------------------------------
 
 func _t_data() -> void:
-	_check("33 areas load (6 overworld, 4 houses, 23 dungeon rooms)", _w.areas.size() == 33, str(_w.areas.size()))
+	_check("39 areas load (6 + 6 Dark World overworld, 4 houses, 23 dungeon rooms)", _w.areas.size() == 39, str(_w.areas.size()))
 	var doors := 0
 	var ok := true
 	for aid in _w.areas:

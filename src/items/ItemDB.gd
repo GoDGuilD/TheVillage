@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 1.2.0
+# Last edit date: 2026-10-20
+# Version: 1.2.1
 class_name ItemDB
 extends RefCounted
 ## "Kinds" are what chests, gifts, pickups and wares hand out. Y-items (GameState.ITEM_ORDER) are a subset.
@@ -32,6 +32,7 @@ const KINDS := {
 	"seal": {"name": "FAMILY SEAL", "icon": "res://assets/sprites/dungeon/seal.png", "text": "get_seal"},
 	"boots": {"name": "DASH BOOTS", "icon": ICON_DIR + "boots.png", "text": "get_boots"},
 	"fire_rod": {"name": "FIRE ROD", "icon": ICON_DIR + "fire_rod.png", "text": "get_fire_rod"},
+	"moon_mirror": {"name": "MOON MIRROR", "icon": ICON_DIR + "moon_mirror.png", "text": "get_moon_mirror"},
 }
 # Kinds that belong to the dungeon they were found in (GameState.dungeon_items).
 const DUNGEON_ITEMS := ["map", "compass", "big_key"]

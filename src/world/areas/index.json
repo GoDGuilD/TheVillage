@@ -15,6 +15,12 @@
   "tato_house",
   "boni_shop",
   "janga_house",
+  "dw_meadow_north",
+  "dw_el_pueblo",
+  "dw_west_woods",
+  "dw_east_lake",
+  "dw_south_road",
+  "dw_south_fields",
   "d1_entrance",
   "d1_hub",
   "d1_west",
@@ -39,6 +45,13 @@
   "keep_gallery",
   "keep_throne"
  ],
+ "act2_spawn": {
+  "area": "dw_el_pueblo",
+  "cell": [
+   23,
+   14
+  ]
+ },
  "dungeons": {
   "d1": {
    "name": "Moss Shrine",

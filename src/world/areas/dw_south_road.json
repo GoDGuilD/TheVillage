@@ -1,0 +1,44 @@
+{
+ "id": "dw_south_road",
+ "name": "Broken Road",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  2,
+  1
+ ],
+ "origin_tiles": [
+  0,
+  42
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTx####TxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxx####xxxxxxxxxxxxxxxxxxxxxx",
+  "Tx...,................####################....Tx",
+  "xx....BB.......,......####################....xx",
+  "Tx................,..S#####..A.........,##.,..Tx",
+  "xx....................#####.............##,...xx",
+  "Tx^^^^^^^^^^^^^^vvvvvvvvvvvv^^^^^^^^^^^^##^^^^Tx",
+  "xx^^^^^^^^^^^^^^############^^^^^^^^^^^^##^^^^xx",
+  "Tx..............##########################R...Tx",
+  "xx..........G...##########################....xx",
+  "Tx...,..............G...............G.....R.B.Tx",
+  "xx........R.R.R......,........R.R.R...,...R,..xx",
+  "TxTxTxTxTxTxTxTxTxTxTx....TxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxx....xxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    21,
+    4
+   ],
+   "text": "dw_sign_tempus"
+  }
+ ],
+ "objects": [],
+ "wares": []
+}

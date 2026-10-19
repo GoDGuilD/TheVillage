@@ -4,8 +4,8 @@ Description: Game design document for The Village - the top-down, A Link to the 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-19
-Version: 2.6.0
+Last edit date: 2026-10-20
+Version: 2.7.0
 -->
 
 # Game Design Document — The Village
@@ -107,7 +107,12 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
   a one-way ledge with a ramp back up; boulders close the way south until the power glove). The game starts in
   Joe's house.
 - **Dark World**: the same grid, re-skinned with the Dark World palette in `tools/palette.py` and re-populated.
-  Umbra, Ignis, Tempus and Silva are its four regions.
+  Umbra, Ignis, Tempus and Silva are its four regions. **Implemented in Phase 8:** the six twins (Hollow Pueblo,
+  Withered Meadow, Thorn Woods, Ash Lake, Broken Road, Dead Fields) at the same coordinates as their Light World
+  areas; tougher enemies, no villagers but Tato's echo, region signs for the four dimensions. Act 2 opens there.
+  The **Moon Mirror** (from Tato's echo) steps Joe into the Light World at the same spot (thrown back if it is
+  solid), leaving a shimmer to return through; **dream rifts** in the Light World lead back once Act 1 is over.
+  First mirror puzzle: the meadow pond's island (dry in the Dark World) holds a piece of heart.
 - **Dungeons**: 3 Light World (family seals) + 4 Dark World (dimension crystals) + Caver's tower.
   **Implemented in Phase 6: the Moss Shrine** (name is a placeholder), in the upper West Woods. Eight rooms:
   entrance -> hub (pits; locked east door, big-key north door) -> west (clear the enemies: map; the shutter opens) ->
@@ -139,6 +144,7 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 | Dash Boots | Ram's Hollow's big chest | dash (L / Shift): sword out, breaks rubble, bonks on walls |
 | Fire Rod | the Frost Vault's big chest | fireballs for 4 magic; burn ice, light torches from afar |
 | Magic jars | drops (8% of the table) | small +4, big +16 magic |
+| Moon Mirror | Tato's echo (Hollow Pueblo) | Dark World only: step into the Light World at the same spot |
 
 Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems.
 

@@ -5,8 +5,8 @@
   "Author": "Jose-Jorge HERNANDEZ",
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
-  "Last edit date": "2026-10-19",
-  "Version": "1.3.0",
+  "Last edit date": "2026-10-20",
+  "Version": "1.4.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -296,6 +296,73 @@
    "the Dark World.",
    "",
    "To be continued."
+  ]
+ },
+ "act2_intro": {
+  "pages": [
+   "Joe wakes on cold ground. The roads are the roads of El Pueblo... but the houses are hollow and the sky is the colour of a bruise.",
+   "This is the valley as Caver dreams it."
+  ]
+ },
+ "tato_echo": {
+  "name": "Tato's echo",
+  "pages": [
+   "Use the mirror where the two worlds touch. What is closed here may be open there.",
+   "Four doors lead deeper into this dream: darkness, fire, time and the wild. None will open for you yet."
+  ],
+  "gift": {
+   "item": "moon_mirror",
+   "flag": "got_moon_mirror",
+   "pages": [
+    "Joe. Even here, I know your face. I am what is left of Tato in Caver's dream.",
+    "Take this. The Moon Mirror shows the waking world. Look into it, and you will stand there - in the same place.",
+    "When you are done, step back through the shimmer it leaves, or find a rift."
+   ]
+  }
+ },
+ "get_moon_mirror": {
+  "pages": [
+   "You got the Moon Mirror! In the Dark World, use it to step into the Light World at the same spot."
+  ]
+ },
+ "mirror_light": {
+  "pages": [
+   "The mirror shows only your own face here."
+  ]
+ },
+ "mirror_blocked": {
+  "pages": [
+   "Something solid stands there in the waking world. The mirror throws you back."
+  ]
+ },
+ "dw_sign_pueblo": {
+  "pages": [
+   "HOLLOW PUEBLO\nNothing here remembers you."
+  ]
+ },
+ "dw_sign_umbra": {
+  "pages": [
+   "UMBRA\nThe darkness beyond is too deep to enter. Not yet."
+  ]
+ },
+ "dw_sign_silva": {
+  "pages": [
+   "SILVA\nThe wild has closed its paths. Not yet."
+  ]
+ },
+ "dw_sign_ignis": {
+  "pages": [
+   "IGNIS\nThe ash is still too hot to cross. Not yet."
+  ]
+ },
+ "dw_sign_tempus": {
+  "pages": [
+   "TEMPUS\nHere the road runs backwards. Not yet."
+  ]
+ },
+ "dw_sign_fields": {
+  "pages": [
+   "DEAD FIELDS\nThe keep is only a shadow here."
   ]
  }
 }

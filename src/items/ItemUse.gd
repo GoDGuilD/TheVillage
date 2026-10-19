@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 1.1.0
+# Last edit date: 2026-10-20
+# Version: 1.1.1
 class_name ItemUse
 extends RefCounted
 ## Called by the Player (state "use"); spawned objects go into Joe's parent (the y-sorted actors of the area).
@@ -63,6 +63,9 @@ static func use(player: Node2D, item: String, aim: Vector2) -> bool:
 			var torch := torch_near(tree, at)
 			if torch != null:
 				torch.call("light")
+			return true
+		"moon_mirror":
+			player.emit_signal("mirror_requested")         # the World knows both worlds; it does the warp
 			return true
 		"fire_rod":
 			if not state.use_magic(ItemDB.FIRE_ROD_MAGIC):

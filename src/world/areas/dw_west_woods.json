@@ -1,0 +1,58 @@
+{
+ "id": "dw_west_woods",
+ "name": "Thorn Woods",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  1,
+  2
+ ],
+ "origin_tiles": [
+  -24,
+  14
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "Tx..Tx..Tx..Tx..Tx....Tx",
+  "xx..xx..xx.,xx..xx,..,xx",
+  "Tx..,...Exxxx..,..R...Tx",
+  "xx......xxxxx.,,......xx",
+  "Tx..Tx..xxxxx...Tx....Tx",
+  "xx..xx..........xx....xx",
+  "Tx,...BB...,..........Tx",
+  "xx....vvvvvvvvvv..,,..xx",
+  "Tx....................Tx",
+  "xx............A...S...xx",
+  "Tx.,..,,,,##############",
+  "xx.....G..##############",
+  "Tx........##############",
+  "xx....B...##############",
+  "Tx,.........,.........Tx",
+  "xx.,.........,........xx",
+  "Tx..Tx..,...BB....Tx,.Tx",
+  "xx..xx.......,,...xx,.xx",
+  "Tx..........Q.........Tx",
+  "xx.,..G..,............xx",
+  "Tx......Tx,.,.Tx....,.Tx",
+  "xx......xx....xx.,....xx",
+  "Tx....................Tx",
+  "xx.R..................xx",
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    18,
+    11
+   ],
+   "text": "dw_sign_silva"
+  }
+ ],
+ "objects": [],
+ "wares": []
+}

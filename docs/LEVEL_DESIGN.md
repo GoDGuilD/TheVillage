@@ -4,8 +4,8 @@ Description: How areas are built, linted and previewed; the glyph table.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-19
-Version: 1.4.0
+Last edit date: 2026-10-20
+Version: 1.5.0
 -->
 
 # Level design
@@ -76,6 +76,14 @@ New dungeons use `make_room(rooms, id, gx, gy, doors, fill, extra)` and are list
 grid `DUNGEON_STRIDE` tiles apart). A dungeon's table entry may carry `ending` instead of a seal (`seal: -1`): its
 boss ends the act. Objects in `GLYPHLESS` (the keep's `seal_gate`) sit on plain cells and cover a 2x2 gateway.
 
+## The Dark World
+`dark_twin(area)` makes `dw_<id>` for every overworld area: same origin and size, the Light World rows with
+`STRIP` cells (villagers, signs, chests, torches, rocks, rubble...) turned into ground, then `DARK_EDITS[id]` (e.g.
+the dry meadow pond), `DARK_EXTRA[id]` enemies (placed on the nearest free cell by `place_near`), and the
+`NPCS` / `SIGNS` / `OBJECTS` entries for `dw_<id>`. No doors. Names come from `DARK_NAMES`. `ACT2_SPAWN` is where
+Act 2 starts. Light World objects with `via_mirror` (the island's heart piece) are reached through the Dark World;
+`rift` objects (glyphless) open once Act 1 is over.
+
 ## Lint
 Sizes, unknown glyphs, multi-cell pieces (fit, fillers covered exactly once), ledge landings, edge openings,
 overlaps between areas, door/exit pairing and spawn cells, reachability from every entrance (ledges are one-way),
@@ -87,5 +95,7 @@ rocks, doors, push blocks and heavy rocks as open. Dungeons: edge openings only 
 dungeon, doors fill their doorway (boss doors start as floor), small keys per dungeon >= locked doors (a shared
 door counts once), a big key exists wherever a big door or big chest does, switch-revealed chests have their
 switch, heavy rocks need a glove somewhere in the world, rubble needs the boots, a Frost Wraith needs the fire rod,
-the seals 0-2 each belong to one dungeon, and a seal gate needs a dungeon with an ending. Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
+the seals 0-2 each belong to one dungeon, a seal gate needs a dungeon with an ending, mirror-only objects and rifts
+need a reachable Dark World twin cell (rifts also a reachable Light World cell), and the Act 2 spawn must be
+reachable. Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

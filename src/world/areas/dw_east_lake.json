@@ -1,0 +1,58 @@
+{
+ "id": "dw_east_lake",
+ "name": "Ash Lake",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  1,
+  2
+ ],
+ "origin_tiles": [
+  48,
+  14
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "Tx*...................Tx",
+  "xx.Tx........~~~~~~~..xx",
+  "Tx.xx....Q...~~~~~~~..Tx",
+  "xx,..........~~~~~~~..xx",
+  "Tx....,,.....~~~~~~~..Tx",
+  "xx.......*...~~~~~~~..xx",
+  "Tx.,.........~~~~~~~..Tx",
+  "xx**BB.......~~~~~~~..xx",
+  "Tx..,.A......~~~~~~~..Tx",
+  "xx..S....,,.*.........xx",
+  "#############.........Tx",
+  "#############...Q.....xx",
+  "#############..,......Tx",
+  "#############.........xx",
+  "Tx..................*.Tx",
+  "xx.....*.OO...~~~~~~~.xx",
+  "Tx.........*..~~~~~~~.Tx",
+  "xx.....Tx...*.~~~~~~~.xx",
+  "Tx.....xx...,.~~~~~~~.Tx",
+  "xx....*.G,....~~~~~~~.xx",
+  "Tx.*.....*B...~~~~~~~.Tx",
+  "xx............~~~~~~~.xx",
+  "Tx............~~~~~~~.Tx",
+  "xx....................xx",
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    4,
+    11
+   ],
+   "text": "dw_sign_ignis"
+  }
+ ],
+ "objects": [],
+ "wares": []
+}

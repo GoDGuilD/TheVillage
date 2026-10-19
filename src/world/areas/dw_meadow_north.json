@@ -1,0 +1,44 @@
+{
+ "id": "dw_meadow_north",
+ "name": "Withered Meadow",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  2,
+  1
+ ],
+ "origin_tiles": [
+  0,
+  0
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "Tx.*......,..*..,.*....,..,*..,,,,,,,,......,.Tx",
+  "xx....Tx,.BBB...Z.......,.....,,,,.,,,......*.xx",
+  "Tx....xx......,.........A.....,,,,,,,,..,..B,.Tx",
+  "xx,...............,.....,......,,,,,,.....,B..xx",
+  "Tx......################################......Tx",
+  "xx...............,..,.####..,...............Z.xx",
+  "Tx,...............*..,####.......,....R.....,.Tx",
+  "xx..........G.Tx..BB,.####.Z.,.....,,...Tx....xx",
+  "Tx.......R....xx....S.####..BB.......*,.xx,...Tx",
+  "xx.*....,....,*...*..,####...............Z..,,xx",
+  "TxTxTxTxTxTxTxTxTxTxTx####TxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxx####xxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    20,
+    10
+   ],
+   "text": "dw_sign_umbra"
+  }
+ ],
+ "objects": [],
+ "wares": []
+}

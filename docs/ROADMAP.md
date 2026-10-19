@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-19
-Version: 1.6.0
+Last edit date: 2026-10-20
+Version: 1.7.0
 -->
 
 # Roadmap
@@ -23,8 +23,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers, Boni's shop stock | Done (67 item checks pass) |
 | 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal (+ the power glove) | Done (62 dungeon checks pass) |
 | 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, the road south opened, Caver's keep, Act 1 ending (+ fire rod, magic jars) | Done (54 Act 1 checks pass) |
-| 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub (Act 2 starts where Act 1's save left Joe) | Next |
-| 9–12 | Umbra, Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (grapple, fire rod, etc.) | Planned |
+| 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub (Act 2 starts where Act 1's save left Joe) | Done (28 Dark World checks pass) |
+| 9–12 | Umbra, Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (grapple, hammer, ice rod, flippers...) | Next (Umbra first) |
 | 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
 | 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
 | 15 | Release | Credits, icon, export preset, performance baseline, store material | Planned |
@@ -99,3 +99,13 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] Caver's Keep (3 rooms), the end of Act 1 (`EndCard`, save outside the keep, back to the title)
 - [x] `tools/gen_act1.py`; 8 new sounds (50); `tests/test_act1.gd`: 54 checks; `tools/capture_act1.gd`
 - [ ] Owner playtest: dungeon 2-3 layouts, boss difficulty, the end card's words, dungeon/boss names (placeholders)
+
+
+## Phase 8 detail
+- [x] `tools/gen_dark.py`: the Dark World atlas (palette map + dusk fallback), rift and portal swirls, the Moon Mirror icon; Tato's echo in `gen_npcs.py`
+- [x] Dark World twins of the six overworld areas (same coordinates, own group, dark tiles, tinted actors, tougher enemies), Hollow Pueblo as the hub
+- [x] Act 2 opening (land in Hollow Pueblo, intro once), Tato's echo gives the Moon Mirror
+- [x] Moon Mirror warp with bounce-back and the portal home; dream rifts in the Light World after Act 1
+- [x] The mirror island's piece of heart; region signs for the four dimensions; map per world
+- [x] Lint for mirror-only objects and rifts; `tests/test_dark.gd`: 28 checks; `tools/capture_dark.gd`
+- [ ] Owner playtest: Dark World names, how dark it should look, the Act 2 intro words

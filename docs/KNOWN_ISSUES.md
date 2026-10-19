@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-19
-Version: 1.6.0
+Last edit date: 2026-10-20
+Version: 1.7.0
 -->
 
 # Known issues
@@ -36,3 +36,7 @@ Version: 1.6.0
 - The end of Act 1 returns to the title: the Dark World (Phase 8) will continue from the save outside the keep.
 - Caver's shade, the Iron Ram and the Frost Wraith are first drafts (patterns, HP, names await the owner).
 - The dash cannot cross pits or ledges and does not knock items off trees (ALttP's boots do).
+
+- The Dark World has no interiors or shops yet, and its houses are shut ruins; the four dimension regions are signs
+  only until Phases 9-12. A mirror landing on a Light World bush or pot overlaps it (Joe can walk out).
+- Rifts and portals are flat swirls y-sorted with the actors: Joe standing just above one is drawn under it.

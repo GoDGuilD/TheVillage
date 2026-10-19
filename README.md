@@ -4,13 +4,13 @@ Description: Project overview, status, and getting-started guide for The Village
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-19
-Version: 5.4.0
+Last edit date: 2026-10-20
+Version: 5.5.0
 -->
 
 # The Village
 
-**Version 7.1.0** (project-wide; see `CHANGELOG.md`)
+**Version 7.2.0** (project-wide; see `CHANGELOG.md`)
 
 A top-down action-adventure in the style of *The Legend of Zelda: A Link to the Past*, built with Godot 4.7.2.
 It is the **first game (prequel) of The Village trilogy**; game 2 is *The Village — Chapel of Dreams*
@@ -18,7 +18,7 @@ It is the **first game (prequel) of The Village trilogy**; game 2 is *The Villag
 vampire-sorcerer Caver, across a Light World and its Dark World mirror.
 
 ## Status
-Rebuilt on 2026-10-15 on Chapel of Dreams' architecture. **Phases 0–7 are done**: Joe walks in 8 directions with
+Rebuilt on 2026-10-15 on Chapel of Dreams' architecture. **Phases 0–8 are done**: Joe walks in 8 directions with
 ALttP facing rules and corner nudging, slashes, charges a spin attack, blocks rocks with his shield, lifts and throws
 pots and bushes, and fights slimes, Caver's guards and rock-spitters that drop hearts and gems, in a
 hearts/gems HUD and generated sound effects. The game starts in Joe's house in El Pueblo; four neighbouring areas
@@ -29,7 +29,9 @@ key blocks, torches, cracked rocks, heart pieces and Boni's shop. The first dung
 playable end to end: locked and big-key doors, shutters, switches, a push block, pits, map and compass, the
 Power Glove, the Grand Slime and the first family seal. **Act 1 is complete**: the road south, two more
 dungeons (Ram's Hollow with the Dash Boots and the Iron Ram, the Frost Vault with the Fire Rod and the Frost
-Wraith), the three seals opening Caver's keep, Caver's shade and the end-of-act card. 368 automated checks pass.
+Wraith), the three seals opening Caver's keep, Caver's shade and the end-of-act card. **Act 2 has begun**: the
+Dark World (the whole valley as Caver dreams it), Tato's echo, the Moon Mirror and the dream rifts. 396 automated
+checks pass.
 Plan: `docs/ROADMAP.md`. Design: `docs/GDD.md`.
 
 ## Run it
@@ -40,10 +42,10 @@ Plan: `docs/ROADMAP.md`. Design: `docs/GDD.md`.
 
 ## Develop
 - Regenerate art and sound: `python -I tools/gen_joe.py`, `gen_tiles.py`, `gen_enemies.py`, `gen_props.py`,
-  `gen_ui.py`, `gen_npcs.py`, `gen_items.py`, `gen_dungeon.py`, `gen_act1.py`, `gen_sfx.py`, `gen_areas.py` (the world; must print `0 lint problems`), then
+  `gen_ui.py`, `gen_npcs.py`, `gen_items.py`, `gen_dungeon.py`, `gen_act1.py`, `gen_dark.py` (after `gen_tiles.py`), `gen_sfx.py`, `gen_areas.py` (the world; must print `0 lint problems`), then
   `Godot_v4.7.2-stable_win64_console.exe --headless --path . --import`.
 - Tests: `Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_player.gd`
-  and the same with `tests/test_combat.gd`, `tests/test_world.gd`, `tests/test_ui.gd`, `tests/test_items.gd`, `tests/test_dungeon.gd` and `tests/test_act1.gd`.
+  and the same with `tests/test_combat.gd`, `tests/test_world.gd`, `tests/test_ui.gd`, `tests/test_items.gd`, `tests/test_dungeon.gd`, `tests/test_act1.gd` and `tests/test_dark.gd`.
 - More: `docs/DEVELOPMENT.md`, `docs/TESTING.md`, `docs/ARCHITECTURE.md`.
 
 ## Project history

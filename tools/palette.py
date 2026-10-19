@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.7.0
+# Version: 1.8.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -325,3 +325,17 @@ ORB_BACK       = _hex("#60d0ff")    # an orb Joe has batted back
 GATE_STONE_D   = _hex("#3c3044")    # Caver's keep walls and the seal gate
 GATE_STONE_M   = _hex("#605070")
 GATE_STONE_L   = _hex("#8c7c9c")
+
+# --- Dark World extras (Phase 8): rifts, the mirror portal, the Moon Mirror --------------------------------
+DW_GRASS_HILITE = _hex("#9c8870")   # the light-world grass highlight's twin
+DW_WATER_LIGHT  = _hex("#7c4c90")
+DW_FOAM         = _hex("#d8a0c8")
+RIFT_DARK       = _hex("#2c0c44")   # a dream rift (Light World -> Dark World)
+RIFT_MID        = _hex("#7c2cb0")
+RIFT_LIGHT      = _hex("#d890ff")
+PORTAL_DARK     = _hex("#1c3c8c")   # the shimmer the Moon Mirror leaves behind
+PORTAL_MID      = _hex("#4c90e8")
+PORTAL_LIGHT    = _hex("#c8ecff")
+MIRROR_FRAME    = _hex("#c8b0e8")
+MIRROR_GLASS    = _hex("#3c2c6c")
+MIRROR_SHINE    = _hex("#f0e8ff")

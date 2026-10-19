@@ -1,10 +1,10 @@
 # File: MapScreen.gd
-# Description: The map (Tab / North button) - in a dungeon its rooms (visited ones, or all with the dungeon map), Joe's room blinking and, with the compass, the boss room; outside, the overworld areas Joe has seen.
+# Description: The map (Tab / North button) - in a dungeon its rooms (visited ones, or all with the dungeon map), Joe's room blinking and, with the compass, the boss room; outside, the areas Joe has seen of the world he is in (Light or Dark).
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-16
-# Last edit date: 2026-10-16
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.1.0
 class_name MapScreen
 extends CanvasLayer
 ## Rooms and areas are drawn as boxes on their screen grid (one box per screen). The World passes its area data in;
@@ -120,11 +120,12 @@ func _draw_dungeon(areas: Dictionary, dungeon: String, info: Dictionary) -> void
 
 
 func _draw_overworld(areas: Dictionary) -> void:
-	_title("THE VALLEY")
+	var world := String(areas[here].get("world", ""))       # "" = the Light World (houses count as light)
+	_title("THE DARK WORLD" if world == "dark" else "THE VALLEY")
 	var cells := {}
 	for aid in areas:
 		var a: Dictionary = areas[aid]
-		if a["kind"] != "overworld":
+		if a["kind"] != "overworld" or String(a.get("world", "")) != world:
 			continue
 		var o: Array = a["origin_tiles"]
 		var sz: Array = a["size_screens"]

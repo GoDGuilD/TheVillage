@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-19
-Version: 2.6.0
+Last edit date: 2026-10-20
+Version: 2.7.0
 -->
 
 # The Village
@@ -73,3 +73,7 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   has `ending: "act1"` (no seal) and `World.play_ending` runs the end card. Bosses' weaknesses go through
   `BaseEnemy._resists(hit)`. Seven suites (368 checks; `test_act1.gd` 54). In tests hit with an element by setting
   `hurt_box.last_hit`; never name boss classes or AreaBuilder statically in a test.
+- Phase 8: Dark World twins `dw_<id>` share their Light World area's coordinates (group `overworld_dark`); run
+  `gen_dark.py` after `gen_tiles.py`. Mirror/rift warps are `World._world_warp(group, mirror)`. Eight suites (396
+  checks; `test_dark.gd` 28). Never use z_index < 0 for floor props (they vanish under the ground tiles); every
+  new item kind needs a `World.grant()` branch.

@@ -127,6 +127,14 @@
    "text": "sign_pueblo_south"
   }
  ],
- "objects": [],
+ "objects": [
+  {
+   "kind": "rift",
+   "cell": [
+    20,
+    17
+   ]
+  }
+ ],
  "wares": []
 }

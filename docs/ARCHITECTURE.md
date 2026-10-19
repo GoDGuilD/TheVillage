@@ -4,8 +4,8 @@ Description: Code architecture of The Village: folders, autoloads, contracts, pl
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-19
-Version: 5.4.0
+Last edit date: 2026-10-20
+Version: 5.5.0
 -->
 
 # Architecture
@@ -25,17 +25,17 @@ src/
   items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
              tiles + actors), TestField (test arenas), Npc, SignPost, Chest, BigChest, Torch, CrackedRock, KeyBlock,
-             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Bush, Pot, Thrown, Pickup
+             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Rift, Bush, Pot, Thrown, Pickup
     areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
   ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, MapScreen, GameOver, EndCard, MenuList,
              PixelText,
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd
 tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
-             test_act1.gd
+             test_act1.gd, test_dark.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -98,6 +98,11 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   Iron Ram resists unless dazed, the Frost Wraith unless the HitBox element is "fire", Caver's shade unless it
   is "orb" (an orb Joe batted back). Bosses carry `is_boss`; the World connects their `defeated` signal. A dungeon
   whose table entry has `ending` (the keep) ends the act instead of giving a reward (`World.play_ending`).
+- **Two worlds.** Each overworld area has a Dark World twin (`world: "dark"`, id `dw_<id>`) at the same
+  coordinates, in the group `overworld_dark`; AreaBuilder paints it with the dark TileSet (`tileset(true)`, same
+  cells, `overworld_dark.png`). Because the coordinates match, the Moon Mirror and the rifts just call
+  `_world_warp(group, mirror)`: rebuild the area of the other group under Joe's feet; the mirror checks the tile
+  under him (`_solid_at`) and bounces back, or leaves a portal `Rift` that returns him.
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 2.1.0
+# Last edit date: 2026-10-20
+# Version: 2.2.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -25,6 +25,7 @@ extends RefCounted
 
 const TILE := 16
 const ATLAS_TEX := preload("res://assets/tiles/overworld_light.png")
+const DARK_ATLAS_TEX := preload("res://assets/tiles/overworld_dark.png")   # same cells, Dark World colours (gen_dark.py)
 const ATLAS_JSON := "res://assets/tiles/overworld_light.json"
 const LAYER_WORLD := 1
 const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemies/Guard.gd",
@@ -44,14 +45,14 @@ const LAYER_PIT := 256                   # pits are walls for enemies only (Joe 
 # Custom data layers on the TileSet (read by Player and the World).
 const DATA_FLAGS := ["ledge", "door", "exit", "pit"]
 
-static var _tileset: TileSet
+static var _tilesets: Dictionary = {}    # false -> Light World TileSet, true -> Dark World TileSet
 static var _cells: Dictionary = {}       # atlas cell name -> Vector2i
 
 
 # The shared TileSet, built once from the atlas manifest: one physics layer, flag custom-data layers.
-static func tileset() -> TileSet:
-	if _tileset != null:
-		return _tileset
+static func tileset(dark: bool = false) -> TileSet:
+	if _tilesets.has(dark):
+		return _tilesets[dark]
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ATLAS_JSON))
 	var ts := TileSet.new()
 	ts.tile_size = Vector2i(TILE, TILE)
@@ -66,7 +67,7 @@ static func tileset() -> TileSet:
 		ts.set_custom_data_layer_name(i, DATA_FLAGS[i])
 		ts.set_custom_data_layer_type(i, TYPE_BOOL)
 	var src := TileSetAtlasSource.new()
-	src.texture = ATLAS_TEX
+	src.texture = DARK_ATLAS_TEX if dark else ATLAS_TEX
 	src.texture_region_size = Vector2i(TILE, TILE)
 	ts.add_source(src, 0)
 	var half := TILE / 2.0
@@ -85,16 +86,16 @@ static func tileset() -> TileSet:
 			td.set_collision_polygon_points(1, 0, square)
 		for flag in DATA_FLAGS:
 			td.set_custom_data(flag, bool(info.get(flag, false)))
-	_tileset = ts
+	_tilesets[dark] = ts
 	return ts
 
 
 # Paint `rows` into a new TileMapLayer and create the actors in `actors`.
 # Returns {tiles, bushes, pots, enemies, spawn (Vector2 or null), doors: [Vector2i], exits: [Vector2i]}.
-static func build(rows: Array, actors: Node2D, indoor: bool = false, with_enemies: bool = true, origin: Vector2 = Vector2.ZERO, dungeon: bool = false) -> Dictionary:
+static func build(rows: Array, actors: Node2D, indoor: bool = false, with_enemies: bool = true, origin: Vector2 = Vector2.ZERO, dungeon: bool = false, dark: bool = false) -> Dictionary:
 	var tiles := TileMapLayer.new()
 	tiles.name = "Tiles"
-	tiles.tile_set = tileset()
+	tiles.tile_set = tileset(dark)
 	tiles.position = origin
 	tiles.add_to_group("terrain")
 	var out := {"tiles": tiles, "bushes": [], "pots": [], "enemies": [], "spawn": null, "doors": [], "exits": []}

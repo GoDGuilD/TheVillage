@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 5.0.0
+# Last edit date: 2026-10-20
+# Version: 6.0.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -20,6 +20,9 @@ extends Node2D
 ## Dungeon rooms scroll into each other like overworld areas (same "group"). Doors read their state from flags:
 ## "door:<id>" (opened locked/big doors), the room flags "cleared:<room>" / "switch:<room>" (shutters), and the
 ## dungeon's "boss:<dungeon>" (the boss door shuts behind Joe until then).
+## The Dark World twins share the Light World's coordinates (group "overworld_dark"), so a warp between the worlds
+## keeps Joe's position: the Moon Mirror (Dark -> Light, bouncing back if that spot is solid, leaving a shimmer to
+## return through) and the dream rifts (Light -> Dark, shown once Act 1 is over).
 
 signal area_entered(area_id: String)
 
@@ -37,6 +40,11 @@ const SEAL_DROP := Vector2(0, -24)       # the seal appears above it (not under 
 const GATE_FLAG := "keep:gate"           # the seal gate of Caver's keep is open
 const ACT1_FLAG := "act1:done"
 const ENDING_DELAY := 1.5                # s between the shade's fall and Caver's last words
+const ACT2_FLAG := "act2:started"        # the Act 2 intro was shown
+const DW_TINT := Color(0.78, 0.68, 0.92)  # Dark World actors (bushes, pots, enemies, villagers) take this tint
+const DW_HP_FACTOR := 2                  # Dark World enemies are twice as tough
+const WORLD_FADE := 0.18                 # mirror / rift fade out and in
+const SOLID_PROBE := Vector2(0, -3)      # the point under Joe checked for a solid tile after a mirror warp
 const TILE := 16
 const VIEW := Vector2(384, 216)
 const SCROLL_TIME := 0.6                 # seconds the camera takes to slide to the next area
@@ -60,6 +68,9 @@ var game_over: GameOver
 var map_screen: MapScreen
 var end_card: EndCard
 var endings := 0                         # act endings played (tests)
+var world_warps := 0                     # mirror and rift warps done (tests)
+var mirror_bounces := 0                  # mirror warps thrown back by a solid spot (tests)
+var act2_spawn: Dictionary = {}          # {area, cell}: where Caver's spell drops Joe
 var dungeons: Dictionary = {}            # dungeon id -> {name, seal, entrance, boss_room, boss_flag}
 var falls := 0                           # pit falls (tests)
 var talking: Node2D = null               # the villager or sign in the current conversation
@@ -101,6 +112,7 @@ func _ready() -> void:
 	player.talk_requested.connect(_on_talk_requested)
 	player.item_collected.connect(func(kind: String) -> void: item_get(kind))
 	player.fell.connect(_on_fell)
+	player.mirror_requested.connect(_on_mirror)
 	hud = Hud.new()
 	add_child(hud)
 	player.health_changed.connect(hud.set_health)
@@ -113,6 +125,10 @@ func _ready() -> void:
 	if not _save_to_apply.is_empty():
 		_set_hearts(int(_save_to_apply.get("hp", PlayerTuning.MAX_HP)), int(_save_to_apply.get("max_hp", PlayerTuning.MAX_HP)))
 		_save_to_apply = {}
+	# Act 2 opens the first time a game continues after the end of Act 1.
+	if GameState.has_flag(ACT1_FLAG) and not GameState.has_flag(ACT2_FLAG):
+		GameState.set_flag(ACT2_FLAG)
+		say.call_deferred("act2_intro")
 
 
 func _build_overlays() -> void:
@@ -175,6 +191,7 @@ func _load_index() -> void:
 	var index: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(AREA_DIR + "index.json"))
 	start_area = String(index["start"])
 	dungeons = index.get("dungeons", {})
+	act2_spawn = index.get("act2_spawn", {})
 	for aid in index["areas"]:
 		areas[aid] = JSON.parse_string(FileAccess.get_file_as_string(AREA_DIR + String(aid) + ".json"))
 
@@ -214,8 +231,12 @@ func overworld_at(p: Vector2) -> String:
 func group_of(area_id: String) -> String:
 	var a: Dictionary = areas[area_id]
 	if a["kind"] == "overworld":
-		return "overworld"
+		return "overworld_dark" if is_dark(area_id) else "overworld"
 	return String(a.get("dungeon", ""))
+
+
+func is_dark(area_id: String) -> bool:
+	return String(areas[area_id].get("world", "")) == "dark"
 
 
 # The area of `group` containing a global point, or "".
@@ -238,8 +259,14 @@ func _build(area_id: String) -> Dictionary:
 	actors.name = "Area_" + area_id
 	actors.y_sort_enabled = true
 	_actors.add_child(actors)
+	var dark := is_dark(area_id)
 	var built := AreaBuilder.build(data["rows"], actors, data["kind"] == "interior", true, origin_of(area_id),
-			data["kind"] == "dungeon")
+			data["kind"] == "dungeon", dark)
+	if dark:
+		actors.modulate = DW_TINT
+		for e in built["enemies"]:
+			e.health.max_health *= DW_HP_FACTOR
+			e.health.current_health = e.health.max_health
 	_ground.add_child(built["tiles"])
 	var boss_flag := String(data.get("boss_flag", ""))
 	for e in built["enemies"].duplicate():
@@ -322,6 +349,13 @@ func _build_object(area_id: String, o: Dictionary, actors: Node2D) -> void:
 			rubble.flag = flag
 			rubble.broken.connect(func(_r: Node2D) -> void: GameState.set_flag(flag))
 			node = rubble
+		"rift":
+			if not GameState.has_flag(ACT1_FLAG):
+				return                                    # rifts open only once Caver has torn the valley
+			var rift := Rift.new()
+			rift.setup(false)
+			rift.entered.connect(func(_r: Node2D) -> void: _world_warp("overworld_dark", false))
+			node = rift
 		"seal_gate":
 			var gate := SealGate.new()
 			gate.setup(GATE_FLAG, GameState.has_flag(GATE_FLAG))
@@ -603,7 +637,7 @@ func grant(kind: String, amount: int = 1) -> bool:
 			return true
 		"map", "compass", "big_key":
 			GameState.give_dungeon_item(dungeon_of(current_id()), kind)
-		"glove", "boots", "fire_rod":
+		"glove", "boots", "fire_rod", "moon_mirror":
 			GameState.give_item(kind)
 		"seal":
 			var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
@@ -832,15 +866,68 @@ func play_ending(act: String) -> void:
 			box_at_top(on_screen))
 
 
-# After the end card: Joe is saved standing outside the keep (Phase 8 continues from there), then the title.
+# After the end card: Caver's spell has thrown Joe into the Dark World. He is saved where he lands (Act 2 opens
+# there on the next Continue), then the title.
 func _on_end_card_finished() -> void:
-	var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
-	var entrance: Dictionary = areas.get(String(info.get("entrance", "")), {})
-	if not entrance.is_empty() and not entrance["exits"].is_empty():
-		var e: Dictionary = entrance["exits"][0]
-		_enter(String(e["to"]), cell_feet(String(e["to"]), e["spawn_cell"]), FACINGS[String(e["facing"])])
+	if not act2_spawn.is_empty() and areas.has(String(act2_spawn["area"])):
+		var aid := String(act2_spawn["area"])
+		_enter(aid, cell_feet(aid, act2_spawn["cell"]), Vector2i.DOWN)
 	save_game()
 	quit_to_title()
+
+
+# --- the two worlds -------------------------------------------------------------------------------------
+
+# The Moon Mirror: only in the Dark World; Joe steps into the Light World at the same spot.
+func _on_mirror() -> void:
+	if transitioning:
+		return
+	if not is_dark(current_id()):
+		say("mirror_light")
+		return
+	_world_warp("overworld", true)
+
+
+# Move Joe to the area of `group` under his feet (same coordinates). `mirror`: bounce back if he would land in
+# something solid, otherwise leave a shimmer there that takes him back.
+func _world_warp(group: String, mirror: bool) -> void:
+	var feet := player.global_position
+	var target := area_at(feet, group)
+	if target == "" or transitioning:
+		return
+	transitioning = true
+	var from := current_id()
+	var facing := player.facing
+	player.freeze(WORLD_FADE * 6.0)
+	Audio.sfx("warp")
+	var tw := create_tween()
+	tw.tween_property(_fade, "modulate:a", 1.0, WORLD_FADE)
+	await tw.finished
+	_enter(target, feet, facing)
+	if mirror:
+		if _solid_at(feet):
+			mirror_bounces += 1
+			_enter(from, feet, facing)
+			say.call_deferred("mirror_blocked")
+		else:
+			var portal := Rift.new()
+			portal.setup(true)
+			portal.position = feet
+			portal.entered.connect(func(_r: Node2D) -> void: _world_warp("overworld_dark", false))
+			current["actors"].add_child(portal)
+	world_warps += 1
+	var tw2 := create_tween()
+	tw2.tween_property(_fade, "modulate:a", 0.0, WORLD_FADE)
+	await tw2.finished
+	player.unfreeze()
+	transitioning = false
+
+
+# True if the current area's tile under `feet` is solid (a mirror warp may not land there).
+func _solid_at(feet: Vector2) -> bool:
+	var tiles: TileMapLayer = current["tiles"]
+	var td := tiles.get_cell_tile_data(tiles.local_to_map(tiles.to_local(feet + SOLID_PROBE)))
+	return td != null and td.get_collision_polygons_count(0) > 0
 
 
 # Back out to the overworld in front of the dungeon's entrance (after the seal).

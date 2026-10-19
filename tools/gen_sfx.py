@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1, world warps) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 3.2.0
+# Last edit date: 2026-10-20
+# Version: 3.3.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -447,6 +447,17 @@ def act_end():
     return np.concatenate(parts)
 
 
+# --- Phase 8: the two worlds ---------------------------------------------------------------
+
+def warp():
+    # Stepping between the worlds: a shimmering rise over a hollow hum.
+    sw = sweep(300, 1600, 0.45, 0.8)
+    n = len(sw)
+    shimmer = pulse(sw, 0.125) * np.sin(np.pi * np.arange(n) / n) * (0.6 + 0.4 * np.sin(2 * np.pi * 18 * np.arange(n) / SR))
+    hum = tri(np.full(n, 110.0)) * np.sin(np.pi * np.arange(n) / n) * 0.5
+    return shimmer + hum
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -466,6 +477,7 @@ SFX = {
     "block_push": (block_push, -6.5), "boss_die": (boss_die, -3.5),
     "dash": (dash, -6.5), "bonk": (bonk, -4.5), "fireball": (fireball, -5.5), "ice_shard": (ice_shard, -7.0),
     "orb": (orb, -6.0), "clank": (clank, -6.0), "magic_jar": (magic_jar, -6.5), "act_end": (act_end, -4.5),
+    "warp": (warp, -5.5),
 }
 
 

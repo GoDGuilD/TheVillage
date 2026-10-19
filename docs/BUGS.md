@@ -4,8 +4,8 @@ Description: Log of every gotcha met, internal or external.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-19
-Version: 1.5.0
+Last edit date: 2026-10-20
+Version: 1.6.0
 -->
 
 # Bugs and gotchas
@@ -27,3 +27,6 @@ Version: 1.5.0
 - [Internal] **The family seal was grabbed the instant it appeared** - Symptom: after the heart container the seal's moment was skipped. Root cause: the seal spawned on the container's spot, where Joe was standing. Fix: it appears 32 px higher (`SEAL_DROP`). File: `src/world/World.gd`.
 - [Internal] **The seal gate could not be talked to** - Symptom: pressing interact in front of the keep's gate did nothing. Root cause: the 32-px gate's talk point sat 8 px below its centre, more than Joe's one-tile probe radius away from where he stands (in front of either half). Fix: the talk point is 2 px below the centre. File: `src/world/SealGate.gd`.
 - [External] **Static class names in a test compile before the autoloads** - Symptom: `test_act1.gd` failed with "Identifier not found: Audio" in Bush/IronRam and the whole World half-built. Root cause: `is IronRam` and `AreaBuilder.flag_at` in the test compile those classes (and their dependencies) before autoloads exist. Fix: compare `get_script().get_global_name()` and `load()` AreaBuilder. File: `tests/test_act1.gd`.
+
+- [Internal] **Floor switches (and rifts) were invisible** - Symptom: the Moss Shrine's floor switch never showed in screenshots; the first rift did not either. Root cause: they set `z_index = -1` to sit "under" actors, which also put them under the ground TileMapLayer. Fix: leave z at 0 and let the y-sorted actors node order them. File: `src/world/FloorSwitch.gd`, `src/world/Rift.gd`.
+- [Internal] **Tato's echo talked but gave nothing** - Symptom: the gift dialogue played, then no Moon Mirror. Root cause: `World.grant()` matches kinds explicitly and had no branch for `moon_mirror`. Fix: added it with the other passive/Y items. File: `src/world/World.gd`.

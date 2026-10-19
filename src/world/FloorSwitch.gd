@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-16
-# Last edit date: 2026-10-16
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.0.1
 class_name FloorSwitch
 extends Area2D
 
@@ -34,7 +34,7 @@ func _ready() -> void:
 	collision_mask = LAYER_WORLD | LAYER_PLAYER
 	monitorable = false
 	add_to_group("floor_switch")
-	z_index = -1                          # drawn under whatever stands on it
+	# Flat on the floor: y-sorted with the actors (a z_index below 0 would hide it under the ground tiles).
 	var shape := CollisionShape2D.new()
 	var r := RectangleShape2D.new()
 	r.size = SIZE

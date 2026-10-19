@@ -1,10 +1,10 @@
 # File: gen_npcs.py
-# Description: Generates the villagers (Tato, Boni, Janga, a village woman and a village boy) as 32x32 idle strips facing down, up and side, plus their manifest and a preview.
+# Description: Generates the villagers (Tato, Boni, Janga, a village woman and a village boy, and Tato's Dark World echo) as 32x32 idle strips facing down, up and side, plus their manifest and a preview.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.1.0
 #
 # Run:  python -I tools/gen_npcs.py
 # Writes assets/sprites/npcs/<id>_idle_<down|up|side>.png (2 frames each, side faces right - the engine flips it),
@@ -20,7 +20,8 @@ from palette import (APRON_DARK, APRON_MID, BANDANA_D, BANDANA_M, BARK_MID, BOOT
                      DRESS_LIGHT, DRESS_MID, HAIR_DARK, HAIR_GREY, HAIR_LIGHT, HAIR_MID, HAIR_ORANGE_D,
                      HAIR_ORANGE_M, HAIR_WHITE, OUTLINE, PANTS_DARK, PANTS_MID, ROBE_DARK, ROBE_LIGHT, ROBE_MID,
                      SHADOW, SHIRT_GREEN_D, SHIRT_GREEN_M, SKIN_DARK, SKIN_LIGHT, SKIN_MID, TUNIC_DARK, TUNIC_MID,
-                     VEST_DARK, VEST_LIGHT, VEST_MID, BARK_DARK, GOLD, WHITE)
+                     VEST_DARK, VEST_LIGHT, VEST_MID, BARK_DARK, GOLD, WHITE, RIFT_DARK, RIFT_MID, RIFT_LIGHT,
+                     PORTAL_LIGHT)
 from sprite_lib import Canvas, pack_strip, upscale
 from PIL import Image
 
@@ -37,6 +38,9 @@ EYE = OUTLINE                       # villagers have dark eyes (Joe's green eyes
 NPCS = {
     "tato": {"body": "robe", "cloth": (ROBE_DARK, ROBE_MID, ROBE_LIGHT), "legs": (ROBE_DARK, ROBE_DARK),
              "hair": "bald", "hair_col": (HAIR_GREY, HAIR_WHITE, WHITE), "beard": True, "staff": True, "shrink": 1},
+    # Tato's echo: the old man as the Dark World remembers him - a pale violet ghost (Phase 8).
+    "tato_echo": {"body": "robe", "cloth": (RIFT_DARK, RIFT_MID, RIFT_LIGHT), "legs": (RIFT_DARK, RIFT_DARK),
+                  "hair": "bald", "hair_col": (RIFT_MID, PORTAL_LIGHT, WHITE), "beard": True, "staff": True, "shrink": 1},
     "boni": {"body": "apron", "cloth": (SHIRT_GREEN_D, SHIRT_GREEN_M, APRON_MID), "legs": (PANTS_DARK, PANTS_MID),
              "hair": "bun", "hair_col": (HAIR_ORANGE_D, HAIR_ORANGE_M, HAIR_ORANGE_M), "beard": False,
              "staff": False, "shrink": 0},

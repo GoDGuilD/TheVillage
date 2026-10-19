@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-19
-# Last edit date: 2026-10-19
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.0.1
 # Run:  Godot_console --headless --fixed-fps 60 --path . -s tests/test_act1.gd   (must end "0 failed")
 extends SceneTree
 
@@ -440,7 +440,7 @@ func _t_caver_and_ending() -> void:
 	await process_frame
 	await process_frame
 	var data := SaveGame.read()
-	_check("the game is saved outside the keep, the act marked done", String(data.get("area", "")) == "south_fields"
+	_check("the game is saved where the spell drops Joe (the Dark World), the act marked done", String(data.get("area", "")) == "dw_el_pueblo"
 			and bool(data["state"]["flags"].get("act1:done", false)), str(data.get("area", "")))
 	_check("and the title screen comes back", current_scene != null and current_scene != world
 			and String(current_scene.scene_file_path).ends_with("TitleScreen.tscn"), str(current_scene))

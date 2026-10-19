@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 2.4.2
+# Last edit date: 2026-10-20
+# Version: 2.4.3
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -18,6 +18,7 @@ signal died
 signal talk_requested(target: Node2D)   # interact pressed facing a villager or sign (the World opens the box)
 signal item_collected(kind: String)       # touched a pickup the World handles (heart piece, container, key)
 signal fell                               # dropped into a pit (the World takes a heart and puts him back)
+signal mirror_requested                   # the Moon Mirror was used (the World does the warp)
 
 const SPRITE_DIR := "res://assets/sprites/joe/"
 const SHADOW_TEX := preload("res://assets/sprites/joe/joe_shadow.png")

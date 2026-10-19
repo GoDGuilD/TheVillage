@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 4.0.0
+# Last edit date: 2026-10-20
+# Version: 5.0.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -57,7 +57,7 @@ ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "he
 WARE_IDS = {"bombs", "arrows", "heart_piece"}                       # ItemDB.WARES
 OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h", "door": "[",
                  "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r", "rubble": "b"}
-GLYPHLESS = {"seal_gate"}          # objects drawn over plain cells (no glyph of their own)
+GLYPHLESS = {"seal_gate", "rift"}  # objects drawn over plain cells (no glyph of their own)
 DOORWAYS = {"n": (11, 0), "s": (11, 12), "w": (0, 6), "e": (22, 6)}   # top-left cell of each 2x2 dungeon doorway
 OPEN_LO, OPEN_HI = 10, 14         # edge openings are 4 tiles wide, centred on each side of a screen pair
 # Openings: north/south at columns 22..25 of a 2-screen-wide area, east/west at rows 12..15 of a 2-screen-tall one.
@@ -178,6 +178,7 @@ def build_meadow_north(rng):
     g.rect(8, 6, 39, 6, "#")
     g.rect(30, 2, 37, 4, "~")                          # pond
     g.rect(31, 5, 36, 5, "~")
+    g.set(34, 3, ".")                                  # an island no one can swim to (the Moon Mirror can)
     for x, y in ((6, 3), (14, 9), (40, 9)):
         g.piece(x, y, "T")
     g.place([(10, 3), (11, 3), (12, 3), (18, 9), (19, 9), (28, 10), (29, 10), (43, 4), (43, 5)], "B")
@@ -396,8 +397,10 @@ def neighbours_walk(rows, solid, x, y):
 
 
 def group_of(a):
-    """Areas that scroll into each other share a group: the overworld, or one dungeon's rooms."""
-    return "overworld" if a["kind"] == "overworld" else a.get("dungeon")
+    """Areas that scroll into each other share a group: each world's overworld, or one dungeon's rooms."""
+    if a["kind"] == "overworld":
+        return "overworld_dark" if a.get("world") == "dark" else "overworld"
+    return a.get("dungeon")
 
 
 def lint_world(areas, problems):
@@ -468,6 +471,7 @@ def lint_world(areas, problems):
             entries[t["id"]].append((sx, sy))
     # Reachability: everything that matters must be reachable from some entry of its area.
     spawns = 0
+    seen_by = {}
     for a in areas:
         rows = a["rows"]
         solid = [[solids[a["id"]][y][x] and rows[y][x] not in OPENABLE for x in range(len(rows[0]))]
@@ -502,8 +506,24 @@ def lint_world(areas, problems):
         # Villagers and signs: glyphs match the lists, the text exists, and Joe can stand next to each one.
         lint_talkers(a, solid, seen, problems)
         lint_objects(a, seen, problems)
+        seen_by[a["id"]] = seen
     if spawns != 1:
         problems.append("world: %d 'P' spawns (need exactly 1)" % spawns)
+    # Moon Mirror targets and rifts: the Dark World twin of the cell must be walkable ground Joe can reach there.
+    for a in areas:
+        if a["kind"] != "overworld" or a.get("world") == "dark":
+            continue
+        twin = by_id.get(DARK_PREFIX + a["id"])
+        for o in a.get("objects", []):
+            if not (o.get("via_mirror") or o["kind"] == "rift"):
+                continue
+            x, y = o["cell"]
+            if twin is None or tuple(o["cell"]) not in seen_by.get(twin["id"], set()):
+                problems.append("%s: %s at (%d,%d) - its Dark World twin cell is not reachable" % (a["id"], o["kind"], x, y))
+            if o["kind"] == "rift" and (x, y) not in seen_by.get(a["id"], set()):
+                problems.append("%s: rift at (%d,%d) is unreachable" % (a["id"], x, y))
+    if ACT2_SPAWN[0] not in by_id or tuple(ACT2_SPAWN[1]) not in seen_by.get(ACT2_SPAWN[0], set()):
+        problems.append("world: the Act 2 arrival cell is not reachable")
     # Keys per pool (overworld = None, else the dungeon id): small keys >= key blocks + distinct locked doors;
     # a big key wherever there is a big door or a big chest; the glove somewhere if a heavy rock exists.
     pools = {}
@@ -588,6 +608,8 @@ def lint_objects(a, seen, problems):
             near = [(x, y + 1)]                                   # chests open from below (ALttP)
         if o["kind"] == "heart_piece":
             near = [(x, y)]
+        if o.get("via_mirror"):
+            continue                                              # reached through the Dark World (checked later)
         if not any(p in seen for p in near):
             problems.append("%s: nobody can reach the %s at (%d,%d)" % (a["id"], o["kind"], x, y))
     for w in a.get("wares", []):
@@ -665,7 +687,9 @@ NPCS = {
 OBJECTS = {
     "joe_house": [("chest", 10, 2, {"item": "lantern"})],
     "meadow_north": [("torch", 28, 4, {}), ("torch", 39, 4, {}),
-                     ("chest", 34, 7, {"item": "heart_piece", "reveal": "torches"})],
+                     ("chest", 34, 7, {"item": "heart_piece", "reveal": "torches"}),
+                     ("heart_piece", 34, 3, {"via_mirror": True})],
+    "el_pueblo": [("rift", 20, 17, {})],
     "west_woods": [("cracked_rock", 2, 24, {}), ("rock", 3, 25, {}), ("heart_piece", 2, 25, {})],
     "east_lake": [("chest", 10, 7, {"item": "small_key"}), ("heavy_rock", 21, 21, {}), ("heart_piece", 21, 22, {}),
                   ("heavy_rock", 21, 23, {})],
@@ -674,7 +698,7 @@ OBJECTS = {
                    # The road south: heavy rocks across the gap in the trees (the power glove lifts them).
                    ("heavy_rock", 22, 12, {}), ("heavy_rock", 23, 12, {}), ("heavy_rock", 24, 12, {}),
                    ("heavy_rock", 25, 12, {})],
-    "south_fields": [("seal_gate", 15, 5, {}), ("rubble", 40, 17, {})],
+    "south_fields": [("seal_gate", 15, 5, {}), ("rubble", 40, 17, {}), ("rift", 12, 10, {})],
 }
 # Boni's wares on her counter (table cells): area -> [(x, y, ware id)].
 WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")]}
@@ -903,6 +927,65 @@ DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms)]
 DUNGEON_STRIDE = 200                     # tiles between two dungeons' room grids
 
 
+# The Dark World: every overworld area has a twin at the same coordinates (so the Moon Mirror maps a point to the
+# same point), its own scroll group, a rotten palette and no doors. Its rows are the Light World's with villagers,
+# signs and objects stripped, plus per-area changes (DARK_EDITS) and its own villagers, signs and enemies.
+DARK_PREFIX = "dw_"
+DARK_NAMES = {"el_pueblo": "Hollow Pueblo", "meadow_north": "Withered Meadow", "west_woods": "Thorn Woods",
+              "east_lake": "Ash Lake", "south_road": "Broken Road", "south_fields": "Dead Fields"}
+STRIP = set("NSClkhrbL")                  # Light World-only cells become plain ground in the Dark World
+ACT2_SPAWN = ("dw_el_pueblo", (23, 14))   # where Caver's spell drops Joe
+DARK_EDITS = {
+    # The meadow's pond is dry in the Dark World: walk to the island's twin and mirror back onto it.
+    "meadow_north": lambda g: [g.set(x, y, ",") for y in range(2, 6) for x in range(30, 38) if g.get(x, y) == "~"],
+}
+DARK_EXTRA = {                            # Dark World enemies added on top of the Light World's
+    "el_pueblo": [(10, 20, "A"), (36, 9, "Z"), (40, 21, "G")],
+    "meadow_north": [(12, 9, "G"), (24, 4, "A"), (44, 7, "Z")],
+    "west_woods": [(14, 11, "A"), (6, 21, "G")],
+    "east_lake": [(6, 10, "A"), (8, 21, "G")],
+    "south_road": [(30, 3, "A"), (12, 9, "G")],
+    "south_fields": [(26, 16, "A"), (12, 24, "G"), (35, 22, "A")],
+}
+NPCS.update({"dw_el_pueblo": [(19, 11, "tato_echo", "down", False)]})
+SIGNS.update({
+    "dw_el_pueblo": [(20, 10, "dw_sign_pueblo")],
+    "dw_meadow_north": [(20, 10, "dw_sign_umbra")],
+    "dw_west_woods": [(18, 11, "dw_sign_silva")],
+    "dw_east_lake": [(4, 11, "dw_sign_ignis")],
+    "dw_south_road": [(21, 4, "dw_sign_tempus")],
+    "dw_south_fields": [(21, 3, "dw_sign_fields")],
+})
+
+
+def place_near(g, x, y, glyph, reach=4):
+    """Put `glyph` on the free grass cell nearest to (x, y) (rings of growing radius, scanned in a fixed order)."""
+    for r in range(reach + 1):
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                if max(abs(dx), abs(dy)) == r and g.get(x + dx, y + dy) in (".", ","):
+                    g.set(x + dx, y + dy, glyph)
+                    return
+    raise ValueError("no free cell near (%d,%d) for %s" % (x, y, glyph))
+
+
+def dark_twin(a):
+    """The Dark World twin of overworld area `a` (same origin and size, its own group)."""
+    rows = [[("." if c in STRIP else c) for c in r] for r in a["rows"]]
+    g = Grid(len(rows[0]), len(rows))
+    g.cells = rows
+    edit = DARK_EDITS.get(a["id"])
+    if edit:
+        edit(g)
+    for x, y, glyph in DARK_EXTRA.get(a["id"], []):
+        place_near(g, x, y, glyph)
+    did = DARK_PREFIX + a["id"]
+    extras = add_people_and_signs(g, did)
+    return {"id": did, "name": DARK_NAMES[a["id"]], "kind": "overworld", "world": "dark",
+            "size_screens": a["size_screens"], "origin_tiles": a["origin_tiles"], "rows": g.rows(), "doors": [],
+            "exits": [], **extras}
+
+
 def add_people_and_signs(g, aid):
     """Stand the area's villagers and signs on the grid (N / S glyphs) and return their JSON lists."""
     npcs, signs = [], []
@@ -920,6 +1003,8 @@ def add_people_and_signs(g, aid):
         if kind not in GLYPHLESS:
             g.place([(x, y)], OBJECT_GLYPHS[kind])
         obj = {"kind": kind, "cell": [x, y]}
+        if extra.get("via_mirror"):
+            obj["via_mirror"] = True
         if kind == "chest":
             obj.update({"item": extra["item"], "amount": extra.get("amount", 1), "reveal": extra.get("reveal", "")})
         objects.append(obj)
@@ -945,6 +1030,8 @@ def assemble():
         areas.append({"id": aid, "name": name, "kind": "interior", "size_screens": [1, 1],
                       "origin_tiles": [INTERIOR_BASE[0] + i * INTERIOR_STRIDE, INTERIOR_BASE[1]],
                       "rows": rows, "doors": [], "exits": [], **extras})
+    for a in [x for x in areas if x["kind"] == "overworld"]:
+        areas.append(dark_twin(a))
     for i, (info, rooms_of) in enumerate(DUNGEONS):
         base = (DUNGEON_BASE[0] + i * DUNGEON_STRIDE, DUNGEON_BASE[1])
         for aid, gx, gy, g, objects, extra in rooms_of():
@@ -975,6 +1062,7 @@ def write(areas):
         with open(os.path.join(OUT_DIR, a["id"] + ".json"), "w", encoding="utf-8", newline="\n") as fh:
             json.dump(a, fh, indent=1)
     index = {"screen": list(SCREEN), "start": START_AREA, "areas": [a["id"] for a in areas],
+             "act2_spawn": {"area": ACT2_SPAWN[0], "cell": list(ACT2_SPAWN[1])},
              "dungeons": {info["id"]: {k: v for k, v in info.items() if k != "id"} for info, _ in DUNGEONS}}
     with open(os.path.join(OUT_DIR, "index.json"), "w", encoding="utf-8", newline="\n") as fh:
         json.dump(index, fh, indent=1)

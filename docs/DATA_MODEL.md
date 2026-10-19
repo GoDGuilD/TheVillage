@@ -4,8 +4,8 @@ Description: Data files and their shapes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-19
-Version: 1.6.0
+Last edit date: 2026-10-20
+Version: 1.7.0
 -->
 
 # Data model
@@ -24,12 +24,13 @@ npcs: [{id, cell, facing, across}], signs: [{cell, text}],
 objects: [{kind: chest|big_chest|torch|cracked_rock|key_block|heart_piece|door|switch|push_block|heavy_rock, cell,
 item?, amount?, reveal? ("" | "torches" | "switch"), flag? (switch flag), heavy?, dir?, type?, id?, when?}],
 wares: [{ware, cell}]}`; dungeon rooms add `dungeon`, `grid`, `clear_flag?`, `boss_flag?`.
-`index.json` adds `dungeons: {<id>: {name, seal, entrance, boss_room, boss_flag, ending?}}` (d1, d2, d3, keep).
+`index.json` adds `dungeons: {<id>: {name, seal, entrance, boss_room, boss_flag, ending?}}` (d1, d2, d3, keep) and
+`act2_spawn: {area, cell}`. Dark World areas carry `world: "dark"`; objects may carry `via_mirror`.
 
 ## World flags (`GameState.flags`)
 Story: `met_tato`, `met_boni`, `met_janga`, `got_boomerang`. Dungeons: `door:<id>` (opened locked/big door),
 `cleared:<room>`, `switch:<room>`, `boss:<dungeon>`, `heart_container:<boss room>`. Act 1: `rubble:...` (broken),
-`keep:gate` (the seal gate opened), `act1:done`. Objects: `chest:<area>:<x>,<y>` (opened),
+`keep:gate` (the seal gate opened), `act1:done`. Act 2: `act2:started` (intro shown), `got_moon_mirror`. Objects: `chest:<area>:<x>,<y>` (opened),
 `cracked_rock:...` (broken), `key_block:...` (opened), `heart_piece:...` (taken), `ware:<id>` (sold out).
 Glyphs are listed in `src/world/AreaBuilder.gd` and `docs/LEVEL_DESIGN.md`.
 

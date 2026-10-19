@@ -4,8 +4,8 @@ Description: Internal scripting API of the main classes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-19
-Version: 2.3.0
+Last edit date: 2026-10-20
+Version: 2.4.0
 -->
 
 # API
@@ -13,7 +13,7 @@ Version: 2.3.0
 The game has no network API; this is the internal API other scripts and tests rely on.
 
 ## Player (`src/player/Player.gd`)
-- Signals: `health_changed(current, maximum)`, `died`, `talk_requested(target)`, `item_collected(kind)`, `fell`.
+- Signals: `health_changed(current, maximum)`, `died`, `talk_requested(target)`, `item_collected(kind)`, `fell`, `mirror_requested`.
 - Properties: `facing: Vector2i`, `health`, `sprite`, `sword: HitBox`, `spin_box: HitBox`, `hurt_box`, `fsm`
   (states `idle walk hop attack charge spin lift carry throw use hold fall dash_charge dash bonk hurt dead`), `held_sprite`, `used_item`, `charged`, `carrying` (`""`, `"pot"`, `"bush"`),
   `_input_override` (tests).
@@ -39,11 +39,12 @@ The game has no network API; this is the internal API other scripts and tests re
   `say(key)`, `item_get(kind, amount)`, `grant(kind, amount) -> bool` (true = new heart container), `buy(ware_node)`,
   static `object_flag(kind, area, cell)`, `item_gets` (tests); dungeons: `dungeons`, `map_screen`, `group_of(id)`,
   `area_at(point, group)`, `dungeon_of(id)`, `leave_dungeon()`, `falls` (tests); Act 1: `end_card`, `play_ending(act)`,
-  `endings` (tests), `GATE_FLAG`, `ACT1_FLAG`.
+  `endings` (tests), `GATE_FLAG`, `ACT1_FLAG`; two worlds: `is_dark(id)`, `act2_spawn`, `world_warps`, `mirror_bounces`
+  (tests), `ACT2_FLAG`, `DW_TINT`, `DW_HP_FACTOR`.
 
 ## AreaBuilder (`src/world/AreaBuilder.gd`, static)
-- `tileset()`, `build(rows, actors, indoor, with_enemies, origin) -> {tiles, bushes, pots, enemies, spawn, doors,
-  exits}`, `glyph(rows, x, y)`, `flag_at(tree, world_pos, flag)`.
+- `tileset(dark)`, `build(rows, actors, indoor, with_enemies, origin, dungeon, dark) -> {tiles, bushes, pots, enemies,
+  spawn, doors, exits}`, `glyph(rows, x, y)`, `flag_at(tree, world_pos, flag)`.
 
 ## Other world nodes (`src/world/`)
 - `TestField`: `layout`, `spawn_enemies`, `player`, `hud`, `bushes`, `pots`, `enemies`, `spawn_point`, `deaths`,
@@ -57,7 +58,8 @@ The game has no network API; this is the internal API other scripts and tests re
   `is_open`), `FloorSwitch` (signal `pressed_down(flag)`; `press()`, `pressed`, `heavy`; group `floor_switch`),
   `PushBlock` (signal `moved`; `push(dir, delta)`, `try_move(dir)`, `pushes`), `BigChest` (a Chest with
   `needs_big_key`), `HeavyRock` (liftable with the glove), `Rubble` (signal `broken`; `dash_break()`, group
-  `dashable`), `SealGate` (`setup(flag, open)`, `refresh(seals)`, `open_gate()`, `is_open`). `Chest` adds `reveal_by`, `reveal_flag`.
+  `dashable`), `SealGate` (`setup(flag, open)`, `refresh(seals)`, `open_gate()`, `is_open`), `Rift` (signal `entered`;
+  `setup(is_portal)`, `portal`, `armed`; group `rift`). `Chest` adds `reveal_by`, `reveal_flag`.
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 

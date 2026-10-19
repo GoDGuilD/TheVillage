@@ -4,8 +4,8 @@ Description: Configuration parameters.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-19
-Version: 1.6.0
+Last edit date: 2026-10-20
+Version: 1.7.0
 -->
 
 # Configuration
@@ -24,6 +24,9 @@ Version: 1.6.0
 | `src/enemies/IronRam.gd`, `FrostWraith.gd`, `CaverShade.gd`, `Bat.gd` | Act 1 bosses and the bat: speeds, timings, HP |
 | `tools/gen_areas.py` (`D2`, `D3`, `KEEP`, `d2_rooms()`, `d3_rooms()`, `keep_rooms()`, `build_south_fields`) | Act 1's places |
 | `src/world/World.gd` (dungeons) | 40 px dungeon push, boss reward delay, reward positions |
+| `tools/gen_areas.py` (`DARK_NAMES`, `DARK_EDITS`, `DARK_EXTRA`, `ACT2_SPAWN`) | The Dark World twins |
+| `tools/gen_dark.py` (`MAP`, `HUE_*`, `SAT_KEEP`, `VALUE_KEEP`) | How the Dark World is recoloured |
+| `src/world/World.gd` (`DW_TINT`, `DW_HP_FACTOR`, `WORLD_FADE`) | Dark World tint, enemy toughness, warp fade |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

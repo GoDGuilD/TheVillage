@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-19
-Version: 5.4.0
+Last edit date: 2026-10-20
+Version: 5.5.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,35 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.2.0] - 2026-10-20 — Phase 8: the Dark World and the Moon Mirror
+
+### Added
+- **The Dark World**: a twin of every overworld area at the same coordinates (own scroll group
+  `overworld_dark`): Hollow Pueblo, Withered Meadow, Thorn Woods, Ash Lake, Broken Road, Dead Fields. Built from
+  the Light World rows with villagers, signs and one-time objects stripped, per-area edits (the meadow's pond is
+  dry) and its own enemies, signs and villager. Drawn with `overworld_dark.png` (the Light World atlas recoloured
+  by `tools/gen_dark.py`); its actors are tinted and its enemies have double health.
+- **Act 2 opening**: the end-of-act card now drops Joe in Hollow Pueblo and saves there; the next Continue shows
+  the Act 2 intro (`act2:started`). **Tato's echo** (new villager sprite) hands over the **Moon Mirror** on the
+  first talk.
+- **Moon Mirror** (Y-item, Dark World only): warps to the same spot in the Light World; if that spot is solid it
+  throws Joe back; otherwise a shimmer (portal) stays there and takes him back once he steps off and on again.
+- **Dream rifts** (`Rift`): shown in the Light World once Act 1 is over (El Pueblo, South Fields); they lead to
+  the Dark World at the same spot.
+- The first **mirror puzzle**: a piece of heart on an island in the Light World meadow pond, reached by walking
+  over the dry Dark World pond and mirroring in.
+- Region signs for Umbra, Ignis, Tempus and Silva (Phases 9-12), sealed for now; the map shows the world Joe is in.
+- `gen_areas.py` v5: `dark_twin`, `DARK_NAMES` / `DARK_EDITS` / `DARK_EXTRA`, `place_near`, the Act 2 spawn in
+  the index, lint for mirror-only objects and rifts (their Dark World twin cell must be reachable). `gen_sfx.py` +
+  warp (51 effects). `tests/test_dark.gd` (28 checks), `tools/capture_dark.gd`.
+
+### Fixed
+- Floor switches and rifts were drawn under the ground tiles (z_index -1): the Moss Shrine's switch was invisible.
+- `World.grant()` did not know the Moon Mirror.
+
+### Changed
+- 396 checks in 8 suites, all passing.
 
 ## [7.1.0] - 2026-10-19 — Phase 7: the rest of Act 1
 

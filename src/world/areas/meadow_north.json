@@ -14,7 +14,7 @@
   "TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
   "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
   "Tx.*......,..*..,.*....,..,*..~~~~~~~~......,.Tx",
-  "xx....Tx,.BBB...Z.......,.....~~~~~~~~......*.xx",
+  "xx....Tx,.BBB...Z.......,.....~~~~h~~~......*.xx",
   "Tx....xx......,.............L.~~~~~~~~.L,..B,.Tx",
   "xx,...............,.....,......~~~~~~.....,B..xx",
   "Tx......################################......Tx",
@@ -62,6 +62,14 @@
    "item": "heart_piece",
    "amount": 1,
    "reveal": "torches"
+  },
+  {
+   "kind": "heart_piece",
+   "cell": [
+    34,
+    3
+   ],
+   "via_mirror": true
   }
  ],
  "wares": []
