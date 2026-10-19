@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 2.4.3
+# Last edit date: 2026-10-21
+# Version: 2.5.0
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -63,6 +63,8 @@ var _carried_tex: Texture2D
 var _knockback := Vector2.ZERO
 var _hop_from := Vector2.ZERO
 var _hop_to := Vector2.ZERO
+var _pull_to := Vector2.ZERO              # where the grapple is dragging Joe (state "pulled")
+var _pull_hook: Node2D = null             # the grapple doing the dragging
 var _input_override = null                # tests may set a Vector2 here instead of reading the keyboard
 
 
@@ -533,8 +535,50 @@ func state_use_enter() -> void:
 
 func state_use_update(delta: float) -> void:
 	_timer -= delta
+	# The grapple holds Joe in place until its chain is back (or until it pulls him: state "pulled").
+	if used_item == "grapple" and not get_tree().get_nodes_in_group("grapple").is_empty():
+		return
 	if _timer <= 0.0:
 		fsm.transition_to("idle")
+
+
+# --- states: pulled by the grapple ------------------------------------------------------------------
+
+# The grapple bit a hook post: fly to `to` (feet position), over pits and water, then let the grapple go.
+func grapple_pull(to: Vector2, hook: Node2D) -> void:
+	_pull_to = to
+	_pull_hook = hook
+	fsm.transition_to("pulled")
+
+
+func state_pulled_enter() -> void:
+	velocity = Vector2.ZERO
+	_timer = PlayerTuning.PULL_MAX
+	collision_mask = 0                       # nothing stops the pull (the post itself is in front of the target)
+	_play("idle")
+
+
+func state_pulled_update(delta: float) -> void:
+	_timer -= delta
+	var to := _pull_to - global_position
+	var step := PlayerTuning.PULL_SPEED * delta
+	if to.length() <= step or _timer <= 0.0:
+		if to.length() <= step:
+			global_position = _pull_to
+		fsm.transition_to("idle")
+		return
+	global_position += to.normalized() * step
+
+
+func state_pulled_exit() -> void:
+	collision_mask = LAYER_WORLD | LAYER_PROPS
+	if is_instance_valid(_pull_hook):
+		_pull_hook.call("release")
+	_pull_hook = null
+
+
+func is_pulled() -> bool:
+	return fsm.current_state == "pulled"
 
 
 # Hold a found item over his head, facing the camera (ALttP's item-get pose). The World ends it.

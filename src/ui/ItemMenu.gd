@@ -1,10 +1,10 @@
 # File: ItemMenu.gd
-# Description: The item menu (I / left shoulder) - ALttP's subscreen: a 5x2 grid of Y-item slots with a cursor that equips found items, Joe's equipment, the three family seals and the heart pieces toward the next container.
+# Description: The item menu (I / left shoulder) - ALttP's subscreen: a 5x2 grid of Y-item slots with a cursor that equips found items, Joe's equipment, the three family seals, the four dimension crystals and the heart pieces toward the next container.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 1.3.0
+# Last edit date: 2026-10-21
+# Version: 1.4.0
 class_name ItemMenu
 extends CanvasLayer
 ## Slots follow GameState.ITEM_ORDER; an item shows once found (icons in assets/ui/items/, Phase 5).
@@ -19,6 +19,8 @@ const GLOVE_TEX := preload("res://assets/ui/items/glove.png")
 const BOOTS_TEX := preload("res://assets/ui/items/boots.png")
 const SEAL_EMPTY_TEX := preload("res://assets/ui/menu/seal_empty.png")
 const SEAL_FULL_TEX := preload("res://assets/ui/menu/seal_full.png")
+const CRYSTAL_EMPTY_TEX := preload("res://assets/ui/menu/crystal_empty.png")
+const CRYSTAL_FULL_TEX := preload("res://assets/ui/menu/crystal_full.png")
 const PIECES_TEX := preload("res://assets/ui/menu/heart_pieces.png")
 const PIECES_FRAME := Vector2i(14, 13)
 const PIECES_OFFSET := Vector2(176, 116)
@@ -34,6 +36,8 @@ const EQUIP_OFFSET := Vector2(176, 26)
 const EQUIP_STEP := 22.0
 const SEALS_OFFSET := Vector2(16, 116)
 const SEAL_STEP := 22.0
+const CRYSTALS_OFFSET := Vector2(104, 116)   # the four dimension crystals, between the seals and the heart pieces
+const CRYSTAL_STEP := 16.0
 const CLOSE_ACTIONS := ["inventory", "ui_cancel", "pause"]
 const NAV := {"ui_left": Vector2i.LEFT, "move_left": Vector2i.LEFT, "ui_right": Vector2i.RIGHT,
 		"move_right": Vector2i.RIGHT, "ui_up": Vector2i.UP, "move_up": Vector2i.UP, "ui_down": Vector2i.DOWN,
@@ -47,6 +51,7 @@ var _highlight: NinePatchRect
 var _name: PixelText
 var _icons: Array[Sprite2D] = []
 var _seals: Array[Sprite2D] = []
+var _crystals: Array[Sprite2D] = []
 var _pieces: Sprite2D
 var _glove_icon: Sprite2D
 var _glove_label: PixelText
@@ -85,6 +90,9 @@ func _ready() -> void:
 	_label("FAMILY SEALS", PANEL_POS + SEALS_OFFSET + Vector2(0, -14), UiTheme.GOLD)
 	for i in GameState.SEAL_COUNT:
 		_seals.append(_sprite(SEAL_EMPTY_TEX, PANEL_POS + SEALS_OFFSET + Vector2(i * SEAL_STEP, 0), false))
+	_label("CRYSTALS", PANEL_POS + CRYSTALS_OFFSET + Vector2(0, -14), UiTheme.GOLD)
+	for i in GameState.CRYSTAL_COUNT:
+		_crystals.append(_sprite(CRYSTAL_EMPTY_TEX, PANEL_POS + CRYSTALS_OFFSET + Vector2(i * CRYSTAL_STEP, 0), false))
 	_label("HEART PIECES", PANEL_POS + PIECES_OFFSET + Vector2(0, -14), UiTheme.GOLD)
 	_pieces = _sprite(null, PANEL_POS + PIECES_OFFSET, false)
 
@@ -135,6 +143,8 @@ func _refresh() -> void:
 		_icons[i].texture = load(path) if GameState.has_item(item) and ResourceLoader.exists(path) else null
 	for i in _seals.size():
 		_seals[i].texture = SEAL_FULL_TEX if GameState.seals[i] else SEAL_EMPTY_TEX
+	for i in _crystals.size():
+		_crystals[i].texture = CRYSTAL_FULL_TEX if GameState.crystals[i] else CRYSTAL_EMPTY_TEX
 	_highlight.position = _slot_pos(selected) - Vector2.ONE * HIGHLIGHT_GROW
 	_glove_icon.visible = GameState.has_item("glove")
 	_glove_label.visible = _glove_icon.visible

@@ -4,8 +4,8 @@ Description: Code architecture of The Village: folders, autoloads, contracts, pl
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-20
-Version: 5.5.0
+Last edit date: 2026-10-21
+Version: 5.6.0
 -->
 
 # Architecture
@@ -20,28 +20,29 @@ src/
              DialogueData (dialogue.json reader), GameState / Audio / Juice (autoloads)
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
-  enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, EnemyRock, EnemyShot, bosses: GrandSlime, IronRam,
-             FrostWraith, CaverShade (+ CaverOrb)
-  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball
+  enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, EnemyRock, EnemyShot, bosses: GrandSlime, IronRam,
+             FrostWraith, CaverShade (+ CaverOrb), GloomMoth
+  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball, Grapple
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
              tiles + actors), TestField (test arenas), Npc, SignPost, Chest, BigChest, Torch, CrackedRock, KeyBlock,
-             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Rift, Bush, Pot, Thrown, Pickup
+             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Rift, HookPost, Bush, Pot, Thrown,
+             Pickup
     areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
   ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, MapScreen, GameOver, EndCard, MenuList,
              PixelText,
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd
 tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
-             test_act1.gd, test_dark.gd
+             test_act1.gd, test_dark.gd, test_umbra.gd
 ```
 
 ## Autoloads (order in project.godot)
 | Autoload | Role |
 |---|---|
-| `GameState` | Run state: gems, magic, keys, items, equipped item, family seals, story flags, the drop table; `snapshot()` / `restore()` for saves |
+| `GameState` | Run state: gems, magic, keys, items, equipped item, family seals, dimension crystals, story flags, the drop table; `snapshot()` / `restore()` for saves |
 | `Audio` | Pooled one-shot SFX on an `SFX` bus (`sfx(name)`, `history` for tests) |
 | `Juice` | Camera shake, per-actor hit-stop (`freeze(seconds)` on actors), one-shot effects from `assets/sprites/vfx` |
 
@@ -103,6 +104,16 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   cells, `overworld_dark.png`). Because the coordinates match, the Moon Mirror and the rifts just call
   `_world_warp(group, mirror)`: rebuild the area of the other group under Joe's feet; the mirror checks the tile
   under him (`_solid_at`) and bounces back, or leaves a portal `Rift` that returns him.
+- **Dimensions (Umbra).** Dark World-only lands (`DARK_ONLY`) have no Light World twin, so the mirror refuses
+  there. Rooms flagged `"dark"` show `World.darkness`: a world-space sprite (z 100, above every actor, below the
+  CanvasLayers) centred on Joe - a night with a soft hole, small or lantern-sized - until all the room's torches
+  burn (`update_darkness`). Crystal dungeons carry `crystal` instead of `seal`; `_spawn_boss_reward` hands out
+  the crystal after the heart container.
+- **The grapple.** `Grapple` flies over cells flagged `low` (water, pits), stops at other solids and bodies, and
+  latches onto the nearest `hookable` (`HookPost.hook_point()`); it then calls `Player.grapple_pull(to, hook)`:
+  state `pulled` drops Joe's collision mask and slides him to the cell in front of the post, then releases the
+  grapple. Its HitBox element `hook` stuns like the boomerang unless the enemy's `_hooked()` handles it (the Gloom
+  Moth lands). The level lint mirrors this in `grapple_hops`.
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 
@@ -113,7 +124,8 @@ continues into) → `charge` (shuffle, facing locked, glint when charged) → `s
 `idle` / `walk` → `lift` (interact on a liftable; a talkable in front takes priority) → `carry` → `throw` → `idle`.
 `idle` / `walk` → `use` (item button) → `idle`; any → `hold` (item-get pose, ended by the World); `idle` / `walk`
 → `fall` (over a pit; the World takes a heart and calls `respawn_after_fall`); `idle` / `walk` → `dash_charge`
-(dash button, boots) → `dash` (sword out; rubble breaks) → `bonk` on a wall → `idle`.
+(dash button, boots) → `dash` (sword out; rubble breaks) → `bonk` on a wall → `idle`. `use` with the grapple
+waits for the chain; a bite → `pulled` (no collision, slides to the post) → `idle`.
 Any state → `hurt` on a hit (knockback, then `idle`; i-frames and blinking run outside the state machine) or →
 `dead` at zero health (the World shows Game Over; a test field revives Joe at its spawn). A hit-stop pauses the state machine and the animation for a few frames.
 

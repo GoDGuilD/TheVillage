@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 2.2.0
+# Last edit date: 2026-10-21
+# Version: 2.2.2
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -30,7 +30,8 @@ const ATLAS_JSON := "res://assets/tiles/overworld_light.json"
 const LAYER_WORLD := 1
 const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemies/Guard.gd",
 		"Q": "res://src/enemies/Spitter.gd", "Y": "res://src/enemies/GrandSlime.gd", "A": "res://src/enemies/Bat.gd",
-		"U": "res://src/enemies/IronRam.gd", "F": "res://src/enemies/FrostWraith.gd", "V": "res://src/enemies/CaverShade.gd"}
+		"U": "res://src/enemies/IronRam.gd", "F": "res://src/enemies/FrostWraith.gd", "V": "res://src/enemies/CaverShade.gd",
+		"X": "res://src/enemies/Lurker.gd", "m": "res://src/enemies/GloomMoth.gd"}
 const GRASS := {".": "grass_a", ",": "grass_b", "*": "flowers"}
 const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b",
 		"+": "pillar", "s": "dstairs"}
@@ -43,7 +44,7 @@ const SHRINE_SIZE := Vector2i(5, 3)
 const SHRINE_DOOR := Vector2i(2, 2)
 const LAYER_PIT := 256                   # pits are walls for enemies only (Joe walks in and falls)
 # Custom data layers on the TileSet (read by Player and the World).
-const DATA_FLAGS := ["ledge", "door", "exit", "pit"]
+const DATA_FLAGS := ["ledge", "door", "exit", "pit", "low"]   # low: water and pits (the grapple flies over them)
 
 static var _tilesets: Dictionary = {}    # false -> Light World TileSet, true -> Dark World TileSet
 static var _cells: Dictionary = {}       # atlas cell name -> Vector2i

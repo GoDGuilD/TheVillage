@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-20
-# Last edit date: 2026-10-20
-# Version: 1.0.0
+# Last edit date: 2026-10-21
+# Version: 1.0.1
 # Run:  Godot_console --headless --fixed-fps 60 --path . -s tests/test_dark.gd   (must end "0 failed")
 extends SceneTree
 
@@ -130,8 +130,10 @@ func _t_data() -> void:
 	var same_place := true
 	for aid in _w.areas:
 		if _w.is_dark(aid):
-			twins += 1
 			var light := String(aid).trim_prefix("dw_")
+			if not _w.areas.has(light):
+				continue                                   # Dark World-only lands (Umbra's vale) have no twin
+			twins += 1
 			same_place = same_place and _w.areas.has(light) and _w.areas[aid]["origin_tiles"] == _w.areas[light]["origin_tiles"]
 	_check("every overworld area has a Dark World twin at the same place", twins == 6 and same_place, str(twins))
 	_check("the twins form their own scroll group", _w.group_of("dw_el_pueblo") == "overworld_dark"
@@ -156,7 +158,9 @@ func _t_dark_area_build() -> void:
 	for e in _w.current["enemies"]:
 		ok = ok and e.health.max_health == e.max_hp * 2
 	_check("their enemies are twice as tough", ok and _w.current["enemies"].size() > 0, str(_w.current["enemies"].size()))
-	_check("Hollow Pueblo has no villagers but Tato's echo", _find("Npc").size() == 1 and _find("Npc")[0].npc_id == "tato_echo")
+	var ids := _find("Npc").map(func(n: Node) -> String: return n.npc_id)
+	ids.sort()
+	_check("Hollow Pueblo has no villagers but Tato's echo and the shade merchant", ids == ["shade_merchant", "tato_echo"], str(ids))
 	_check("the caption names the Dark World place", _w.hud.caption_shown == "HOLLOW PUEBLO", _w.hud.caption_shown)
 
 

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 1.3.0
+# Last edit date: 2026-10-21
+# Version: 1.4.0
 class_name BaseEnemy
 extends CharacterBody2D
 ## Subclasses set the pack/stat variables in _init() and override _think(delta) (AI) and optionally _anim_base().
@@ -27,6 +27,7 @@ const IFRAMES := 0.3                     # one slash can only hit once
 const HIT_STOP := 0.05                   # freeze for both sides when a hit lands
 const KILL_SHAKE := Vector2(1.0, 0.12)   # (pixels, seconds) of camera shake on a kill
 const STUN_ELEMENT := "stun"             # HitBox.element of hits that only stun (boomerang)
+const HOOK_ELEMENT := "hook"             # the grapple: stuns like the boomerang unless _hooked() takes it
 const STUN_TIME := 2.0                   # seconds a stunned enemy stays frozen
 const FEET_BOX := Vector2(10, 6)
 
@@ -177,7 +178,11 @@ func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void
 		Juice.play_fx("hit_spark", global_position + body_center, get_parent())
 		return
 	# A "stun" hit (the boomerang) freezes the enemy in place without hurting it, like ALttP.
-	if hurt_box.last_hit != null and hurt_box.last_hit.element == STUN_ELEMENT:
+	var element := hurt_box.last_hit.element if hurt_box.last_hit != null else ""
+	if element == HOOK_ELEMENT and _hooked():
+		_iframes_left = IFRAMES
+		return
+	if element == STUN_ELEMENT or element == HOOK_ELEMENT:
 		if stun_immune:
 			return
 		_iframes_left = IFRAMES
@@ -198,6 +203,11 @@ func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void
 	_knock_left = KNOCK_TIME
 	if not health.is_alive():
 		_die()
+
+
+# Subclasses return true when they handle the grapple's bite themselves (the Gloom Moth is dragged down).
+func _hooked() -> bool:
+	return false
 
 
 # Subclasses return true for hits that do nothing to them (checked before stun and damage).

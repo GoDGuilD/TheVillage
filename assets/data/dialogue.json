@@ -5,8 +5,8 @@
   "Author": "Jose-Jorge HERNANDEZ",
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
-  "Last edit date": "2026-10-20",
-  "Version": "1.4.0",
+  "Last edit date": "2026-10-21",
+  "Version": "1.5.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -308,7 +308,7 @@
   "name": "Tato's echo",
   "pages": [
    "Use the mirror where the two worlds touch. What is closed here may be open there.",
-   "Four doors lead deeper into this dream: darkness, fire, time and the wild. None will open for you yet."
+   "Four doors lead deeper into this dream: darkness, fire, time and the wild. The darkness lies north, past the withered meadow. Take a light."
   ],
   "gift": {
    "item": "moon_mirror",
@@ -342,7 +342,7 @@
  },
  "dw_sign_umbra": {
   "pages": [
-   "UMBRA\nThe darkness beyond is too deep to enter. Not yet."
+   "UMBRA\nNorth: the Umbral Vale. Keep a light with you."
   ]
  },
  "dw_sign_silva": {
@@ -363,6 +363,80 @@
  "dw_sign_fields": {
   "pages": [
    "DEAD FIELDS\nThe keep is only a shadow here."
+  ]
+ },
+ "shade_merchant": {
+  "name": "Shade",
+  "pages": [
+   "Gems spend the same in a dream, traveller. Dearer, though. Everything is dearer here.",
+   "Magic runs thin in the dark. A bottle of it keeps the shadows honest."
+  ]
+ },
+ "dw_shop_bombs": {
+  "name": "Shade",
+  "pages": [
+   "Five bombs. 30 gems. Want them?"
+  ]
+ },
+ "dw_shop_arrows": {
+  "name": "Shade",
+  "pages": [
+   "Ten arrows. 25 gems. Want them?"
+  ]
+ },
+ "dw_shop_magic": {
+  "name": "Shade",
+  "pages": [
+   "A bottle of magic - it fills you to the brim. 40 gems. Want it?"
+  ]
+ },
+ "dw_shop_thanks": {
+  "name": "Shade",
+  "pages": [
+   "A pleasure. Mind the dark."
+  ]
+ },
+ "dw_shop_no_gems": {
+  "name": "Shade",
+  "pages": [
+   "No gems, no goods. Even in a dream."
+  ]
+ },
+ "dw_shop_full": {
+  "name": "Shade",
+  "pages": [
+   "You are full already. Come back emptier."
+  ]
+ },
+ "mirror_void": {
+  "pages": [
+   "The mirror shows only darkness. There is no waking world behind this place."
+  ]
+ },
+ "dw_sign_sanctum": {
+  "pages": [
+   "UMBRA SANCTUM\nWhat lives here hates the light."
+  ]
+ },
+ "get_grapple": {
+  "pages": [
+   "You got the Grapple! Shoot it with the item button: it bites into hook posts and pulls you across chasms and water. It stuns what it hits."
+  ]
+ },
+ "get_crystal": {
+  "pages": [
+   "You got a dimension crystal!"
+  ]
+ },
+ "get_crystal_0": {
+  "pages": [
+   "You got the Crystal of Umbra! Its cold light pushes the dream back a little.",
+   "Three more crystals wait in the other lands of the Dark World."
+  ]
+ },
+ "get_magic": {
+  "pages": [
+   "Your magic is full again!"
   ]
  }
 }

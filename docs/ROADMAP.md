@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.7.0
+Last edit date: 2026-10-21
+Version: 1.8.0
 -->
 
 # Roadmap
@@ -24,7 +24,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal (+ the power glove) | Done (62 dungeon checks pass) |
 | 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, the road south opened, Caver's keep, Act 1 ending (+ fire rod, magic jars) | Done (54 Act 1 checks pass) |
 | 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub (Act 2 starts where Act 1's save left Joe) | Done (28 Dark World checks pass) |
-| 9–12 | Umbra, Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (grapple, hammer, ice rod, flippers...) | Next (Umbra first) |
+| 9 | Umbra | The Umbral Vale, the Umbra Sanctum (dark rooms), the Grapple and hook posts, lurkers, the Gloom Moth, the first dimension crystal, the Shade Market | Done (45 Umbra checks pass) |
+| 10–12 | Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (hammer, ice rod, flippers...) | Next (Ignis) |
 | 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
 | 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
 | 15 | Release | Credits, icon, export preset, performance baseline, store material | Planned |
@@ -109,3 +110,13 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] The mirror island's piece of heart; region signs for the four dimensions; map per world
 - [x] Lint for mirror-only objects and rifts; `tests/test_dark.gd`: 28 checks; `tools/capture_dark.gd`
 - [ ] Owner playtest: Dark World names, how dark it should look, the Act 2 intro words
+
+
+## Phase 9 detail
+- [x] `tools/gen_umbra.py`: grapple icon/claw/chain, hook post, crystals (pickup + menu sockets), darkness masks, lurker and Gloom Moth packs, dust shot; the shade merchant in `gen_npcs.py`; `chain` and `clink` sounds
+- [x] The Umbral Vale (Dark World-only, north of the Withered Meadow) with the chasm island's piece of heart; the mirror does nothing there
+- [x] The Grapple: hook posts, pull over pits and water, stuns, returns from walls; TileSet flag `low`; grapple-aware lint
+- [x] The Umbra Sanctum (5 rooms, two dark rooms with torches), lurkers, the Gloom Moth, the Crystal of Umbra; crystals in saves and the item menu
+- [x] The Shade Market (bombs, arrows, magic refill)
+- [x] `tests/test_umbra.gd`: 45 checks; `tools/capture_umbra.gd`
+- [ ] Owner playtest: dark-room light radius, the moth's difficulty, prices, names (vale, sanctum, moth, Shade)

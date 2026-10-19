@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.7.0
+Last edit date: 2026-10-21
+Version: 1.8.0
 -->
 
 # Known issues
@@ -40,3 +40,10 @@ Version: 1.7.0
 - The Dark World has no interiors or shops yet, and its houses are shut ruins; the four dimension regions are signs
   only until Phases 9-12. A mirror landing on a Light World bush or pot overlaps it (Joe can walk out).
 - Rifts and portals are flat swirls y-sorted with the actors: Joe standing just above one is drawn under it.
+- The grapple only shoots in Joe's four facings, and a pull never crosses into another area (posts are placed
+  inside one screen). Joe is not invincible while being pulled.
+- Dark rooms forget their lit torches when Joe leaves (torches are not saved), so a dark room is dark again on
+  return. The darkness is a soft circle, not ALttP's lantern cone.
+- The Gloom Moth's grounded frame is the flying frame with folded wings, close to the floor; its dust is not
+  blockable by the shield.
+- The Shade Market reuses the indoor table tiles outdoors.

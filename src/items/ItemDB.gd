@@ -1,10 +1,10 @@
 # File: ItemDB.gd
-# Description: Static catalogue of everything Joe can receive (items, ammo, keys, heart pieces/containers, gems, dungeon items, the glove, family seals): display names, icons, the text shown on getting them, and Boni's shop wares with prices.
+# Description: Static catalogue of everything Joe can receive (items, ammo, keys, heart pieces/containers, gems, dungeon items, the glove, family seals, crystals, the grapple): display names, icons, the text shown on getting them, and Boni's shop wares with prices.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 1.2.1
+# Last edit date: 2026-10-21
+# Version: 1.3.0
 class_name ItemDB
 extends RefCounted
 ## "Kinds" are what chests, gifts, pickups and wares hand out. Y-items (GameState.ITEM_ORDER) are a subset.
@@ -33,6 +33,9 @@ const KINDS := {
 	"boots": {"name": "DASH BOOTS", "icon": ICON_DIR + "boots.png", "text": "get_boots"},
 	"fire_rod": {"name": "FIRE ROD", "icon": ICON_DIR + "fire_rod.png", "text": "get_fire_rod"},
 	"moon_mirror": {"name": "MOON MIRROR", "icon": ICON_DIR + "moon_mirror.png", "text": "get_moon_mirror"},
+	"grapple": {"name": "GRAPPLE", "icon": ICON_DIR + "grapple.png", "text": "get_grapple"},
+	"crystal": {"name": "CRYSTAL", "icon": "res://assets/sprites/dungeon/crystal.png", "text": "get_crystal"},
+	"magic": {"name": "MAGIC", "icon": SPRITE_DIR + "magic_big.png", "text": "get_magic"},
 }
 # Kinds that belong to the dungeon they were found in (GameState.dungeon_items).
 const DUNGEON_ITEMS := ["map", "compass", "big_key"]
@@ -47,6 +50,10 @@ const WARES := {
 	"bombs": {"kind": "bombs", "amount": 5, "price": 20, "text": "shop_bombs", "once": false},
 	"arrows": {"kind": "arrows", "amount": 10, "price": 15, "text": "shop_arrows", "once": false},
 	"heart_piece": {"kind": "heart_piece", "amount": 1, "price": 100, "text": "shop_heart_piece", "once": true},
+	# The Shade Market (Hollow Pueblo, Phase 9): dearer, and it sells a full magic refill.
+	"dw_bombs": {"kind": "bombs", "amount": 5, "price": 30, "text": "dw_shop_bombs", "once": false},
+	"dw_arrows": {"kind": "arrows", "amount": 10, "price": 25, "text": "dw_shop_arrows", "once": false},
+	"dw_magic": {"kind": "magic", "amount": 32, "price": 40, "text": "dw_shop_magic", "once": false},
 }
 
 

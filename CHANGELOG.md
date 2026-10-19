@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-20
-Version: 5.5.0
+Last edit date: 2026-10-21
+Version: 5.6.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,38 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.3.0] - 2026-10-21 — Phase 9: Umbra
+
+### Added
+- **The Umbral Vale** (`dw_umbra_vale`), the first Dark World-only land: the Withered Meadow's trees now part
+  north into it. A path leads to the Umbra Sanctum; in the east a chasm hides an island with a piece of heart,
+  reached and left by its two hook posts. Lurkers and a bat roam it. The Moon Mirror does nothing there
+  (`mirror_void`): there is no waking world behind it.
+- **The Grapple** (Y-item, ALttP's hookshot; `src/items/Grapple.gd`): a claw on a seven-tile chain, shot straight
+  ahead. It flies over pits and water (TileSet flag `low`), bites into **hook posts** (`HookPost`, group
+  `hookable`) and pulls Joe to the cell in front of them (Player state `pulled`), stuns enemies (element `hook`),
+  and comes back from walls or the end of its chain. Sounds `chain` and `clink` (53 effects).
+- **The Umbra Sanctum** (dungeon 4, 5 rooms, the first dimension crystal): two **dark rooms** (black but for a
+  small light around Joe, wider with the lantern, until all their torches burn), a torch-lit map and small key,
+  the big key and the big chest (the Grapple) in the east room, whose chasm Joe grapples across to the switch that
+  opens the hall's north shutter, and the compass.
+- **Lurkers** (`Lurker`): shadows that creep toward Joe only while his back is turned and freeze when he looks.
+- **The Gloom Moth** (boss): flies out of the sword's reach on a loop, throwing fans of dust; the grapple drags it
+  to the ground, where it can be struck for a few seconds (more dust and speed below half health).
+- **Dimension crystals**: `GameState.crystals` (4, saved), `crystal_count()`; the boss reward is a heart container,
+  then the crystal (`get_crystal_0`), then Joe is back in the vale. Four crystal sockets in the item menu.
+- **The Shade Market** in Hollow Pueblo: a hooded merchant (`shade_merchant`) at an open-air stall selling bombs,
+  arrows and a full **magic refill** (new kind `magic`) at Dark World prices, with its own lines.
+- `tools/gen_umbra.py` (grapple, chain, hook post, crystals, darkness masks, lurker and Gloom Moth packs, dust);
+  `gen_areas.py` v6: `DARK_ONLY` lands, `D4`/`d4_rooms()`, `"dark"` rooms, glyphs `X` (lurker), `m` (Gloom
+  Moth), `|` (hook post), and grapple-aware reachability (`grapple_hops`) plus lint for hook posts, the moth and
+  crystal order. `tests/test_umbra.gd` (45 checks), `tools/capture_umbra.gd`.
+
+### Changed
+- Tato's echo and the Umbra sign now point north to the vale. `test_world.gd` / `test_dark.gd` know the new area,
+  door and villager.
+- 441 checks in 9 suites, all passing.
 
 ## [7.2.0] - 2026-10-20 — Phase 8: the Dark World and the Moon Mirror
 

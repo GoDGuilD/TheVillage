@@ -1,0 +1,79 @@
+{
+ "id": "dw_umbra_vale",
+ "name": "Umbral Vale",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  2,
+  1
+ ],
+ "origin_tiles": [
+  0,
+  -14
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "Tx.,.............,...Exxxx..............,.,...Tx",
+  "xx,...Tx........Tx...xxxxx.B..oooooooooooooo..xx",
+  "Tx.,..xx........xx...xxxxx....oooooooooooooo..Tx",
+  "xx.......X............####....ooo.h..ooooooo..xx",
+  "Tx..A............,....####....ooo,..|ooooooo..Tx",
+  "xx,.......,.........S.####..|.ooo....ooooooo..xx",
+  "Tx...,....,.Tx....,...####....oooooooooooooo..Tx",
+  "xx..BB.,....xx....,,..####..X.oooooooooooooo..xx",
+  "Tx........,....X..B..,####,,..oooooooooooooo.,Tx",
+  "xx..............,.....####.B.........,,...,...xx",
+  "TxTxTxTxTxTxTxTxTxTxTx####TxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxx####xxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [
+  {
+   "cell": [
+    23,
+    4
+   ],
+   "to": "d4_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  }
+ ],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    20,
+    7
+   ],
+   "text": "dw_sign_sanctum"
+  }
+ ],
+ "objects": [
+  {
+   "kind": "hook_post",
+   "cell": [
+    36,
+    6
+   ]
+  },
+  {
+   "kind": "hook_post",
+   "cell": [
+    28,
+    7
+   ]
+  },
+  {
+   "kind": "heart_piece",
+   "cell": [
+    34,
+    5
+   ]
+  }
+ ],
+ "wares": []
+}

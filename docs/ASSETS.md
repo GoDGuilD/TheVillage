@@ -4,8 +4,8 @@ Description: Asset inventory.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.7.0
+Last edit date: 2026-10-21
+Version: 1.8.0
 -->
 
 # Assets
@@ -30,6 +30,8 @@ Version: 1.7.0
 | `assets/sprites/items/fireball, magic_small/big, rubble, ice_shard, orb, orb_back`, `dungeon/seal_gate, seal_socket`, `ui/items/boots, fire_rod`, `vfx/dust` (+ `vfx_act1.json`) | Act 1 items, props and effects | `tools/gen_act1.py` |
 | `assets/tiles/overworld_dark.png` | the Dark World atlas (same cells as the light one) | `tools/gen_dark.py` (run after `gen_tiles.py`) |
 | `assets/sprites/world/rift.png`, `portal.png`, `assets/ui/items/moon_mirror.png` | dream rift, mirror portal, Moon Mirror icon | `tools/gen_dark.py` |
+| `assets/ui/items/grapple.png`, `assets/sprites/items/{grapple_head,chain,dust_shot}.png`, `assets/sprites/dungeon/{hook_post,crystal}.png`, `assets/ui/menu/crystal_{empty,full}.png`, `assets/sprites/world/darkness_{small,lantern}.png`, enemy packs `lurker`, `gloom_moth` | Umbra (Phase 9) | `tools/gen_umbra.py` |
+| `assets/sprites/npcs/shade_merchant_*` | the Shade Market's merchant | `tools/gen_npcs.py` |
 | `assets/sprites/npcs/tato_echo_*` | Tato's echo (Dark World) | `tools/gen_npcs.py` |
 | `assets/data/dialogue.json` | every villager line and sign text | hand-written (story lines are a draft) |
 | `src/world/areas/` | `index.json` + 9 area files (5 overworld, 4 interiors) with villagers and signs | `tools/gen_areas.py` |

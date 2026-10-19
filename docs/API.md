@@ -4,8 +4,8 @@ Description: Internal scripting API of the main classes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 2.4.0
+Last edit date: 2026-10-21
+Version: 2.5.0
 -->
 
 # API
@@ -59,7 +59,12 @@ The game has no network API; this is the internal API other scripts and tests re
   `PushBlock` (signal `moved`; `push(dir, delta)`, `try_move(dir)`, `pushes`), `BigChest` (a Chest with
   `needs_big_key`), `HeavyRock` (liftable with the glove), `Rubble` (signal `broken`; `dash_break()`, group
   `dashable`), `SealGate` (`setup(flag, open)`, `refresh(seals)`, `open_gate()`, `is_open`), `Rift` (signal `entered`;
-  `setup(is_portal)`, `portal`, `armed`; group `rift`). `Chest` adds `reveal_by`, `reveal_flag`.
+  `setup(is_portal)`, `portal`, `armed`; group `rift`), `HookPost` (hookable contract: group `hookable`,
+  `hook_point()`). `Chest` adds `reveal_by`, `reveal_flag`.
+- `Grapple` (group `grapple`; signal `finished`; `direction`, `owner_node`, `state` out/back/latched, `release()`);
+  `Player.grapple_pull(to, hook)`, `is_pulled()`. `BaseEnemy._hooked() -> bool` (true = the enemy handled the bite),
+  `HOOK_ELEMENT`. `Lurker` (`watched`, `is_watched()`), `GloomMoth` (`state`, `is_grounded()`, `groundings`,
+  `shots_fired`). `World.darkness`, `update_darkness()`, `shop_line(item, key)`.
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 
@@ -68,8 +73,8 @@ The game has no network API; this is the internal API other scripts and tests re
   `gems`, `magic`, `keys`, `items`, `equipped`, `seals`, `flags`; `add_gems()`, `use_magic() -> bool`, `add_magic()`,
   `add_keys()`, `add_ammo(kind, n) -> int`, `use_ammo(kind) -> bool`, `ammo_full()`, `add_heart_piece() -> bool`,
   `bombs`, `arrows`, `heart_pieces`, signal `ammo_changed`, `key_pool`, `key_pools`, `set_key_pool()`,
-  `dungeon_items`, `has_dungeon_item()`, `give_dungeon_item()`, `visited`, `give_item()`, `has_item()`, `equip()`, `set_flag()`, `has_flag()`, `seal_count()`, `roll_drop()`,
-  `snapshot()`, `restore(data)`, `reset()`; `MAX_MAGIC`, `ITEM_ORDER`, `SEAL_COUNT`, `GEM_VALUES`.
+  `dungeon_items`, `has_dungeon_item()`, `give_dungeon_item()`, `visited`, `give_item()`, `has_item()`, `equip()`, `set_flag()`, `has_flag()`, `seal_count()`, `crystals`, `crystal_count()`, `roll_drop()`,
+  `snapshot()`, `restore(data)`, `reset()`; `MAX_MAGIC`, `ITEM_ORDER`, `SEAL_COUNT`, `CRYSTAL_COUNT`, `GEM_VALUES`.
 - `Audio`: `sfx(name, pitch, volume_db, jitter)`, `played_recently(name, n)`, `history`, `last_sfx`.
 - `Juice`: `shake(px, seconds)`, `hit_stop(actors, seconds)`, `play_fx(name, pos, parent)`, `fx_count`,
   `last_hit_stop`.

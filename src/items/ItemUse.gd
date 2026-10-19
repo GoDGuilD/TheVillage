@@ -1,10 +1,10 @@
 # File: ItemUse.gd
-# Description: What pressing the item button does with the equipped Y-item - throw the boomerang, shoot an arrow, set a bomb, hold out the lantern's flame (lighting a torch in front) or cast a fireball - including ammo and magic costs.
+# Description: What pressing the item button does with the equipped Y-item - throw the boomerang, shoot an arrow, set a bomb, hold out the lantern's flame (lighting a torch in front) cast a fireball or shoot the grapple - including ammo and magic costs.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 1.1.1
+# Last edit date: 2026-10-21
+# Version: 1.2.0
 class_name ItemUse
 extends RefCounted
 ## Called by the Player (state "use"); spawned objects go into Joe's parent (the y-sorted actors of the area).
@@ -14,6 +14,7 @@ const BOOMERANG := preload("res://src/items/Boomerang.gd")
 const ARROW := preload("res://src/items/Arrow.gd")
 const BOMB := preload("res://src/items/Bomb.gd")
 const FIREBALL := preload("res://src/items/Fireball.gd")
+const GRAPPLE := preload("res://src/items/Grapple.gd")
 const FIREBALL_AHEAD := 8.0
 const MAX_BOMBS_OUT := 2                 # bombs ticking at the same time
 const BOMB_AHEAD := 12.0                 # px in front of Joe's feet where a bomb is set down
@@ -66,6 +67,15 @@ static func use(player: Node2D, item: String, aim: Vector2) -> bool:
 			return true
 		"moon_mirror":
 			player.emit_signal("mirror_requested")         # the World knows both worlds; it does the warp
+			return true
+		"grapple":
+			if not tree.get_nodes_in_group("grapple").is_empty():
+				return false
+			var g: Node2D = GRAPPLE.new()
+			g.direction = facing
+			g.owner_node = player
+			g.position = player.position + Vector2(0, -GRAPPLE.HEIGHT)
+			parent.add_child(g)
 			return true
 		"fire_rod":
 			if not state.use_magic(ItemDB.FIRE_ROD_MAGIC):

@@ -4,8 +4,8 @@ Description: How the game is tested.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.7.0
+Last edit date: 2026-10-21
+Version: 1.8.0
 -->
 
 # Testing
@@ -20,8 +20,9 @@ F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 6
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_dungeon.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_act1.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_dark.gd
+F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_umbra.gd
 ```
-Each must end `RESULT: N passed, 0 failed`. Current count: **396 checks** in 8 suites (36 + 56 + 32 + 61 + 67 + 62 + 54 + 28).
+Each must end `RESULT: N passed, 0 failed`. Current count: **441 checks** in 9 suites (36 + 56 + 32 + 61 + 67 + 62 + 54 + 28 + 45).
 Run them with a `timeout` wrapper: a script that fails to compile (e.g. a new `class_name` before `--import`)
 makes Godot wait forever instead of failing.
 

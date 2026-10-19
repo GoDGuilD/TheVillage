@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 6.0.0
+# Last edit date: 2026-10-21
+# Version: 6.1.1
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -37,6 +37,9 @@ const DUNGEON_PUSH := 40.0               # px Joe walks into a dungeon room on a
 const BOSS_REWARD_DELAY := 1.2           # s after the boss falls before the heart container appears
 const REWARD_DROP := Vector2(0, 8)       # heart container position relative to the room's centre
 const SEAL_DROP := Vector2(0, -24)       # the seal appears above it (not under Joe, who just took the heart)
+const DARK_SMALL := preload("res://assets/sprites/world/darkness_small.png")      # dark rooms without the lantern
+const DARK_LANTERN := preload("res://assets/sprites/world/darkness_lantern.png")  # ...and with it
+const DARK_Z := 100                      # the darkness covers every actor (the HUD and boxes are CanvasLayers)
 const GATE_FLAG := "keep:gate"           # the seal gate of Caver's keep is open
 const ACT1_FLAG := "act1:done"
 const ENDING_DELAY := 1.5                # s between the shade's fall and Caver's last words
@@ -73,6 +76,7 @@ var mirror_bounces := 0                  # mirror warps thrown back by a solid s
 var act2_spawn: Dictionary = {}          # {area, cell}: where Caver's spell drops Joe
 var dungeons: Dictionary = {}            # dungeon id -> {name, seal, entrance, boss_room, boss_flag}
 var falls := 0                           # pit falls (tests)
+var darkness: Sprite2D                   # the night around Joe in a dark room (gen_umbra.py masks)
 var talking: Node2D = null               # the villager or sign in the current conversation
 var item_gets := 0                       # item-get sequences run (tests)
 var _after_dialogue := Callable()        # runs once the current box closes (gift hand-over, end of item-get)
@@ -106,6 +110,11 @@ func _ready() -> void:
 	camera.name = "Camera"
 	add_child(camera)
 	camera.make_current()
+	darkness = Sprite2D.new()
+	darkness.name = "Darkness"
+	darkness.z_index = DARK_Z
+	darkness.visible = false
+	add_child(darkness)
 	player = PLAYER_SCENE.instantiate()
 	_actors.add_child(player)
 	player.died.connect(_on_player_died)
@@ -349,6 +358,8 @@ func _build_object(area_id: String, o: Dictionary, actors: Node2D) -> void:
 			rubble.flag = flag
 			rubble.broken.connect(func(_r: Node2D) -> void: GameState.set_flag(flag))
 			node = rubble
+		"hook_post":
+			node = HookPost.new()
 		"rift":
 			if not GameState.has_flag(ACT1_FLAG):
 				return                                    # rifts open only once Caver has torn the valley
@@ -447,6 +458,20 @@ func _snap_camera() -> void:
 func _process(_delta: float) -> void:
 	if not transitioning and not current.is_empty():
 		camera.global_position = camera_target(player.global_position + PlayerTuning.BODY_CENTER, current["rect"])
+	darkness.global_position = player.global_position + PlayerTuning.BODY_CENTER
+
+
+# Dark rooms ("dark": true) are black but for a little light around Joe - a wider one with the lantern - until
+# every torch of the room burns.
+func update_darkness() -> void:
+	var dark := not current.is_empty() and bool(current["data"].get("dark", false)) and not _all_torches_lit()
+	darkness.visible = dark
+	darkness.texture = DARK_LANTERN if GameState.has_item("lantern") else DARK_SMALL
+
+
+func _all_torches_lit() -> bool:
+	var torches: Array = current["actors"].get_children().filter(func(n: Node) -> bool: return n is Torch)
+	return not torches.is_empty() and torches.all(func(t: Node) -> bool: return t.lit)
 
 
 # --- edges and doors ---------------------------------------------------------------------------
@@ -599,11 +624,15 @@ func item_get(kind: String, amount: int = 1) -> void:
 		var idx := int(dungeons.get(dungeon_of(current_id()), {}).get("seal", 0))
 		if idx > 0 and DialogueData.has("get_seal_%d" % idx):
 			text = "get_seal_%d" % idx
+	if kind == "crystal":                               # ...and so does each dimension crystal
+		var cidx := int(dungeons.get(dungeon_of(current_id()), {}).get("crystal", 0))
+		if DialogueData.has("get_crystal_%d" % cidx):
+			text = "get_crystal_%d" % cidx
 	var pages: Array = DialogueData.pages_for(text, GameState)
 	if new_heart and kind == "heart_piece":
 		pages.append_array(DialogueData.pages_for(ItemDB.text_key("heart_container"), GameState))
 	_after_dialogue = func() -> void: player.end_hold()
-	if kind == "seal":
+	if kind == "seal" or kind == "crystal":
 		_after_dialogue = func() -> void:
 			player.end_hold()
 			leave_dungeon()
@@ -637,11 +666,16 @@ func grant(kind: String, amount: int = 1) -> bool:
 			return true
 		"map", "compass", "big_key":
 			GameState.give_dungeon_item(dungeon_of(current_id()), kind)
-		"glove", "boots", "fire_rod", "moon_mirror":
+		"glove", "boots", "fire_rod", "moon_mirror", "grapple":
 			GameState.give_item(kind)
+		"magic":
+			GameState.add_magic(amount)
 		"seal":
 			var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
 			GameState.seals[int(info.get("seal", 0))] = true
+		"crystal":
+			var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
+			GameState.crystals[int(info.get("crystal", 0))] = true
 	return false
 
 
@@ -712,12 +746,13 @@ func buy(item: ShopItem) -> bool:
 	var amount := int(w["amount"])
 	if GameState.gems < item.price():
 		Audio.sfx("error")
-		say("shop_no_gems")
+		say(shop_line(item, "shop_no_gems"))
 		return false
-	var is_ammo := kind == "arrows" or (kind == "bombs" and GameState.has_item("bombs"))
-	if is_ammo and GameState.ammo_full(kind):
+	var is_ammo := kind == "arrows" or (kind == "bombs" and GameState.has_item("bombs")) or kind == "magic"
+	var full := GameState.magic >= GameState.MAX_MAGIC if kind == "magic" else GameState.ammo_full(kind)
+	if is_ammo and full:
 		Audio.sfx("error")
-		say("shop_full")
+		say(shop_line(item, "shop_full"))
 		return false
 	GameState.add_gems(-item.price())
 	Audio.sfx("shop_buy")
@@ -726,10 +761,17 @@ func buy(item: ShopItem) -> bool:
 		item.sold_out()
 	if is_ammo:
 		grant(kind, amount)
-		say("shop_thanks")
+		say(shop_line(item, "shop_thanks"))
 	else:
 		item_get(kind, amount)
 	return true
+
+
+# The shopkeeper's words for `key`: the Shade Market's wares ("dw_...") have their own merchant's lines.
+func shop_line(item: ShopItem, key: String) -> String:
+	if item.ware.begins_with("dw_") and DialogueData.has("dw_" + key):
+		return "dw_" + key
+	return key
 
 
 # A torch caught fire: when every torch of the area burns, hidden chests appear.
@@ -738,6 +780,7 @@ func _on_torch_lit() -> void:
 	if torches.any(func(t: Node) -> bool: return not t.lit):
 		return
 	_reveal_chests(func(c: Chest) -> bool: return c.reveal_by == "torches")
+	update_darkness()
 
 
 func _reveal_chests(which: Callable) -> void:
@@ -752,6 +795,7 @@ func _reveal_chests(which: Callable) -> void:
 
 func _on_area_entered(aid: String) -> void:
 	GameState.visited[aid] = true
+	update_darkness()
 	var dungeon := dungeon_of(aid)
 	hud.show_zero_keys = dungeon != ""
 	GameState.set_key_pool(dungeon)
@@ -819,7 +863,7 @@ func _on_boss_defeated(room: String) -> void:
 		_spawn_boss_reward(current)
 
 
-# After the boss: first a heart container, then the family seal (each only until it is taken).
+# After the boss: first a heart container, then the family seal or the dimension crystal (each only until taken).
 func _spawn_boss_reward(rec: Dictionary) -> void:
 	var room := String(rec["id"])
 	var container_flag := "heart_container:" + room
@@ -835,6 +879,12 @@ func _spawn_boss_reward(rec: Dictionary) -> void:
 			GameState.set_flag(container_flag)
 			_spawn_boss_reward.call_deferred(rec))
 		rec["actors"].add_child.call_deferred(c)
+	elif info.has("crystal"):
+		if not GameState.crystals[int(info["crystal"])]:
+			var crystal: Area2D = PICKUP_SCRIPT.new()
+			crystal.kind = "crystal"
+			crystal.position = at - REWARD_DROP + SEAL_DROP
+			rec["actors"].add_child.call_deferred(crystal)
 	elif not GameState.seals[int(info.get("seal", 0))]:
 		var seal: Area2D = PICKUP_SCRIPT.new()
 		seal.kind = "seal"
@@ -884,6 +934,9 @@ func _on_mirror() -> void:
 		return
 	if not is_dark(current_id()):
 		say("mirror_light")
+		return
+	if area_at(player.global_position, "overworld") == "":
+		say("mirror_void")                              # Dark World-only lands (the dimensions) have no twin
 		return
 	_world_warp("overworld", true)
 

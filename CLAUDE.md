@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-20
-Version: 2.7.0
+Last edit date: 2026-10-21
+Version: 2.8.0
 -->
 
 # The Village
@@ -77,3 +77,8 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   `gen_dark.py` after `gen_tiles.py`. Mirror/rift warps are `World._world_warp(group, mirror)`. Eight suites (396
   checks; `test_dark.gd` 28). Never use z_index < 0 for floor props (they vanish under the ground tiles); every
   new item kind needs a `World.grant()` branch.
+- Phase 9 (Umbra): Dark World-only lands are `DARK_ONLY` in `gen_areas.py` (no twin: the mirror says
+  `mirror_void`); rooms with `"dark": True` get `World.darkness` until their torches burn. The grapple flies over
+  TileSet cells flagged `low` (water, pits) and latches onto group `hookable`; the lint's reachability follows it
+  (`grapple_hops`). Crystal dungeons carry `crystal` and no `seal` key. Nine suites (441 checks; `test_umbra.gd`
+  45). JSON numbers load as floats: compare positions as Vector2, not arrays; wait ~2 s before reading a typing box.

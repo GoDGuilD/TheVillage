@@ -1,0 +1,20 @@
+{
+  "frame_size": [
+    24,
+    24
+  ],
+  "feet": [
+    12,
+    22
+  ],
+  "anims": {
+    "creep": {
+      "fps": 8.0,
+      "loop": true
+    },
+    "frozen": {
+      "fps": 1.0,
+      "loop": false
+    }
+  }
+}

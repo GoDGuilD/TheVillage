@@ -1,0 +1,103 @@
+{
+ "id": "d4_east",
+ "name": "Umbra Sanctum",
+ "kind": "dungeon",
+ "dungeon": "d4",
+ "size_screens": [
+  1,
+  1
+ ],
+ "origin_tiles": [
+  2848,
+  14
+ ],
+ "grid": [
+  2,
+  1
+ ],
+ "rows": [
+  "%%%%%%%%%%%%%%%%%%%%%%%%",
+  "%%%%%%%%%%%%%%%%%%%%%%%%",
+  "%%===========ooo======%%",
+  "%%==$x==C====ooo===@==%%",
+  "%%===========ooo======%%",
+  "%%===========ooo======%%",
+  "[[===========ooo=|X===%%",
+  "[[===========ooo======%%",
+  "%%===========ooo======%%",
+  "%%=====A===|=ooo===C==%%",
+  "%%===========ooo======%%",
+  "%%===========ooo======%%",
+  "%%%%%%%%%%%%%%%%%%%%%%%%",
+  "%%%%%%%%%%%%%%%%%%%%%%%%"
+ ],
+ "doors": [],
+ "exits": [],
+ "npcs": [],
+ "signs": [],
+ "objects": [
+  {
+   "kind": "door",
+   "cell": [
+    0,
+    6
+   ],
+   "dir": "w",
+   "type": "locked",
+   "id": "d4_hall_east",
+   "when": ""
+  },
+  {
+   "kind": "big_chest",
+   "cell": [
+    4,
+    3
+   ],
+   "item": "grapple"
+  },
+  {
+   "kind": "chest",
+   "cell": [
+    8,
+    3
+   ],
+   "item": "big_key",
+   "amount": 1,
+   "reveal": ""
+  },
+  {
+   "kind": "hook_post",
+   "cell": [
+    17,
+    6
+   ]
+  },
+  {
+   "kind": "hook_post",
+   "cell": [
+    11,
+    9
+   ]
+  },
+  {
+   "kind": "switch",
+   "cell": [
+    19,
+    3
+   ],
+   "flag": "switch:d4_east",
+   "heavy": false
+  },
+  {
+   "kind": "chest",
+   "cell": [
+    19,
+    9
+   ],
+   "item": "compass",
+   "amount": 1,
+   "reveal": ""
+  }
+ ],
+ "wares": []
+}

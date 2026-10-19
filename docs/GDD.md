@@ -4,8 +4,8 @@ Description: Game design document for The Village - the top-down, A Link to the 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-20
-Version: 2.7.0
+Last edit date: 2026-10-21
+Version: 2.8.0
 -->
 
 # Game Design Document — The Village
@@ -128,6 +128,14 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
   **Frost Vault** behind rubble (Fire Rod; boss the Frost Wraith - only fire hurts it; seal 3); **Caver's Keep**
   behind the seal gate (all three seals): Caver's shade throws orbs Joe bats back with the sword; three hits end
   Act 1 (his last words, the end card; the game is saved outside the keep).
+  **Implemented in Phase 9 - Umbra** (names are placeholders): the Withered Meadow opens north into the
+  **Umbral Vale** (Dark World only - the mirror shows nothing there), whose chasm island holds a piece of heart for
+  the grapple. The **Umbra Sanctum** (5 rooms): a dark hall and a dark west room (light is a small circle around
+  Joe, wider with the lantern, until the torches burn) hold the map and the small key; the east room has the big
+  key and the big chest (the **Grapple**) and a chasm crossed by hook posts to the switch that opens the way to the
+  boss. Enemies: **lurkers**, shadows that move only while Joe looks away. Boss: the **Gloom Moth** - out of reach
+  in the air, throwing dust; the grapple pulls it down for a few seconds of sword hits. Reward: a heart container,
+  then the **Crystal of Umbra** (first of four dimension crystals).
 
 ## 7. Items (ALttP equivalents in brackets)
 
@@ -145,8 +153,11 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 | Fire Rod | the Frost Vault's big chest | fireballs for 4 magic; burn ice, light torches from afar |
 | Magic jars | drops (8% of the table) | small +4, big +16 magic |
 | Moon Mirror | Tato's echo (Hollow Pueblo) | Dark World only: step into the Light World at the same spot |
+| Grapple | the Umbra Sanctum's big chest | 7-tile chain over pits and water: bites hook posts and pulls Joe across; stuns enemies |
+| Magic refill | the Shade Market, 40 gems | fills the magic meter |
 
-Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems.
+Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems. The Shade Market (Hollow Pueblo): bombs 5 for 30,
+arrows 10 for 25, magic refill 40.
 
 **Planned:**
 Sword and shield, boomerang, bow, bombs, lantern, hookshot-style grapple, dash boots [Pegasus Boots], power

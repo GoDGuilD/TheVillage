@@ -1,10 +1,10 @@
 # File: GameState.gd
-# Description: Autoload holding run-wide state - gems, magic, small keys (one pool per dungeon), dungeon items, bombs/arrows, heart pieces, items, family seals, story flags, visited areas - plus the drop table, and the snapshot/restore used by saves.
+# Description: Autoload holding run-wide state - gems, magic, small keys (one pool per dungeon), dungeon items, bombs/arrows, heart pieces, items, family seals, dimension crystals, story flags, visited areas - plus the drop table, and the snapshot/restore used by saves.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 3.0.2
+# Last edit date: 2026-10-21
+# Version: 3.1.0
 extends Node
 ## Keep it data + small helpers only. Joe's own hearts live on his HealthComponent (the World copies them in and
 ## out of saves). Items are listed here so the item menu can show their slots; they are found from Phase 5 on.
@@ -19,6 +19,7 @@ const MAX_GEMS := 999
 const MAX_MAGIC := 32                    # one pixel of the HUD meter per unit
 const MAX_KEYS := 9
 const SEAL_COUNT := 3                    # the three family seals of the Light World dungeons
+const CRYSTAL_COUNT := 4                 # the four dimension crystals of the Dark World (Umbra, Ignis, Tempus, Silva)
 const MAX_BOMBS := 10
 const MAX_ARROWS := 30
 const PIECES_PER_HEART := 4             # four heart pieces make a heart container
@@ -50,6 +51,7 @@ var heart_pieces := 0                    # 0..3 pieces toward the next container
 var items: Dictionary = {}               # item id -> level/count (absent = not found)
 var equipped := ""                       # the item in the HUD box ("" = none)
 var seals: Array = [false, false, false]
+var crystals: Array = [false, false, false, false]
 var flags: Dictionary = {}               # story flags, e.g. "met_tato": true
 var drops_enabled := true                # tests switch random drops off
 var force_drop := ""                     # tests force a specific drop ("" = roll normally)
@@ -156,6 +158,10 @@ func seal_count() -> int:
 	return seals.count(true)
 
 
+func crystal_count() -> int:
+	return crystals.count(true)
+
+
 # Pick a drop kind ("" for none) from DROP_TABLE.
 func roll_drop() -> String:
 	if force_drop != "":
@@ -178,7 +184,7 @@ func snapshot() -> Dictionary:
 	return {"gems": gems, "magic": magic, "key_pools": key_pools.duplicate(), "dungeon_items": dungeon_items.duplicate(true),
 			"visited": visited.keys(), "bombs": bombs, "arrows": arrows,
 			"heart_pieces": heart_pieces, "items": items.duplicate(), "equipped": equipped,
-			"seals": seals.duplicate(), "flags": flags.duplicate()}
+			"seals": seals.duplicate(), "crystals": crystals.duplicate(), "flags": flags.duplicate()}
 
 
 # Put a snapshot back (missing fields fall back to a fresh game's values).
@@ -202,6 +208,10 @@ func restore(data: Dictionary) -> void:
 	seals = []
 	for i in SEAL_COUNT:
 		seals.append(i < s.size() and bool(s[i]))
+	var c: Array = data.get("crystals", [])
+	crystals = []
+	for i in CRYSTAL_COUNT:
+		crystals.append(i < c.size() and bool(c[i]))
 	flags = Dictionary(data.get("flags", {})).duplicate()
 	_emit_all()
 

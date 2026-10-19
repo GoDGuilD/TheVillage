@@ -1,0 +1,20 @@
+{
+  "frame_size": [
+    64,
+    56
+  ],
+  "feet": [
+    32,
+    52
+  ],
+  "anims": {
+    "fly": {
+      "fps": 10.0,
+      "loop": true
+    },
+    "grounded": {
+      "fps": 1.0,
+      "loop": false
+    }
+  }
+}

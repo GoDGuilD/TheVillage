@@ -445,63 +445,72 @@
         0,
         4
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_0_-1": {
       "cell": [
         1,
         4
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_1_-1": {
       "cell": [
         2,
         4
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_-1_0": {
       "cell": [
         0,
         5
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_0_0": {
       "cell": [
         1,
         5
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_1_0": {
       "cell": [
         2,
         5
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_-1_1": {
       "cell": [
         0,
         6
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_0_1": {
       "cell": [
         1,
         6
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "water_1_1": {
       "cell": [
         2,
         6
       ],
-      "solid": true
+      "solid": true,
+      "low": true
     },
     "ledge_l": {
       "cell": [
@@ -676,7 +685,8 @@
         10
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_0_-1": {
       "cell": [
@@ -684,7 +694,8 @@
         10
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_1_-1": {
       "cell": [
@@ -692,7 +703,8 @@
         10
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_-1_0": {
       "cell": [
@@ -700,7 +712,8 @@
         11
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_0_0": {
       "cell": [
@@ -708,7 +721,8 @@
         11
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_1_0": {
       "cell": [
@@ -716,7 +730,8 @@
         11
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_-1_1": {
       "cell": [
@@ -724,7 +739,8 @@
         12
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_0_1": {
       "cell": [
@@ -732,7 +748,8 @@
         12
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "pit_1_1": {
       "cell": [
@@ -740,7 +757,8 @@
         12
       ],
       "solid": false,
-      "pit": true
+      "pit": true,
+      "low": true
     },
     "shrine_0_0": {
       "cell": [

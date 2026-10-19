@@ -4,8 +4,8 @@ Description: Configuration parameters.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.7.0
+Last edit date: 2026-10-21
+Version: 1.8.0
 -->
 
 # Configuration
@@ -27,6 +27,10 @@ Version: 1.7.0
 | `tools/gen_areas.py` (`DARK_NAMES`, `DARK_EDITS`, `DARK_EXTRA`, `ACT2_SPAWN`) | The Dark World twins |
 | `tools/gen_dark.py` (`MAP`, `HUE_*`, `SAT_KEEP`, `VALUE_KEEP`) | How the Dark World is recoloured |
 | `src/world/World.gd` (`DW_TINT`, `DW_HP_FACTOR`, `WORLD_FADE`) | Dark World tint, enemy toughness, warp fade |
+| `src/items/Grapple.gd` (`SPEED`, `RETURN_SPEED`, `RANGE`, `LATCH_RADIUS`), `PlayerTuning` (`PULL_SPEED`, `PULL_MAX`) | The grapple's reach and speeds |
+| `tools/gen_umbra.py` (`LIGHT_SMALL`, `LIGHT_LANTERN`, `SOFT`) | How much Joe sees in a dark room (with and without the lantern) |
+| `src/enemies/Lurker.gd`, `GloomMoth.gd` | Lurker speed and "looked at" cone; the moth's loop, dust, ground time |
+| `tools/gen_areas.py` (`D4`, `d4_rooms()`, `build_umbra_vale`, `DARK_ONLY`), `ItemDB.WARES` (`dw_*`) | Umbra's places and the Shade Market's prices |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

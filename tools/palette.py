@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.8.0
+# Version: 1.9.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -339,3 +339,26 @@ PORTAL_LIGHT    = _hex("#c8ecff")
 MIRROR_FRAME    = _hex("#c8b0e8")
 MIRROR_GLASS    = _hex("#3c2c6c")
 MIRROR_SHINE    = _hex("#f0e8ff")
+
+# --- Umbra (Phase 9): the grapple, hook posts, darkness, crystals, the lurker, the Gloom Moth, the shade merchant -----
+CHAIN_DARK     = _hex("#5c6478")    # the grapple's chain and claw
+CHAIN_LIGHT    = _hex("#b8c0d8")
+CLAW_GOLD      = _hex("#d8b048")
+POST_DARK      = _hex("#3c2c24")    # hook posts (an iron ring on a dark stake)
+POST_MID       = _hex("#6c5040")
+POST_RING      = _hex("#c0c8d8")
+NIGHT          = _hex("#05040a")    # the darkness outside the light around Joe
+CRYSTAL_DARK   = _hex("#2c5c9c")    # dimension crystals (Umbra = 1st of 4)
+CRYSTAL_MID    = _hex("#58a0e8")
+CRYSTAL_LIGHT  = _hex("#c8ecff")
+LURKER_DARK    = _hex("#0c0814")    # the lurker: a shadow with two pale eyes
+LURKER_MID     = _hex("#281c3c")
+LURKER_EYE     = _hex("#e8f0ff")
+MOTH_DARK      = _hex("#2c1c3c")    # the Gloom Moth (Umbra boss)
+MOTH_MID       = _hex("#5c3c7c")
+MOTH_LIGHT     = _hex("#9c7cc8")
+MOTH_EYE       = _hex("#f0d040")
+MOTH_DUST      = _hex("#8c6cb0")
+HOOD_DARK      = _hex("#1c1428")    # the shade merchant's hood
+HOOD_MID       = _hex("#3c2c58")
+HOOD_TRIM      = _hex("#c8a040")

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 2.5.0
+# Last edit date: 2026-10-21
+# Version: 2.5.1
 class_name PlayerTuning
 extends RefCounted
 
@@ -66,6 +66,8 @@ const TALK_COOLDOWN := 0.15           # s Joe stays still after a conversation (
 
 # --- Items (item button, Phase 5) -----------------------------------------------------------------------
 const USE_TIME := 0.2                 # s Joe stands in the throw pose after using an item
+const PULL_SPEED := 240.0             # px/s the grapple drags Joe toward a hook post
+const PULL_MAX := 1.2                 # s: a pull that never arrives (blocked) ends anyway
 const HOLD_HEIGHT := 30.0             # px above the feet where a found item is held up
 
 # --- Dungeons (Phase 6) ---------------------------------------------------------------------------------------

@@ -21,6 +21,7 @@
   "dw_east_lake",
   "dw_south_road",
   "dw_south_fields",
+  "dw_umbra_vale",
   "d1_entrance",
   "d1_hub",
   "d1_west",
@@ -43,7 +44,12 @@
   "d3_boss",
   "keep_entrance",
   "keep_gallery",
-  "keep_throne"
+  "keep_throne",
+  "d4_entrance",
+  "d4_hall",
+  "d4_west",
+  "d4_east",
+  "d4_boss"
  ],
  "act2_spawn": {
   "area": "dw_el_pueblo",
@@ -81,6 +87,13 @@
    "boss_room": "keep_throne",
    "boss_flag": "boss:keep",
    "ending": "act1"
+  },
+  "d4": {
+   "name": "Umbra Sanctum",
+   "crystal": 0,
+   "entrance": "d4_entrance",
+   "boss_room": "d4_boss",
+   "boss_flag": "boss:d4"
   }
  }
 }
