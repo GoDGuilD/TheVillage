@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.8.0
+Last edit date: 2026-10-22
+Version: 1.9.0
 -->
 
 # Roadmap
@@ -25,7 +25,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, the road south opened, Caver's keep, Act 1 ending (+ fire rod, magic jars) | Done (54 Act 1 checks pass) |
 | 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub (Act 2 starts where Act 1's save left Joe) | Done (28 Dark World checks pass) |
 | 9 | Umbra | The Umbral Vale, the Umbra Sanctum (dark rooms), the Grapple and hook posts, lurkers, the Gloom Moth, the first dimension crystal, the Shade Market | Done (45 Umbra checks pass) |
-| 10–12 | Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (hammer, ice rod, flippers...) | Next (Ignis) |
+| 10 | Ignis | The Cinder Barrens and lava, the Ice Rod (frozen enemies, lava crust), cinders, the Ignis Forge, the Magma Wyrm, the second crystal | Done (36 Ignis checks pass) |
+| 11–12 | Tempus, Silva | One region + dungeon + boss each, with their key items (hammer, flippers...) | Next (Tempus) |
 | 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
 | 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
 | 15 | Release | Credits, icon, export preset, performance baseline, store material | Planned |
@@ -120,3 +121,12 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] The Shade Market (bombs, arrows, magic refill)
 - [x] `tests/test_umbra.gd`: 45 checks; `tools/capture_umbra.gd`
 - [ ] Owner playtest: dark-room light radius, the moth's difficulty, prices, names (vale, sanctum, moth, Shade)
+
+
+## Phase 10 detail
+- [x] Lava, crust and ash tiles (`tools/ignis_art.py` via `gen_tiles.py`, kept out of the Dark World recolour); `tools/gen_ignis.py`; three sounds
+- [x] The Cinder Barrens (Dark World-only, east of Ash Lake; grapple-gated lava river; the lava pool's piece of heart)
+- [x] The Ice Rod: frozen enemies, lava crust that melts (`AreaBuilder.freeze_at`), `ice_hops` lint
+- [x] The Ignis Forge (5 rooms), cinders and their flames, the Magma Wyrm, the Crystal of Ignis
+- [x] `tests/test_ignis.gd`: 36 checks; `tools/capture_ignis.gd`
+- [ ] Owner playtest: crust time, lava damage, the wyrm's difficulty, names (barrens, forge, wyrm)

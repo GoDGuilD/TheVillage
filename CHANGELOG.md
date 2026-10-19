@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-21
-Version: 5.6.0
+Last edit date: 2026-10-22
+Version: 5.7.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,33 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.4.0] - 2026-10-22 — Phase 10: Ignis
+
+### Added
+- **The Cinder Barrens** (`dw_cinder_barrens`, Dark World only): Ash Lake's shore path now runs east into an ash
+  land. A lava river only the grapple crosses (two hook posts) guards it, so Umbra comes first; the Ignis Forge
+  stands in the north; a lava pool in the south hides an islet with a piece of heart for the ice rod.
+- **Lava** (glyph `!`, atlas cells `lava_*` from `tools/ignis_art.py`): a pit for Joe (he burns: a heart, back to
+  the entry, sound `sizzle`), a wall for enemies, `low` for the grapple, and flagged `lava`. **Ash** ground (`a`).
+  The Dark World recolour leaves lava, crust and ash as they are (`gen_dark.py` `KEEP_PREFIXES`).
+- **The Ice Rod** (Y-item, 4 magic per bolt; `IceBolt.gd`): its bolt freezes enemies in ice for 3 s (element `ice`,
+  `BaseEnemy._iced()` lets a boss handle it) and turns every lava cell it flies over into **crust** for 6 s
+  (`AreaBuilder.freeze_at`; refreezing extends it; standing on it when it melts drops Joe in).
+- **The Ignis Forge** (dungeon 5, 5 rooms, the second dimension crystal): a small key at the entrance, the big
+  key on a lava islet reached by grapple, the big chest's Ice Rod and a lava channel crossed on frozen crust to the
+  switch that opens the hall's north shutter.
+- **Cinders** (`Cinder`, a Slime): hop at Joe and leave a short-lived flame (`GroundFlame`) where they land.
+- **The Magma Wyrm** (boss): rises from a random lava cell of its room, spits fans of embers and sinks again; the
+  sword clanks off it unless an ice bolt has frozen it above the lava (three hits, then it sinks).
+- `tools/gen_ignis.py` (ice rod, ice bolt, ember shot, ground flame, cinder and magma wyrm packs), sounds `freeze`,
+  `lava_burst`, `sizzle` (56 effects). `gen_areas.py` v7: `build_cinder_barrens`, `D5`/`d5_rooms()`, glyphs
+  `!` `a` `c` `I`, `ice_hops` reachability, lint for a wyrm without an ice rod. `tests/test_ignis.gd` (36
+  checks), `tools/capture_ignis.gd`.
+
+### Changed
+- The Ignis sign at Ash Lake points east. `test_world.gd` knows the new area and door.
+- 477 checks in 10 suites, all passing.
 
 ## [7.3.0] - 2026-10-21 — Phase 9: Umbra
 

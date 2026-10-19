@@ -5,8 +5,8 @@
   "Author": "Jose-Jorge HERNANDEZ",
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
-  "Last edit date": "2026-10-21",
-  "Version": "1.5.0",
+  "Last edit date": "2026-10-22",
+  "Version": "1.6.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -352,7 +352,7 @@
  },
  "dw_sign_ignis": {
   "pages": [
-   "IGNIS\nThe ash is still too hot to cross. Not yet."
+   "IGNIS\nEast: the Cinder Barrens. The lava runs too wide to jump - find a way across."
   ]
  },
  "dw_sign_tempus": {
@@ -437,6 +437,22 @@
  "get_magic": {
   "pages": [
    "Your magic is full again!"
+  ]
+ },
+ "dw_sign_forge": {
+  "pages": [
+   "IGNIS FORGE\nWhat burns here never cools. Bring something colder."
+  ]
+ },
+ "get_ice_rod": {
+  "pages": [
+   "You got the Ice Rod! Its bolts (4 magic) freeze enemies solid, and turn lava into a crust you can cross - for a few seconds."
+  ]
+ },
+ "get_crystal_1": {
+  "pages": [
+   "You got the Crystal of Ignis! It burns without heat in your hand.",
+   "Two more crystals wait in the Dark World."
   ]
  }
 }

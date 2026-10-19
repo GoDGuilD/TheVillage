@@ -4,8 +4,8 @@ Description: Code architecture of The Village: folders, autoloads, contracts, pl
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-21
-Version: 5.6.0
+Last edit date: 2026-10-22
+Version: 5.7.0
 -->
 
 # Architecture
@@ -20,23 +20,23 @@ src/
              DialogueData (dialogue.json reader), GameState / Audio / Juice (autoloads)
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
-  enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, EnemyRock, EnemyShot, bosses: GrandSlime, IronRam,
-             FrostWraith, CaverShade (+ CaverOrb), GloomMoth
-  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball, Grapple
+  enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, Cinder, EnemyRock, EnemyShot, bosses: GrandSlime,
+             IronRam, FrostWraith, CaverShade (+ CaverOrb), GloomMoth, MagmaWyrm
+  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball, Grapple, IceBolt
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
              tiles + actors), TestField (test arenas), Npc, SignPost, Chest, BigChest, Torch, CrackedRock, KeyBlock,
-             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Rift, HookPost, Bush, Pot, Thrown,
-             Pickup
+             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Rift, HookPost, GroundFlame, Bush, Pot,
+             Thrown, Pickup
     areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
   ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, MapScreen, GameOver, EndCard, MenuList,
              PixelText,
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd
 tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
-             test_act1.gd, test_dark.gd, test_umbra.gd
+             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -114,6 +114,11 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   state `pulled` drops Joe's collision mask and slides him to the cell in front of the post, then releases the
   grapple. Its HitBox element `hook` stuns like the boomerang unless the enemy's `_hooked()` handles it (the Gloom
   Moth lands). The level lint mirrors this in `grapple_hops`.
+- **Lava and ice (Ignis).** Lava cells carry `pit` (Joe falls in), `low` (the grapple flies over) and `lava`. An
+  `IceBolt` calls `AreaBuilder.freeze_at` every frame: a lava cell under it becomes the `crust` cell (no flags, no
+  collision) and a timer per cell puts the lava piece back; each freeze bumps a per-cell generation so only the
+  newest timer thaws it. Element `ice` freezes ordinary enemies (`freeze` + a blue `self_modulate`) unless
+  `_iced()` handles it - the Magma Wyrm turns it into its `frozen` state.
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 

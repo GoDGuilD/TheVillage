@@ -4,8 +4,8 @@ Description: Game design document for The Village - the top-down, A Link to the 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-21
-Version: 2.8.0
+Last edit date: 2026-10-22
+Version: 2.9.0
 -->
 
 # Game Design Document — The Village
@@ -136,6 +136,13 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
   boss. Enemies: **lurkers**, shadows that move only while Joe looks away. Boss: the **Gloom Moth** - out of reach
   in the air, throwing dust; the grapple pulls it down for a few seconds of sword hits. Reward: a heart container,
   then the **Crystal of Umbra** (first of four dimension crystals).
+  **Implemented in Phase 10 - Ignis** (names are placeholders): Ash Lake's shore runs east into the **Cinder
+  Barrens** (Dark World only), cut off by a lava river the grapple crosses - so Umbra comes first. Lava burns
+  (a heart, back to the entrance). The **Ignis Forge** (5 rooms): a small key at the entrance, the big key on a
+  lava islet (grapple), the **Ice Rod** in the big chest, and a lava channel crossed on frozen crust to the switch
+  that opens the way to the boss. Enemies: **cinders** that leave flames where they land. Boss: the **Magma Wyrm**
+  - it rises from the lava pools, spits embers and sinks; only an ice bolt holds it up, frozen, for the sword.
+  Reward: a heart container, then the **Crystal of Ignis**.
 
 ## 7. Items (ALttP equivalents in brackets)
 
@@ -155,6 +162,7 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 | Moon Mirror | Tato's echo (Hollow Pueblo) | Dark World only: step into the Light World at the same spot |
 | Grapple | the Umbra Sanctum's big chest | 7-tile chain over pits and water: bites hook posts and pulls Joe across; stuns enemies |
 | Magic refill | the Shade Market, 40 gems | fills the magic meter |
+| Ice Rod | the Ignis Forge's big chest | ice bolts for 4 magic: freeze enemies 3 s; freeze lava into a 6-s crust |
 
 Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems. The Shade Market (Hollow Pueblo): bombs 5 for 30,
 arrows 10 for 25, magic refill 40.

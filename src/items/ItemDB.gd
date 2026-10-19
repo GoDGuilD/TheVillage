@@ -1,10 +1,10 @@
 # File: ItemDB.gd
-# Description: Static catalogue of everything Joe can receive (items, ammo, keys, heart pieces/containers, gems, dungeon items, the glove, family seals, crystals, the grapple): display names, icons, the text shown on getting them, and Boni's shop wares with prices.
+# Description: Static catalogue of everything Joe can receive (items, ammo, keys, heart pieces/containers, gems, dungeon items, the glove, family seals, crystals, the grapple, the ice rod): display names, icons, the text shown on getting them, and Boni's shop wares with prices.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 1.3.0
+# Last edit date: 2026-10-22
+# Version: 1.4.0
 class_name ItemDB
 extends RefCounted
 ## "Kinds" are what chests, gifts, pickups and wares hand out. Y-items (GameState.ITEM_ORDER) are a subset.
@@ -34,6 +34,7 @@ const KINDS := {
 	"fire_rod": {"name": "FIRE ROD", "icon": ICON_DIR + "fire_rod.png", "text": "get_fire_rod"},
 	"moon_mirror": {"name": "MOON MIRROR", "icon": ICON_DIR + "moon_mirror.png", "text": "get_moon_mirror"},
 	"grapple": {"name": "GRAPPLE", "icon": ICON_DIR + "grapple.png", "text": "get_grapple"},
+	"ice_rod": {"name": "ICE ROD", "icon": ICON_DIR + "ice_rod.png", "text": "get_ice_rod"},
 	"crystal": {"name": "CRYSTAL", "icon": "res://assets/sprites/dungeon/crystal.png", "text": "get_crystal"},
 	"magic": {"name": "MAGIC", "icon": SPRITE_DIR + "magic_big.png", "text": "get_magic"},
 }
@@ -41,9 +42,10 @@ const KINDS := {
 const DUNGEON_ITEMS := ["map", "compass", "big_key"]
 
 # Y-items that consume something when used: item -> ammo kind or "magic".
-const USES := {"bow": "arrows", "bombs": "bombs", "lantern": "magic", "fire_rod": "magic"}
+const USES := {"bow": "arrows", "bombs": "bombs", "lantern": "magic", "fire_rod": "magic", "ice_rod": "magic"}
 const LANTERN_MAGIC := 2                 # magic units (of GameState.MAX_MAGIC) per lantern flame
 const FIRE_ROD_MAGIC := 4                # per fireball
+const ICE_ROD_MAGIC := 4                 # per ice bolt
 
 # Boni's wares: ware -> {kind, amount, price, text (the offer), once (sold out after one sale)}
 const WARES := {

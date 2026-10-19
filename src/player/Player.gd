@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 2.5.0
+# Last edit date: 2026-10-22
+# Version: 2.5.1
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -705,7 +705,7 @@ func state_fall_enter() -> void:
 	if carrying != "":
 		_release_carried(DROP_TRAVEL)
 	_play("hurt")
-	Audio.sfx("fall")
+	Audio.sfx("sizzle" if AreaBuilder.flag_at(get_tree(), global_position + PlayerTuning.PIT_PROBE, "lava") else "fall")
 	var tw := sprite.create_tween()
 	tw.tween_property(sprite, "scale", Vector2.ZERO, PlayerTuning.FALL_TIME)
 

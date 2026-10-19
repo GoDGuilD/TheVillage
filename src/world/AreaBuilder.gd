@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 2.2.2
+# Last edit date: 2026-10-22
+# Version: 2.3.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -31,7 +31,8 @@ const LAYER_WORLD := 1
 const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemies/Guard.gd",
 		"Q": "res://src/enemies/Spitter.gd", "Y": "res://src/enemies/GrandSlime.gd", "A": "res://src/enemies/Bat.gd",
 		"U": "res://src/enemies/IronRam.gd", "F": "res://src/enemies/FrostWraith.gd", "V": "res://src/enemies/CaverShade.gd",
-		"X": "res://src/enemies/Lurker.gd", "m": "res://src/enemies/GloomMoth.gd"}
+		"X": "res://src/enemies/Lurker.gd", "m": "res://src/enemies/GloomMoth.gd",
+		"c": "res://src/enemies/Cinder.gd", "I": "res://src/enemies/MagmaWyrm.gd"}
 const GRASS := {".": "grass_a", ",": "grass_b", "*": "flowers"}
 const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b",
 		"+": "pillar", "s": "dstairs"}
@@ -44,10 +45,13 @@ const SHRINE_SIZE := Vector2i(5, 3)
 const SHRINE_DOOR := Vector2i(2, 2)
 const LAYER_PIT := 256                   # pits are walls for enemies only (Joe walks in and falls)
 # Custom data layers on the TileSet (read by Player and the World).
-const DATA_FLAGS := ["ledge", "door", "exit", "pit", "low"]   # low: water and pits (the grapple flies over them)
+const DATA_FLAGS := ["ledge", "door", "exit", "pit", "low", "lava"]   # low: water, pits and lava (the grapple
+                                                                       # flies over them); lava: the ice rod freezes it
 
 static var _tilesets: Dictionary = {}    # false -> Light World TileSet, true -> Dark World TileSet
 static var _cells: Dictionary = {}       # atlas cell name -> Vector2i
+static var _crust_under: Dictionary = {}          # frozen lava: key -> the lava piece under the crust
+static var _crust_gen: Dictionary = {}            # key -> how many times it was frozen (newest timer wins)
 
 
 # The shared TileSet, built once from the atlas manifest: one physics layer, flag custom-data layers.
@@ -155,6 +159,10 @@ static func _paint_cell(tiles: TileMapLayer, rows: Array, x: int, y: int, g: Str
 		_put(tiles, x, y, _nine(rows, x, y, "~", "water"))
 	elif g == "o":
 		_put(tiles, x, y, _nine(rows, x, y, "o", "pit"))
+	elif g == "!":
+		_put(tiles, x, y, _nine(rows, x, y, "!", "lava"))
+	elif g == "a":
+		_put(tiles, x, y, _ash(x, y))
 	elif g in DWALLS:
 		var under := glyph(rows, x, y + 1)
 		_put(tiles, x, y, "dwall_face" if under != "" and not under in DWALLS else "dwall_top")
@@ -194,7 +202,49 @@ static func _paint_cell(tiles: TileMapLayer, rows: Array, x: int, y: int, g: Str
 		_put(tiles, x, y, "bed_t")
 		_put(tiles, x, y + 1, "bed_b")
 	else:
-		_put(tiles, x, y, "dfloor" if dungeon else ("floor" if indoor else "grass_a"))   # actors/objects on plain ground
+		var ground := "floor" if indoor else ("grass_a" if not _near(rows, x, y, "a") else _ash(x, y))
+		_put(tiles, x, y, "dfloor" if dungeon else ground)   # actors/objects on plain ground (ash next to ash)
+
+
+# Ignis ground: plain ash with an ember-flecked cell here and there (a fixed pattern, so rebuilds look the same).
+static func _ash(x: int, y: int) -> String:
+	return "ash_b" if (x * 7 + y * 13) % 5 == 0 else "ash"
+
+
+# True if one of the four neighbours of (x, y) is glyph `g`.
+static func _near(rows: Array, x: int, y: int, g: String) -> bool:
+	for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+		if glyph(rows, x + d.x, y + d.y) == g:
+			return true
+	return false
+
+
+# The ice rod: turn the lava cell under `world_pos` (in any built area) into walkable crust for `seconds`, or keep
+# an existing crust frozen that long again. Returns true if the cell was lava or crust.
+static func freeze_at(tree: SceneTree, world_pos: Vector2, seconds: float) -> bool:
+	for node in tree.get_nodes_in_group("terrain"):
+		var tiles := node as TileMapLayer
+		if tiles == null or not tiles.is_inside_tree():
+			continue
+		var cell := tiles.local_to_map(tiles.to_local(world_pos))
+		var key := "%d:%d,%d" % [tiles.get_instance_id(), cell.x, cell.y]
+		var td := tiles.get_cell_tile_data(cell)
+		if td != null and bool(td.get_custom_data("lava")):
+			_crust_under[key] = tiles.get_cell_atlas_coords(cell)
+			tiles.set_cell(cell, 0, _cells["crust"])
+		elif not (_crust_under.has(key) and tiles.get_cell_atlas_coords(cell) == _cells["crust"]):
+			continue
+		var gen := int(_crust_gen.get(key, 0)) + 1
+		_crust_gen[key] = gen
+		tree.create_timer(seconds, false, true).timeout.connect(func() -> void:
+			if int(_crust_gen.get(key, 0)) != gen:
+				return                                    # frozen again since: a later timer thaws it
+			if is_instance_valid(tiles) and tiles.get_cell_atlas_coords(cell) == _cells["crust"]:
+				tiles.set_cell(cell, 0, _crust_under[key])
+			_crust_under.erase(key)
+			_crust_gen.erase(key))
+		return true
+	return false
 
 
 # Nine-slice piece name for a band of `same` glyphs: the lip faces the neighbours that differ.

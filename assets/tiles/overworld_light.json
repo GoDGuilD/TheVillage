@@ -760,6 +760,117 @@
       "pit": true,
       "low": true
     },
+    "lava_-1_-1": {
+      "cell": [
+        4,
+        10
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_0_-1": {
+      "cell": [
+        5,
+        10
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_1_-1": {
+      "cell": [
+        6,
+        10
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_-1_0": {
+      "cell": [
+        4,
+        11
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_0_0": {
+      "cell": [
+        5,
+        11
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_1_0": {
+      "cell": [
+        6,
+        11
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_-1_1": {
+      "cell": [
+        4,
+        12
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_0_1": {
+      "cell": [
+        5,
+        12
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "lava_1_1": {
+      "cell": [
+        6,
+        12
+      ],
+      "solid": false,
+      "pit": true,
+      "low": true,
+      "lava": true
+    },
+    "crust": {
+      "cell": [
+        7,
+        10
+      ],
+      "solid": false
+    },
+    "ash": {
+      "cell": [
+        7,
+        11
+      ],
+      "solid": false
+    },
+    "ash_b": {
+      "cell": [
+        8,
+        11
+      ],
+      "solid": false
+    },
     "shrine_0_0": {
       "cell": [
         9,

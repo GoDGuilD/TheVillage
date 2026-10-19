@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 5.1.0
+# Last edit date: 2026-10-22
+# Version: 5.2.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -43,20 +43,21 @@ HOUSE_DOOR = (2, 3)
 SHRINE_DOOR = (2, 2)
 # Solid: N villager, C chest, L torch, k cracked rock, l key block, % dungeon wall, + pillar, o pit (Joe falls),
 # [ door, & push block, r heavy rock (all solid bodies or impassable cells).
-SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&rb|")   # ... b = rubble (the dash boots break it), | hook post
-ACTORS = set("BOZGQPhYAUFVXm")    # h heart piece; A bat; X lurker; bosses: Y Grand Slime, U Iron Ram, F Frost Wraith,
-                                   # V Caver, m Gloom Moth
+SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&rb|!")  # ... b = rubble (the dash boots break it), | hook post, ! lava
+ACTORS = set("BOZGQPhYAUFVXmcI")  # h heart piece; A bat; X lurker; c cinder; bosses: Y Grand Slime, U Iron Ram,
+                                   # F Frost Wraith, V Caver, m Gloom Moth, I Magma Wyrm
 OPENABLE = set("kl[&rb")           # solid until a bomb / key / push / glove / dash opens them (reachability: open)
-GROUND = set(".,*#_M=;@s")         # = ; dungeon floor, @ floor switch, s exit stairs
+GROUND = set(".,*#_M=;@sa")        # = ; dungeon floor, @ floor switch, s exit stairs, a ash (Ignis)
 VALID = SOLID | ACTORS | GROUND | {"x"} | set(MULTI)
-ENEMIES = set("ZGQYAUFVXm")
-LOW = set("o~")                   # pits and water: the grapple's chain flies over them
+ENEMIES = set("ZGQYAUFVXmcI")
+LOW = set("o~!")                  # pits, water and lava: the grapple's chain flies over them
+ICE_REACH = 8                     # tiles an ice bolt flies (IceBolt.MAX_DISTANCE): it freezes every lava cell on the way
 GRAPPLE_REACH = 7                 # tiles from Joe to a hook post the grapple can still bite (Grapple.RANGE)
 FACING_STEP = {"down": (0, 1), "up": (0, -1), "left": (-1, 0), "right": (1, 0)}
 # Everything a chest, gift or ware may hand out - mirrors ItemDB.KINDS in src/items/ItemDB.gd (test_items.gd
 # checks that every kind used by the areas exists there).
 ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "heart_piece", "heart_container", "gems",
-              "map", "compass", "big_key", "glove", "boots", "fire_rod", "grapple", "magic"}
+              "map", "compass", "big_key", "glove", "boots", "fire_rod", "grapple", "magic", "ice_rod"}
 WARE_IDS = {"bombs", "arrows", "heart_piece", "dw_bombs", "dw_arrows", "dw_magic"}   # ItemDB.WARES
 OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h", "door": "[",
                  "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r", "rubble": "b",
@@ -301,6 +302,24 @@ def build_umbra_vale(rng):
     return g, [{"cell": [21 + SHRINE_DOOR[0], 2 + SHRINE_DOOR[1]], "to": "d4_entrance"}]
 
 
+def build_cinder_barrens(rng):
+    """The Cinder Barrens (Ignis's land, Dark World only, east of Ash Lake): ash ground behind a lava river only the
+    grapple crosses (by its hook posts); the Ignis Forge in the north; a lava pool in the south whose islet holds a
+    piece of heart for the ice rod."""
+    g = Grid(*size_of((1, 2)), fill="a")
+    g.tree_border({"w": (12, 15)})
+    g.rect(0, 12, 3, 15, "#")
+    g.rect(4, 2, 8, 25, "!")                           # the lava river
+    g.piece(14, 2, "E")                                # the Ignis Forge
+    g.rect(15, 5, 17, 11, "#")
+    g.rect(11, 17, 20, 24, "!")                        # the lava pool...
+    g.rect(15, 20, 16, 21, "a")                        # ...and its islet
+    g.place([(12, 8), (20, 6), (19, 14)], "R")
+    g.place([(12, 11), (19, 9), (10, 22)], "c")
+    g.place([(17, 14)], "A")
+    return g, [{"cell": [14 + SHRINE_DOOR[0], 2 + SHRINE_DOOR[1]], "to": "d5_entrance"}]
+
+
 def build_interior(kind, rng, spawn=False):
     """A 16x11 room: two-row north wall (top + face, with shelves), side walls, furniture, exit mat at the bottom."""
     g = Grid(16, 11, "_")
@@ -420,10 +439,27 @@ def grapple_hops(rows, solid, x, y):
                 break
 
 
+def ice_hops(rows, solid, x, y):
+    """Cells Joe walks to over frozen lava from (x, y): an ice bolt shot along a facing freezes the unbroken run of
+    lava in front of him, and he crosses it to the first walkable cell past it (within ICE_REACH tiles)."""
+    h, w = len(rows), len(rows[0])
+    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        for k in range(1, ICE_REACH + 1):
+            nx, ny = x + dx * k, y + dy * k
+            if not (0 <= nx < w and 0 <= ny < h):
+                break
+            if rows[ny][nx] == "!":
+                continue
+            if k >= 2 and not solid[ny][nx]:
+                yield nx, ny
+            break
+
+
 def neighbours_walk(rows, solid, x, y):
     """Cells reachable in one step from (x, y); walking south onto a ledge lands on the first cell past it."""
     h, w = len(rows), len(rows[0])
     yield from grapple_hops(rows, solid, x, y)
+    yield from ice_hops(rows, solid, x, y)
     for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
         nx, ny = x + dx, y + dy
         if not (0 <= nx < w and 0 <= ny < h):
@@ -601,6 +637,8 @@ def lint_world(areas, problems):
         problems.append("world: hook posts but no grapple anywhere")
     if any("m" in r for a in areas for r in a["rows"]) and "grapple" not in held:
         problems.append("world: a Gloom Moth but no grapple anywhere")
+    if any("I" in r for a in areas for r in a["rows"]) and "ice_rod" not in held:
+        problems.append("world: a Magma Wyrm but no ice rod anywhere")
     if seals != [0, 1, 2]:
         problems.append("world: the dungeons hold seals %s (need 0, 1, 2)" % seals)
     if any(o["kind"] == "seal_gate" for o in every) and not any(info.get("ending") for info, _ in DUNGEONS):
@@ -749,6 +787,8 @@ OBJECTS = {
     "south_fields": [("seal_gate", 15, 5, {}), ("rubble", 40, 17, {}), ("rift", 12, 10, {})],
     # Umbra: the chasm's island (grapple there by the post on its west edge, back by the post on the mainland).
     "dw_umbra_vale": [("hook_post", 36, 6, {}), ("hook_post", 28, 7, {}), ("heart_piece", 34, 5, {})],
+    # Ignis: the posts across the lava river (the way in needs Umbra's grapple) and the lava pool's heart piece.
+    "dw_cinder_barrens": [("hook_post", 10, 13, {}), ("hook_post", 2, 10, {}), ("heart_piece", 15, 20, {})],
 }
 # Boni's wares on her counter (table cells): area -> [(x, y, ware id)].
 WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")],
@@ -871,7 +911,7 @@ def d1_rooms():
     return rooms
 
 
-ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "O", "B", "+", "o", ";")
+ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "c", "I", "O", "B", "+", "o", "!", ";")
 
 
 def make_room(rooms, aid, gx, gy, doors, fill, extra=None):
@@ -1021,7 +1061,56 @@ def d4_rooms():
     return rooms
 
 
-DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms), (D4, d4_rooms)]
+# The Ignis Forge (Dark World dungeon 2): the second dimension crystal.
+D5 = {"id": "d5", "name": "Ignis Forge", "crystal": 1, "entrance": "d5_entrance", "boss_room": "d5_boss",
+      "boss_flag": "boss:d5"}
+
+
+def d5_rooms():
+    """The Ignis Forge: the entrance's small key opens the east room; the big key waits on a lava islet in the west
+    room (grapple there and back); the east room's big chest holds the Ice Rod, whose bolts freeze a path over the
+    lava to the switch that opens the hall's north shutter; then the Magma Wyrm."""
+    rooms = []
+
+    def entrance(g):
+        g.rect(3, 3, 6, 4, "!")
+        g.rect(17, 3, 20, 4, "!")
+        return [("chest", 11, 4, {"item": "small_key", "amount": 1, "reveal": ""}), ("c", 7, 8, {}), ("c", 16, 8, {}),
+                (";", 9, 10, {})]
+    make_room(rooms, "d5_entrance", 1, 2, {"n": ("open",), "s": ("stairs",)}, entrance)
+
+    def hall(g):
+        for x0, y0 in ((4, 3), (16, 3), (4, 9), (16, 9)):
+            g.rect(x0, y0, x0 + 3, y0 + 1, "!")
+        return [("chest", 8, 6, {"item": "map", "amount": 1, "reveal": ""}), ("c", 15, 7, {}), ("A", 10, 9, {})]
+    make_room(rooms, "d5_hall", 1, 1, {"s": ("open",), "w": ("open",), "e": ("locked", "d5_hall_east", ""),
+                                       "n": ("shutter", "d5_hall_north", "switch:d5_east")}, hall)
+
+    def west(g):
+        g.rect(4, 3, 15, 9, "!")                       # a lava lake...
+        g.rect(9, 5, 11, 7, "=")                       # ...with an islet
+        return [("hook_post", 9, 6, {}), ("chest", 10, 5, {"item": "big_key", "amount": 1, "reveal": ""}),
+                ("hook_post", 17, 7, {}), ("chest", 19, 3, {"item": "compass", "amount": 1, "reveal": ""}),
+                ("c", 18, 10, {}), ("c", 5, 11, {})]
+    make_room(rooms, "d5_west", 0, 1, {"e": ("open",)}, west)
+
+    def east(g):
+        g.rect(13, 2, 15, 11, "!")                     # a lava channel splits the room
+        return [("big_chest", 4, 3, {"item": "ice_rod"}),
+                ("switch", 19, 3, {"flag": "switch:d5_east", "heavy": False}),
+                ("chest", 19, 9, {"item": "gems", "amount": 50, "reveal": ""}), ("c", 18, 6, {}), ("A", 7, 9, {})]
+    make_room(rooms, "d5_east", 2, 1, {"w": ("locked", "d5_hall_east", "")}, east)
+
+    def boss(g):
+        for x0, y0 in ((5, 3), (17, 3), (5, 8), (17, 8)):
+            g.rect(x0, y0, x0 + 1, y0 + 1, "!")
+        return [("I", 11, 7, {})]
+    make_room(rooms, "d5_boss", 1, 0, {"s": ("boss", "d5_boss_door", D5["boss_flag"])}, boss,
+              {"boss_flag": D5["boss_flag"]})
+    return rooms
+
+
+DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms), (D4, d4_rooms), (D5, d5_rooms)]
 DUNGEON_STRIDE = 200                     # tiles between two dungeons' room grids
 
 
@@ -1038,10 +1127,12 @@ DARK_EDITS = {
     "meadow_north": lambda g: ([g.set(x, y, ",") for y in range(2, 6) for x in range(30, 38) if g.get(x, y) == "~"],
                                g.rect(22, 0, 25, 5, "#")),     # ...and the trees part north, toward Umbra
     "el_pueblo": lambda g: (g.piece(8, 17, "K"), g.piece(11, 17, "K")),   # the Shade Market's stall
+    "east_lake": lambda g: g.rect(20, 12, 23, 15, "#"),                   # the shore path runs on east, to Ignis
 }
 # Dark World-only areas (the dimensions' lands): no Light World twin, so the Moon Mirror does nothing there.
 DARK_ONLY = [
     ("dw_umbra_vale", "Umbral Vale", (0, -1), (2, 1), build_umbra_vale),
+    ("dw_cinder_barrens", "Cinder Barrens", (3, 1), (1, 2), build_cinder_barrens),
 ]
 DARK_EXTRA = {                            # Dark World enemies added on top of the Light World's
     "el_pueblo": [(10, 20, "A"), (36, 9, "Z"), (40, 21, "G")],
@@ -1060,6 +1151,7 @@ SIGNS.update({
     "dw_south_road": [(21, 4, "dw_sign_tempus")],
     "dw_south_fields": [(21, 3, "dw_sign_fields")],
     "dw_umbra_vale": [(20, 7, "dw_sign_sanctum")],
+    "dw_cinder_barrens": [(13, 6, "dw_sign_forge")],
 })
 
 

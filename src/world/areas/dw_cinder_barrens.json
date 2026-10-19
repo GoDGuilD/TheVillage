@@ -1,0 +1,93 @@
+{
+ "id": "dw_cinder_barrens",
+ "name": "Cinder Barrens",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  1,
+  2
+ ],
+ "origin_tiles": [
+  72,
+  14
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "Txaa!!!!!aaaaaExxxxaaaTx",
+  "xxaa!!!!!aaaaaxxxxxaaaxx",
+  "Txaa!!!!!aaaaaxxxxxaaaTx",
+  "xxaa!!!!!aaaaaa###aaaaxx",
+  "Txaa!!!!!aaaaSa###aaRaTx",
+  "xxaa!!!!!aaaaaa###aaaaxx",
+  "Txaa!!!!!aaaRaa###aaaaTx",
+  "xxaa!!!!!aaaaaa###acaaxx",
+  "Tx|a!!!!!aaaaaa###aaaaTx",
+  "xxaa!!!!!aaacaa###aaaaxx",
+  "####!!!!!aaaaaaaaaaaaaTx",
+  "####!!!!!a|aaaaaaaaaaaxx",
+  "####!!!!!aaaaaaaaAaRaaTx",
+  "####!!!!!aaaaaaaaaaaaaxx",
+  "Txaa!!!!!aaaaaaaaaaaaaTx",
+  "xxaa!!!!!aa!!!!!!!!!!axx",
+  "Txaa!!!!!aa!!!!!!!!!!aTx",
+  "xxaa!!!!!aa!!!!!!!!!!axx",
+  "Txaa!!!!!aa!!!!ha!!!!aTx",
+  "xxaa!!!!!aa!!!!aa!!!!axx",
+  "Txaa!!!!!ac!!!!!!!!!!aTx",
+  "xxaa!!!!!aa!!!!!!!!!!axx",
+  "Txaa!!!!!aa!!!!!!!!!!aTx",
+  "xxaa!!!!!aaaaaaaaaaaaaxx",
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [
+  {
+   "cell": [
+    16,
+    4
+   ],
+   "to": "d5_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  }
+ ],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    13,
+    6
+   ],
+   "text": "dw_sign_forge"
+  }
+ ],
+ "objects": [
+  {
+   "kind": "hook_post",
+   "cell": [
+    10,
+    13
+   ]
+  },
+  {
+   "kind": "hook_post",
+   "cell": [
+    2,
+    10
+   ]
+  },
+  {
+   "kind": "heart_piece",
+   "cell": [
+    15,
+    20
+   ]
+  }
+ ],
+ "wares": []
+}

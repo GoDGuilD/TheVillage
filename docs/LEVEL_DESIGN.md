@@ -4,8 +4,8 @@ Description: How areas are built, linted and previewed; the glyph table.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.6.0
+Last edit date: 2026-10-22
+Version: 1.7.0
 -->
 
 # Level design
@@ -51,7 +51,8 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `r` | heavy rock (power glove) | `b` | rubble (dash boots) |
 | `A` | bat | `Y` `U` `F` `V` | bosses: Grand Slime, Iron Ram, Frost Wraith, Caver's shade |
 | `X` | lurker (creeps while Joe looks away) | `m` | boss: the Gloom Moth |
-| `|` | hook post (solid; the grapple bites it) | | |
+| `|` | hook post (solid; the grapple bites it) | `!` | lava (Joe burns; the grapple flies over; the ice rod freezes it) |
+| `a` | ash ground (Ignis) | `c` `I` | cinder; boss: the Magma Wyrm |
 
 ## Villagers and signs
 Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
@@ -101,6 +102,8 @@ the seals 0-2 each belong to one dungeon, a seal gate needs a dungeon with an en
 need a reachable Dark World twin cell (rifts also a reachable Light World cell), and the Act 2 spawn must be
 reachable. The grapple counts as a way across: from any reachable cell, a straight line over open ground, pits or
 water to a hook post at most 7 tiles away reaches the cell in front of the post (`grapple_hops`). Hook posts and
-a Gloom Moth need a grapple somewhere; crystals are numbered 0, 1, ... in order. Rooms can be `"dark": True`
+a Gloom Moth need a grapple somewhere; crystals are numbered 0, 1, ... in order. The ice rod counts too: from
+any reachable cell, an unbroken run of lava straight ahead leads to the first walkable cell past it within 8 tiles
+(`ice_hops`); a Magma Wyrm needs an ice rod somewhere. Rooms can be `"dark": True`
 (give them torches). Dark World-only lands go in `DARK_ONLY` (they keep `world: "dark"` and have no twin). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

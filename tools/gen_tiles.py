@@ -3,12 +3,12 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 3.0.1
+# Last edit date: 2026-10-22
+# Version: 3.1.0
 #
 # Run:  python -I tools/gen_tiles.py   (writes assets/tiles/overworld_light.png + .json, assets/sprites/world/, tmp/tiles_preview.png)
 #
-# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and flags it (solid, ledge, door, exit, pit, low = the grapple flies over it),
+# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and flags it (solid, ledge, door, exit, pit, low = the grapple flies over it, lava),
 # so the game builds its TileSet from the manifest at runtime (no hand-made .tres to keep in sync).
 # Multi-cell pieces (2x2 tree, 5x4 houses) are named <piece>_<x>_<y>; the area painter places them by anchor.
 import json
@@ -25,6 +25,7 @@ from palette import (BARK_DARK, BARK_LIGHT, BARK_MID, BUSH_DARK, BUSH_LIGHT, BUS
 from sprite_lib import Canvas, upscale
 import terrain_art as ta
 import dungeon_art as da
+import ignis_art as ia
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TILE_DIR = os.path.join(ROOT, "assets", "tiles")
@@ -189,6 +190,17 @@ def make_atlas():
             col, row = 1 + dx, 11 + dy
             da.pit(c, col * T, row * T, dy == -1, dy == 1, dx == -1, dx == 1)
             put("pit_%d_%d" % (dx, dy), col, row, pit=True, low=True)
+    # Ignis (Phase 10): lava nine-slice at columns 4-6, rows 10-12 (a pit for Joe, a wall for enemies, the grapple
+    # flies over it, the ice rod freezes it into crust); the crust and two ash grounds in column 7-8.
+    irng = random.Random(1010)                 # own stream: the cells drawn after this keep their old look
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            col, row = 5 + dx, 11 + dy
+            ia.lava(c, col * T, row * T, irng, dy == -1, dy == 1, dx == -1, dx == 1)
+            put("lava_%d_%d" % (dx, dy), col, row, pit=True, low=True, lava=True)
+    ia.crust(c, 7 * T, 10 * T, irng); put("crust", 7, 10)
+    ia.ash(c, 7 * T, 11 * T, irng); put("ash", 7, 11)
+    ia.ash(c, 8 * T, 11 * T, irng, embers=3); put("ash_b", 8, 11)
     # The Moss Shrine facade (5x3, door cell walkable) at columns 9-13, rows 9-11.
     da.shrine(c, 9 * T, 9 * T, rng)
     for ty in range(da.SHRINE_H):

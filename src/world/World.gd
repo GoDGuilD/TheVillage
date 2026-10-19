@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals; Ignis: lava.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 6.1.1
+# Last edit date: 2026-10-22
+# Version: 6.1.2
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -666,7 +666,7 @@ func grant(kind: String, amount: int = 1) -> bool:
 			return true
 		"map", "compass", "big_key":
 			GameState.give_dungeon_item(dungeon_of(current_id()), kind)
-		"glove", "boots", "fire_rod", "moon_mirror", "grapple":
+		"glove", "boots", "fire_rod", "moon_mirror", "grapple", "ice_rod":
 			GameState.give_item(kind)
 		"magic":
 			GameState.add_magic(amount)

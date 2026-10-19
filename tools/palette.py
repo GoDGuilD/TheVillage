@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.9.0
+# Last edit date: 2026-10-22
+# Version: 1.10.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -362,3 +362,28 @@ MOTH_DUST      = _hex("#8c6cb0")
 HOOD_DARK      = _hex("#1c1428")    # the shade merchant's hood
 HOOD_MID       = _hex("#3c2c58")
 HOOD_TRIM      = _hex("#c8a040")
+
+# --- Ignis (Phase 10): lava, ash, the ice crust, the ice rod, cinders, the magma wyrm -----------------------------
+LAVA_DEEP      = _hex("#7c1c0c")
+LAVA_MID       = _hex("#d84818")
+LAVA_LIGHT     = _hex("#f89830")
+LAVA_GLOW      = _hex("#fce070")
+BASALT_DARK    = _hex("#241c20")    # the rim of lava pools
+BASALT_MID     = _hex("#443438")
+ASH_DARK       = _hex("#3c3434")    # Ignis ground
+ASH_MID        = _hex("#5c5050")
+ASH_LIGHT      = _hex("#7c6c68")
+EMBER          = _hex("#e86c28")
+CRUST_DARK     = _hex("#4c7cb0")    # lava frozen by the ice rod
+CRUST_MID      = _hex("#90c0e8")
+CRUST_LIGHT    = _hex("#e0f4ff")
+ICE_DARK       = _hex("#3c78c8")
+ICE_MID        = _hex("#88c8f8")
+ICE_LIGHT      = _hex("#e8f8ff")
+CINDER_DARK    = _hex("#3c1c14")
+CINDER_MID     = _hex("#8c3018")
+CINDER_EYE     = _hex("#fce070")
+WYRM_DARK      = _hex("#4c1410")
+WYRM_MID       = _hex("#a03420")
+WYRM_LIGHT     = _hex("#e0683c")
+WYRM_BELLY     = _hex("#f0b048")

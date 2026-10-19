@@ -4,13 +4,13 @@ Description: Project overview, status, and getting-started guide for The Village
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-21
-Version: 5.5.1
+Last edit date: 2026-10-22
+Version: 5.5.2
 -->
 
 # The Village
 
-**Version 7.3.0** (project-wide; see `CHANGELOG.md`)
+**Version 7.4.0** (project-wide; see `CHANGELOG.md`)
 
 A top-down action-adventure in the style of *The Legend of Zelda: A Link to the Past*, built with Godot 4.7.2.
 It is the **first game (prequel) of The Village trilogy**; game 2 is *The Village — Chapel of Dreams*
@@ -18,7 +18,7 @@ It is the **first game (prequel) of The Village trilogy**; game 2 is *The Villag
 vampire-sorcerer Caver, across a Light World and its Dark World mirror.
 
 ## Status
-Rebuilt on 2026-10-15 on Chapel of Dreams' architecture. **Phases 0–9 are done**: Joe walks in 8 directions with
+Rebuilt on 2026-10-15 on Chapel of Dreams' architecture. **Phases 0–10 are done**: Joe walks in 8 directions with
 ALttP facing rules and corner nudging, slashes, charges a spin attack, blocks rocks with his shield, lifts and throws
 pots and bushes, and fights slimes, Caver's guards and rock-spitters that drop hearts and gems, in a
 hearts/gems HUD and generated sound effects. The game starts in Joe's house in El Pueblo; four neighbouring areas
@@ -32,7 +32,8 @@ dungeons (Ram's Hollow with the Dash Boots and the Iron Ram, the Frost Vault wit
 Wraith), the three seals opening Caver's keep, Caver's shade and the end-of-act card. **Act 2 has begun**: the
 Dark World (the whole valley as Caver dreams it), Tato's echo, the Moon Mirror and the dream rifts; then Umbra,
 the first dimension: the Umbral Vale, the Umbra Sanctum's dark rooms, the Grapple and its hook posts, lurkers, the
-Gloom Moth and the first crystal, and the Shade Market. 441 automated checks pass.
+Gloom Moth and the first crystal, and the Shade Market; then Ignis: the Cinder Barrens' lava, the Ice Rod that
+freezes enemies and lava, cinders, the Ignis Forge, the Magma Wyrm and the second crystal. 477 automated checks pass.
 Plan: `docs/ROADMAP.md`. Design: `docs/GDD.md`.
 
 ## Run it

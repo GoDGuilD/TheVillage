@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1, world warps, the grapple) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1, world warps, the grapple, Ignis) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 3.4.0
+# Last edit date: 2026-10-22
+# Version: 3.5.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -477,6 +477,31 @@ def clink():
     return (np.sin(2 * np.pi * 2400 * t) + 0.6 * np.sin(2 * np.pi * 3600 * t)) * decay(n, 0.06) + 0.3 * crush(noise(n), 3) * decay(n, 0.01)
 
 
+# --- Phase 10: Ignis ----------------------------------------------------------------------
+
+def freeze():
+    # The ice rod's bolt: a bright crystalline shimmer falling in pitch.
+    t = tt(0.32)
+    n = len(t)
+    f = 3200 - 1800 * t / t[-1]
+    tone = np.sin(2 * np.pi * np.cumsum(f) / SR) + 0.5 * np.sin(2 * np.pi * np.cumsum(f * 1.5) / SR)
+    return tone * decay(n, 0.12) + 0.25 * noise(n) * decay(n, 0.03)
+
+
+def lava_burst():
+    # The magma wyrm breaking the surface: a low gloop and a hiss.
+    t = tt(0.45)
+    n = len(t)
+    f = 90 + 160 * np.exp(-t * 9)
+    return 0.9 * np.sin(2 * np.pi * np.cumsum(f) / SR) * decay(n, 0.2) + 0.4 * crush(noise(n), 2) * decay(n, 0.15)
+
+
+def sizzle():
+    # Joe stepping into lava (or a crust melting under him).
+    n = int(0.4 * SR)
+    return 0.7 * crush(noise(n), 3) * decay(n, 0.14)
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -497,6 +522,7 @@ SFX = {
     "dash": (dash, -6.5), "bonk": (bonk, -4.5), "fireball": (fireball, -5.5), "ice_shard": (ice_shard, -7.0),
     "orb": (orb, -6.0), "clank": (clank, -6.0), "magic_jar": (magic_jar, -6.5), "act_end": (act_end, -4.5),
     "warp": (warp, -5.5), "chain": (chain, -7.0), "clink": (clink, -6.0),
+    "freeze": (freeze, -6.0), "lava_burst": (lava_burst, -5.0), "sizzle": (sizzle, -8.0),
 }
 
 

@@ -4,8 +4,8 @@ Description: Asset inventory.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.8.0
+Last edit date: 2026-10-22
+Version: 1.9.0
 -->
 
 # Assets
@@ -32,6 +32,8 @@ Version: 1.8.0
 | `assets/sprites/world/rift.png`, `portal.png`, `assets/ui/items/moon_mirror.png` | dream rift, mirror portal, Moon Mirror icon | `tools/gen_dark.py` |
 | `assets/ui/items/grapple.png`, `assets/sprites/items/{grapple_head,chain,dust_shot}.png`, `assets/sprites/dungeon/{hook_post,crystal}.png`, `assets/ui/menu/crystal_{empty,full}.png`, `assets/sprites/world/darkness_{small,lantern}.png`, enemy packs `lurker`, `gloom_moth` | Umbra (Phase 9) | `tools/gen_umbra.py` |
 | `assets/sprites/npcs/shade_merchant_*` | the Shade Market's merchant | `tools/gen_npcs.py` |
+| atlas cells `lava_*`, `crust`, `ash`, `ash_b` | Ignis ground (kept as-is in the Dark World atlas) | `tools/ignis_art.py` via `tools/gen_tiles.py` |
+| `assets/ui/items/ice_rod.png`, `assets/sprites/items/{ice_bolt,ember_shot,ground_flame}.png`, enemy packs `cinder`, `magma_wyrm` | Ignis (Phase 10) | `tools/gen_ignis.py` |
 | `assets/sprites/npcs/tato_echo_*` | Tato's echo (Dark World) | `tools/gen_npcs.py` |
 | `assets/data/dialogue.json` | every villager line and sign text | hand-written (story lines are a draft) |
 | `src/world/areas/` | `index.json` + 9 area files (5 overworld, 4 interiors) with villagers and signs | `tools/gen_areas.py` |

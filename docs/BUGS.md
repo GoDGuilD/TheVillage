@@ -4,8 +4,8 @@ Description: Log of every gotcha met, internal or external.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.7.0
+Last edit date: 2026-10-22
+Version: 1.8.0
 -->
 
 # Bugs and gotchas
@@ -29,6 +29,8 @@ Version: 1.7.0
 - [External] **Static class names in a test compile before the autoloads** - Symptom: `test_act1.gd` failed with "Identifier not found: Audio" in Bush/IronRam and the whole World half-built. Root cause: `is IronRam` and `AreaBuilder.flag_at` in the test compile those classes (and their dependencies) before autoloads exist. Fix: compare `get_script().get_global_name()` and `load()` AreaBuilder. File: `tests/test_act1.gd`.
 
 - [Internal] **Floor switches (and rifts) were invisible** - Symptom: the Moss Shrine's floor switch never showed in screenshots; the first rift did not either. Root cause: they set `z_index = -1` to sit "under" actors, which also put them under the ground TileMapLayer. Fix: leave z at 0 and let the y-sorted actors node order them. File: `src/world/FloorSwitch.gd`, `src/world/Rift.gd`.
+- [Internal] **Ignis tiles would have redrawn the shrine** - Symptom: (caught before shipping) adding the lava cells to `gen_tiles.py` shifted the shared random stream, so every cell drawn after them (the Moss Shrine facade) would change. Root cause: one `random.Random` feeds the whole atlas in order. Fix: the Ignis cells use their own seeded stream; a cell-by-cell diff against the previous atlas showed no old cell changed. File: `tools/gen_tiles.py`.
+- [External] **A test naming AreaBuilder / BaseEnemy does not compile** - Symptom: `test_ignis.gd` failed with "Identifier not found: Audio", and later area builds failed oddly. Root cause: the same as before - in `-s` mode a static reference compiles those classes before the autoloads exist. Fix: `load()` AreaBuilder into a variable and read enemy constants through an instance. File: `tests/test_ignis.gd`.
 - [External] **JSON numbers come back as floats** - Symptom: `test_umbra.gd` said the Umbral Vale was not at its origin although the data was right. Root cause: `JSON.parse_string` turns every number into a float, and `[0.0, -14.0] == [0, -14]` is false for Arrays. Fix: compare positions as `Vector2` (`World.origin_of`). File: `tests/test_umbra.gd`.
 - [Internal] **Dialogue checks read a half-typed box** - Symptom: text checks failed with "The m" or "". Root cause: the box types its page; `visible_text()` right after opening shows only the first letters. Fix: the test waits ~2 s (`_text()`) before reading. File: `tests/test_umbra.gd`.
 - [Internal] **The moth's dust drew both frames side by side** - Symptom: the first dust shot preview was a 20-px strip. Root cause: `EnemyShot` draws a plain Sprite2D, not an animation; the generator wrote a 2-frame strip. Fix: `dust_shot.png` is one frame. File: `tools/gen_umbra.py`.

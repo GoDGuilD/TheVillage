@@ -1,0 +1,20 @@
+{
+  "frame_size": [
+    24,
+    24
+  ],
+  "feet": [
+    12,
+    20
+  ],
+  "anims": {
+    "idle": {
+      "fps": 3.0,
+      "loop": true
+    },
+    "hop": {
+      "fps": 10.0,
+      "loop": false
+    }
+  }
+}

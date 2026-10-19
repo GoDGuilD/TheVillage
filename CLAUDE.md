@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-21
-Version: 2.8.0
+Last edit date: 2026-10-22
+Version: 2.9.0
 -->
 
 # The Village
@@ -82,3 +82,7 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   TileSet cells flagged `low` (water, pits) and latches onto group `hookable`; the lint's reachability follows it
   (`grapple_hops`). Crystal dungeons carry `crystal` and no `seal` key. Nine suites (441 checks; `test_umbra.gd`
   45). JSON numbers load as floats: compare positions as Vector2, not arrays; wait ~2 s before reading a typing box.
+- Phase 10 (Ignis): lava `!` is a pit + `low` + `lava` cell (ignis_art.py; gen_dark keeps its colours); the ice rod
+  freezes it via `AreaBuilder.freeze_at` (crust, timers per cell generation) and the lint follows it (`ice_hops`).
+  Element `ice` -> `BaseEnemy._iced()`. Ten suites (477 checks; `test_ignis.gd` 36). Tests reach AreaBuilder only
+  through `load()` and read enemy constants through an instance (`slime.ICE_TINT`, never `BaseEnemy.ICE_TINT`).

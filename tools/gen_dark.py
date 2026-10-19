@@ -3,14 +3,15 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-20
-# Last edit date: 2026-10-20
-# Version: 1.0.0
+# Last edit date: 2026-10-22
+# Version: 1.1.0
 #
 # Run AFTER gen_tiles.py:  python -I tools/gen_dark.py
 # Writes assets/tiles/overworld_dark.png (same cells and manifest as overworld_light.json), assets/sprites/world/
 # rift.png, portal.png, assets/ui/items/moon_mirror.png and tmp/dark_preview.png.
 # The Dark World is the same land as Caver dreams it: shapes stay, colours rot (ALttP's Dark World recolour).
 import colorsys
+import json
 import os
 import sys
 
@@ -53,12 +54,26 @@ def dusk(c):
     return (int(r2 * 255), int(g2 * 255), int(b2 * 255), a)
 
 
+# Cells that keep their Light World colours in the Dark World (Ignis's lava, crust and ash are already its own).
+KEEP_PREFIXES = ("lava_", "crust", "ash")
+
+
+def kept_cells():
+    """Atlas cells (col, row) listed in the manifest under a KEEP_PREFIXES name."""
+    with open(LIGHT.replace(".png", ".json"), encoding="utf-8") as f:
+        cells = json.load(f)["cells"]
+    return {tuple(v["cell"]) for k, v in cells.items() if k.startswith(KEEP_PREFIXES)}
+
+
 def dark_atlas():
     img = Image.open(LIGHT).convert("RGBA")
     px = img.load()
     cache = {}
+    keep = kept_cells()
     for y in range(img.height):
         for x in range(img.width):
+            if (x // 16, y // 16) in keep:
+                continue
             c = px[x, y]
             if c not in cache:
                 cache[c] = MAP.get(c, dusk(c))

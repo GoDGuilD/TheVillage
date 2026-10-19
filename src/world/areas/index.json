@@ -22,6 +22,7 @@
   "dw_south_road",
   "dw_south_fields",
   "dw_umbra_vale",
+  "dw_cinder_barrens",
   "d1_entrance",
   "d1_hub",
   "d1_west",
@@ -49,7 +50,12 @@
   "d4_hall",
   "d4_west",
   "d4_east",
-  "d4_boss"
+  "d4_boss",
+  "d5_entrance",
+  "d5_hall",
+  "d5_west",
+  "d5_east",
+  "d5_boss"
  ],
  "act2_spawn": {
   "area": "dw_el_pueblo",
@@ -94,6 +100,13 @@
    "entrance": "d4_entrance",
    "boss_room": "d4_boss",
    "boss_flag": "boss:d4"
+  },
+  "d5": {
+   "name": "Ignis Forge",
+   "crystal": 1,
+   "entrance": "d5_entrance",
+   "boss_room": "d5_boss",
+   "boss_flag": "boss:d5"
   }
  }
 }

@@ -1,0 +1,28 @@
+{
+  "frame_size": [
+    48,
+    48
+  ],
+  "feet": [
+    24,
+    44
+  ],
+  "anims": {
+    "rise": {
+      "fps": 8.0,
+      "loop": false
+    },
+    "up": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "sink": {
+      "fps": 8.0,
+      "loop": false
+    },
+    "frozen": {
+      "fps": 1.0,
+      "loop": false
+    }
+  }
+}

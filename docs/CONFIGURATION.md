@@ -4,8 +4,8 @@ Description: Configuration parameters.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.8.0
+Last edit date: 2026-10-22
+Version: 1.9.0
 -->
 
 # Configuration
@@ -31,6 +31,9 @@ Version: 1.8.0
 | `tools/gen_umbra.py` (`LIGHT_SMALL`, `LIGHT_LANTERN`, `SOFT`) | How much Joe sees in a dark room (with and without the lantern) |
 | `src/enemies/Lurker.gd`, `GloomMoth.gd` | Lurker speed and "looked at" cone; the moth's loop, dust, ground time |
 | `tools/gen_areas.py` (`D4`, `d4_rooms()`, `build_umbra_vale`, `DARK_ONLY`), `ItemDB.WARES` (`dw_*`) | Umbra's places and the Shade Market's prices |
+| `src/items/IceBolt.gd` (`SPEED`, `MAX_DISTANCE`, `CRUST_TIME`), `ItemDB.ICE_ROD_MAGIC`, `BaseEnemy.ICE_TIME` | The ice rod: reach, how long crust holds, cost, freeze time |
+| `src/enemies/Cinder.gd`, `MagmaWyrm.gd`, `src/world/GroundFlame.gd` | Cinder stats; the wyrm's timings, spits, frozen time; flame life and damage |
+| `tools/gen_areas.py` (`D5`, `d5_rooms()`, `build_cinder_barrens`, `ICE_REACH`) | Ignis's places |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.8.0
+Last edit date: 2026-10-22
+Version: 1.9.0
 -->
 
 # Known issues
@@ -47,3 +47,6 @@ Version: 1.8.0
 - The Gloom Moth's grounded frame is the flying frame with folded wings, close to the floor; its dust is not
   blockable by the shield.
 - The Shade Market reuses the indoor table tiles outdoors.
+- Lava crust gives no warning before it melts, and lava is not animated. Enemies may walk onto crust and are left
+  standing in lava when it melts. Lava burns like a pit (one heart, back to the entry).
+- The Magma Wyrm rises at any lava cell of its room (not only pool centres), so it can sit at a pool's edge.

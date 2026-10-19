@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 1.4.0
+# Last edit date: 2026-10-22
+# Version: 1.5.0
 class_name BaseEnemy
 extends CharacterBody2D
 ## Subclasses set the pack/stat variables in _init() and override _think(delta) (AI) and optionally _anim_base().
@@ -28,6 +28,9 @@ const HIT_STOP := 0.05                   # freeze for both sides when a hit land
 const KILL_SHAKE := Vector2(1.0, 0.12)   # (pixels, seconds) of camera shake on a kill
 const STUN_ELEMENT := "stun"             # HitBox.element of hits that only stun (boomerang)
 const HOOK_ELEMENT := "hook"             # the grapple: stuns like the boomerang unless _hooked() takes it
+const ICE_ELEMENT := "ice"               # the ice rod: freezes the enemy in a block of ice unless _iced() takes it
+const ICE_TIME := 3.0                    # seconds a frozen enemy stays frozen
+const ICE_TINT := Color(0.55, 0.8, 1.0)  # how a frozen enemy looks (sprite self_modulate)
 const STUN_TIME := 2.0                   # seconds a stunned enemy stays frozen
 const FEET_BOX := Vector2(10, 6)
 
@@ -106,6 +109,8 @@ func _physics_process(delta: float) -> void:
 	if _frozen_left > 0.0:
 		_frozen_left -= delta
 		sprite.speed_scale = 0.0
+		if _frozen_left <= 0.0:
+			sprite.self_modulate = Color.WHITE        # thawed (ice) / woke up (stun)
 		return
 	sprite.speed_scale = 1.0
 	_iframes_left = maxf(0.0, _iframes_left - delta)
@@ -182,6 +187,13 @@ func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void
 	if element == HOOK_ELEMENT and _hooked():
 		_iframes_left = IFRAMES
 		return
+	if element == ICE_ELEMENT:
+		_iframes_left = IFRAMES
+		if not _iced():
+			freeze(ICE_TIME)
+			sprite.self_modulate = ICE_TINT
+			Audio.sfx("freeze")
+		return
 	if element == STUN_ELEMENT or element == HOOK_ELEMENT:
 		if stun_immune:
 			return
@@ -203,6 +215,11 @@ func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void
 	_knock_left = KNOCK_TIME
 	if not health.is_alive():
 		_die()
+
+
+# Subclasses return true when they handle the ice rod's bolt themselves (the Magma Wyrm is held above the lava).
+func _iced() -> bool:
+	return false
 
 
 # Subclasses return true when they handle the grapple's bite themselves (the Gloom Moth is dragged down).
