@@ -1,0 +1,40 @@
+{
+  "frame_size": [
+    48,
+    40
+  ],
+  "feet": [
+    24,
+    36
+  ],
+  "anims": {
+    "walk_down": {
+      "fps": 8.0,
+      "loop": true
+    },
+    "charge_down": {
+      "fps": 16.0,
+      "loop": true
+    },
+    "walk_up": {
+      "fps": 8.0,
+      "loop": true
+    },
+    "charge_up": {
+      "fps": 16.0,
+      "loop": true
+    },
+    "walk_side": {
+      "fps": 8.0,
+      "loop": true
+    },
+    "charge_side": {
+      "fps": 16.0,
+      "loop": true
+    },
+    "dazed": {
+      "fps": 8.0,
+      "loop": true
+    }
+  }
+}

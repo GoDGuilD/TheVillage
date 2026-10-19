@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 2.4.0
+# Last edit date: 2026-10-19
+# Version: 2.5.0
 class_name PlayerTuning
 extends RefCounted
 
@@ -72,6 +72,16 @@ const HOLD_HEIGHT := 30.0             # px above the feet where a found item is 
 const PIT_PROBE := Vector2(0, -3)     # the point under Joe that must be over a pit for him to fall
 const FALL_TIME := 0.5                # s spent shrinking into the pit
 const FALL_DAMAGE := 2                # half-hearts lost per fall (one heart)
+
+# --- Dash boots (dash button, Phase 7) ---------------------------------------------------------------------
+const DASH_CHARGE := 0.3              # s of running on the spot before the dash goes
+const DASH_SPEED := 220.0             # px/s
+const DASH_DAMAGE := 2                # the sword held out in front
+const DASH_KEEP_DOT := 0.7            # the dash stops when the stick points away from it (cos of the angle)
+const DASH_DUST_EVERY := 0.08         # s between dust puffs
+const BONK_TIME := 0.25               # s knocked back after dashing into a wall
+const BONK_SPEED := 70.0
+const BONK_SHAKE := Vector2(2.0, 0.15)
 
 # --- Health and being hurt ------------------------------------------------------
 const MAX_HP := 6                     # half-heart units: 6 = three hearts, like ALttP's start

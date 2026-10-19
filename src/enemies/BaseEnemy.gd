@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 1.2.1
+# Last edit date: 2026-10-19
+# Version: 1.3.0
 class_name BaseEnemy
 extends CharacterBody2D
 ## Subclasses set the pack/stat variables in _init() and override _think(delta) (AI) and optionally _anim_base().
@@ -170,6 +170,12 @@ func is_dead() -> bool:
 func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void:
 	if _dead or _iframes_left > 0.0:
 		return
+	# Armour and elements: a resisted hit only clanks (bosses that need a trick or a particular weapon).
+	if hurt_box.last_hit != null and _resists(hurt_box.last_hit):
+		_iframes_left = IFRAMES
+		Audio.sfx("clank")
+		Juice.play_fx("hit_spark", global_position + body_center, get_parent())
+		return
 	# A "stun" hit (the boomerang) freezes the enemy in place without hurting it, like ALttP.
 	if hurt_box.last_hit != null and hurt_box.last_hit.element == STUN_ELEMENT:
 		if stun_immune:
@@ -192,6 +198,11 @@ func _on_hurt(damage: int, source_position: Vector2, knockback: Vector2) -> void
 	_knock_left = KNOCK_TIME
 	if not health.is_alive():
 		_die()
+
+
+# Subclasses return true for hits that do nothing to them (checked before stun and damage).
+func _resists(_hit: HitBox) -> bool:
+	return false
 
 
 func _die() -> void:

@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 3.1.0
+# Last edit date: 2026-10-19
+# Version: 3.2.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -396,6 +396,57 @@ def boss_die():
     return np.concatenate([rumble, 0.6 * chime])
 
 
+# --- Phase 7: Act 1 ------------------------------------------------------------------------
+
+def dash():
+    sw = sweep(300, 1200, 0.25, 0.6)
+    n = len(sw)
+    return bandpass(noise(n), sw, 3.0) * decay(n, 0.2) + 0.3 * pulse(sw * 0.5, 0.25) * decay(n, 0.1)
+
+
+def bonk():
+    sw = sweep(160, 60, 0.2)
+    n = len(sw)
+    return tri(sw) * decay(n, 0.06) + 0.6 * lowpass(crush(noise(n), 3), 1500) * decay(n, 0.03)
+
+
+def fireball():
+    sw = sweep(900, 300, 0.3)
+    n = len(sw)
+    return bandpass(noise(n), sw, 2.0) * decay(n, 0.2) + 0.4 * lowpass(noise(n), 900) * decay(n, 0.1)
+
+
+def ice_shard():
+    return notes([(2637.0, 0.04), (3136.0, 0.08)], 0.125, 0.04)
+
+
+def orb():
+    sw = sweep(500, 900, 0.3)
+    n = len(sw)
+    return tri(sw) * np.sin(np.pi * np.arange(n) / n) + 0.3 * pulse(sw * 1.5, 0.5) * decay(n, 0.15)
+
+
+def clank():
+    # A blow that does nothing (armour, the wrong weapon).
+    t = tt(0.15)
+    n = len(t)
+    return (np.sin(2 * np.pi * 1400 * t) + 0.5 * np.sin(2 * np.pi * 2100 * t)) * decay(n, 0.04)
+
+
+def magic_jar():
+    return notes([(1046.5, 0.05), (1568.0, 0.05), (2093.0, 0.12)], 0.5, 0.08)
+
+
+def act_end():
+    # The end of Act 1: a slow minor rise that resolves.
+    seq = [(440.0, 0.25), (523.3, 0.25), (659.3, 0.25), (622.3, 0.5), (659.3, 0.9)]
+    parts = []
+    for f, d in seq:
+        n = int(d * SR)
+        parts.append(0.6 * tri(np.full(n, f)) * decay(n, d * 0.9, 0.01) + 0.3 * pulse(np.full(n, f * 2), 0.25) * decay(n, d * 0.4))
+    return np.concatenate(parts)
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -413,6 +464,8 @@ SFX = {
     "lantern": (lantern, -7.0), "shop_buy": (shop_buy, -6.0), "error": (error, -7.0),
     "fall": (fall, -6.0), "shutter": (shutter, -5.5), "switch_click": (switch_click, -6.5),
     "block_push": (block_push, -6.5), "boss_die": (boss_die, -3.5),
+    "dash": (dash, -6.5), "bonk": (bonk, -4.5), "fireball": (fireball, -5.5), "ice_shard": (ice_shard, -7.0),
+    "orb": (orb, -6.0), "clank": (clank, -6.0), "magic_jar": (magic_jar, -6.5), "act_end": (act_end, -4.5),
 }
 
 

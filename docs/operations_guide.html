@@ -4,8 +4,8 @@ Description: Printable operations and maintenance guide for The Village (run, ve
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-16
-Version: 1.5.0
+Last edit date: 2026-10-19
+Version: 1.6.0
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -47,14 +47,15 @@ behaviour is verified by headless scripted test suites.</p>
 <ul>
 <li><b>Start:</b> open the editor, import the project folder, press F5. The title screen opens; NEW GAME starts in Joe's house, CONTINUE loads the save.</li>
 <li><b>Stop:</b> close the game window (or F8 in the editor).</li>
-<li><b>Verify:</b> run the six test suites; each must end with <code>0 failed</code> (314 checks today):</li>
+<li><b>Verify:</b> run the seven test suites; each must end with <code>0 failed</code> (368 checks today):</li>
 </ul>
 <pre>Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_player.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_combat.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_world.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_ui.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_items.gd
-Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_dungeon.gd</pre>
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_dungeon.gd
+Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_act1.gd</pre>
 <p>Level lint (must print <code>0 lint problems</code>):</p>
 <pre>python -I tools/gen_areas.py</pre>
 <p>Visual checks (open a window, write <code>tmp/field_*.png</code>, <code>tmp/world_*.png</code>, <code>tmp/ui_*.png</code>):</p>
@@ -62,7 +63,8 @@ Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s test
 Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_world.gd
 Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_ui.gd
 Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_items.gd
-Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_dungeon.gd</pre>
+Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_dungeon.gd
+Godot_v4.7.2-stable_win64_console.exe --path . -s tools/capture_act1.gd</pre>
 
 <h2>4. Logs and monitoring</h2>
 <p>The game writes Godot's standard log to <code>%APPDATA%\Godot\app_userdata\The Village\logs\godot.log</code>.
@@ -92,6 +94,7 @@ python -I tools/gen_ui.py
 python -I tools/gen_npcs.py
 python -I tools/gen_items.py
 python -I tools/gen_dungeon.py
+python -I tools/gen_act1.py
 python -I tools/gen_sfx.py
 python -I tools/gen_areas.py
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --import</pre>

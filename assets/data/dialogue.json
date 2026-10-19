@@ -5,8 +5,8 @@
   "Author": "Jose-Jorge HERNANDEZ",
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
-  "Last edit date": "2026-10-16",
-  "Version": "1.2.0",
+  "Last edit date": "2026-10-19",
+  "Version": "1.3.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -93,7 +93,7 @@
  },
  "sign_south_road": {
   "pages": [
-   "SOUTH ROAD\nClosed by order of Caver.\nThe boulders are too heavy to lift."
+   "SOUTH ROAD\nClosed by order of Caver.\nNo bare hands will move those rocks."
   ]
  },
  "get_lantern": {
@@ -226,6 +226,76 @@
  "sign_shrine": {
   "pages": [
    "MOSS SHRINE\nThe old guardians kept a family seal here."
+  ]
+ },
+ "sign_fields": {
+  "pages": [
+   "SOUTH FIELDS\nWest: the Hollow. East: the Vault.\nNorth-west: the keep. Keep out."
+  ]
+ },
+ "sign_rams_hollow": {
+  "pages": [
+   "RAM'S HOLLOW\nSomething big paces down there."
+  ]
+ },
+ "sign_frost_vault": {
+  "pages": [
+   "FROST VAULT\nThe fence was put up for a reason."
+  ]
+ },
+ "sign_keep": {
+  "pages": [
+   "CAVER'S KEEP\nThree seals open what one man closed."
+  ]
+ },
+ "get_boots": {
+  "pages": [
+   "You got the Dash Boots! Press Shift (or the right stick) to dash. Rubble won't stand in your way."
+  ]
+ },
+ "get_fire_rod": {
+  "pages": [
+   "You got the Fire Rod! Its fireballs burn what ice protects, and light torches from afar."
+  ]
+ },
+ "get_seal_1": {
+  "pages": [
+   "You got the second Family Seal! It hums when you face the south.",
+   "One more seal waits."
+  ]
+ },
+ "get_seal_2": {
+  "pages": [
+   "You got the third Family Seal! All three are warm now.",
+   "Caver's keep cannot keep you out any longer."
+  ]
+ },
+ "seal_gate": {
+  "pages": [
+   "Three sockets are carved into the gate. It will open only when all three family seals are set in them."
+  ]
+ },
+ "seal_gate_open": {
+  "pages": [
+   "The three seals blaze in their sockets. With a groan, the gate of Caver's keep opens."
+  ]
+ },
+ "caver_banish": {
+  "name": "Caver",
+  "pages": [
+   "Enough. You fight like your father, boy. He lost, too.",
+   "You want my valley? Then see it as I dream it.",
+   "Go. Wander my world until it swallows you."
+  ]
+ },
+ "act1_card": {
+  "name": "END OF ACT ONE",
+  "pages": [
+   "Caver's spell tears the valley in two.",
+   "Joe falls into the land his enemy dreams:",
+   "the Dark World.",
+   "",
+   "To be continued."
   ]
  }
 }

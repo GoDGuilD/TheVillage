@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 3.0.1
+# Last edit date: 2026-10-19
+# Version: 3.0.2
 extends Node
 ## Keep it data + small helpers only. Joe's own hearts live on his HealthComponent (the World copies them in and
 ## out of saves). Items are listed here so the item menu can show their slots; they are found from Phase 5 on.
@@ -26,8 +26,10 @@ const PIECES_PER_HEART := 4             # four heart pieces make a heart contain
 const ITEM_ORDER := ["boomerang", "bow", "bombs", "lantern", "grapple",
 		"fire_rod", "ice_rod", "hammer", "moon_mirror", "bottle"]
 # Drop table rolled when an enemy dies or a pot breaks: [kind, weight]. "" = nothing.
-const DROP_TABLE := [["", 50], ["heart", 20], ["gem_green", 22], ["gem_blue", 6], ["gem_red", 2]]
+const DROP_TABLE := [["", 42], ["heart", 20], ["gem_green", 22], ["gem_blue", 6], ["gem_red", 2], ["magic_small", 6],
+		["magic_big", 2]]
 const GEM_VALUES := {"gem_green": 1, "gem_blue": 5, "gem_red": 20}
+const MAGIC_JARS := {"magic_small": 4, "magic_big": 16}    # magic units a jar refills (ALttP: 1/8 and 1/2)
 
 var gems := 0
 var magic := MAX_MAGIC

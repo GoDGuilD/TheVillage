@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-15
-# Version: 1.6.0
+# Version: 1.7.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -285,3 +285,43 @@ GLOVE_MID     = _hex("#b0703c")
 GLOVE_LIGHT   = _hex("#e0a870")
 MAP_PAPER     = _hex("#e8d8a8")
 MAP_INK       = _hex("#7c5c34")
+
+# --- Act 1 (Phase 7): dash boots, fire rod, magic jars, rubble, bats, bosses, Caver, the seal gate -----------
+BOOT_LEATHER_D = _hex("#5c3018")    # the dash boots
+BOOT_LEATHER_M = _hex("#9c5828")
+BOOT_WING      = _hex("#f0f0f8")
+ROD_WOOD_D     = _hex("#6c2c14")    # the fire rod
+ROD_WOOD_M     = _hex("#a8482c")
+ROD_GEM        = _hex("#ff7030")
+FIRE_CORE      = _hex("#fff8d0")    # fireball
+FIRE_MID       = _hex("#ffb030")
+FIRE_EDGE      = _hex("#e04818")
+JAR_GLASS      = _hex("#c8e8f0")    # magic jars
+JAR_POTION     = _hex("#40c050")
+JAR_CORK       = _hex("#a87848")
+RUBBLE_DARK    = _hex("#6c6458")    # rubble piles the dash breaks
+RUBBLE_MID     = _hex("#9c9484")
+RUBBLE_LIGHT   = _hex("#c8c0b0")
+BAT_DARK       = _hex("#28143c")    # bats
+BAT_MID        = _hex("#523078")
+BAT_EYE        = _hex("#ff4040")
+RAM_DARK       = _hex("#3c3c4c")    # the Iron Ram (boss 2)
+RAM_MID        = _hex("#6c6c84")
+RAM_LIGHT      = _hex("#a8a8c0")
+RAM_HORN       = _hex("#d8c890")
+RAM_EYE        = _hex("#ff5030")
+WRAITH_DARK    = _hex("#2c5c8c")    # the Frost Wraith (boss 3)
+WRAITH_MID     = _hex("#6ca8e0")
+WRAITH_LIGHT   = _hex("#d0f0ff")
+ICE_CORE       = _hex("#f0ffff")
+ICE_EDGE       = _hex("#7cc8f0")
+CAVER_CLOAK_D  = _hex("#2c0c1c")    # Caver's shade
+CAVER_CLOAK_M  = _hex("#5c1c38")
+CAVER_SKIN     = _hex("#c8c0d0")
+CAVER_EYE      = _hex("#ff3050")
+ORB_CORE       = _hex("#ffe0f0")
+ORB_EDGE       = _hex("#c03080")
+ORB_BACK       = _hex("#60d0ff")    # an orb Joe has batted back
+GATE_STONE_D   = _hex("#3c3044")    # Caver's keep walls and the seal gate
+GATE_STONE_M   = _hex("#605070")
+GATE_STONE_L   = _hex("#8c7c9c")

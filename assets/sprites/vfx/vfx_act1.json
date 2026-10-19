@@ -1,0 +1,10 @@
+{
+ "dust.png": {
+  "frame_size": [
+   12,
+   12
+  ],
+  "fps": 14.0,
+  "origin": "center"
+ }
+}

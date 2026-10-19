@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-16
-Version: 2.5.0
+Last edit date: 2026-10-19
+Version: 2.6.0
 -->
 
 # The Village
@@ -69,3 +69,7 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   flags; keys are per dungeon (`key_pools`). Pits: TileSet flag `pit` + physics layer 9 (enemies only). Six suites
   (314 checks; `test_dungeon.gd` 62). Never give a variable the name of a method in the same class; a rebuilt
   room frees its nodes (tests fetch them again); blocks press switches directly, not through Area2D overlaps.
+- Phase 7 (Act 1 complete): dungeons are listed in `DUNGEONS` in `gen_areas.py` (`make_room`); the keep's entry
+  has `ending: "act1"` (no seal) and `World.play_ending` runs the end card. Bosses' weaknesses go through
+  `BaseEnemy._resists(hit)`. Seven suites (368 checks; `test_act1.gd` 54). In tests hit with an element by setting
+  `hurt_box.last_hit`; never name boss classes or AreaBuilder statically in a test.

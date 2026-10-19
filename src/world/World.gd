@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 4.0.0
+# Last edit date: 2026-10-19
+# Version: 5.0.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -34,6 +34,9 @@ const DUNGEON_PUSH := 40.0               # px Joe walks into a dungeon room on a
 const BOSS_REWARD_DELAY := 1.2           # s after the boss falls before the heart container appears
 const REWARD_DROP := Vector2(0, 8)       # heart container position relative to the room's centre
 const SEAL_DROP := Vector2(0, -24)       # the seal appears above it (not under Joe, who just took the heart)
+const GATE_FLAG := "keep:gate"           # the seal gate of Caver's keep is open
+const ACT1_FLAG := "act1:done"
+const ENDING_DELAY := 1.5                # s between the shade's fall and Caver's last words
 const TILE := 16
 const VIEW := Vector2(384, 216)
 const SCROLL_TIME := 0.6                 # seconds the camera takes to slide to the next area
@@ -55,6 +58,8 @@ var pause_menu: PauseMenu
 var item_menu: ItemMenu
 var game_over: GameOver
 var map_screen: MapScreen
+var end_card: EndCard
+var endings := 0                         # act endings played (tests)
 var dungeons: Dictionary = {}            # dungeon id -> {name, seal, entrance, boss_room, boss_flag}
 var falls := 0                           # pit falls (tests)
 var talking: Node2D = null               # the villager or sign in the current conversation
@@ -128,6 +133,9 @@ func _build_overlays() -> void:
 	game_over.picked.connect(_on_game_over_picked)
 	map_screen = MapScreen.new()
 	add_child(map_screen)
+	end_card = EndCard.new()
+	add_child(end_card)
+	end_card.finished.connect(_on_end_card_finished)
 	var layer := CanvasLayer.new()
 	layer.layer = UiTheme.LAYER_FADE
 	add_child(layer)
@@ -307,6 +315,19 @@ func _build_object(area_id: String, o: Dictionary, actors: Node2D) -> void:
 			node = PushBlock.new()
 		"heavy_rock":
 			node = HeavyRock.new()
+		"rubble":
+			if GameState.has_flag(flag):
+				return
+			var rubble := Rubble.new()
+			rubble.flag = flag
+			rubble.broken.connect(func(_r: Node2D) -> void: GameState.set_flag(flag))
+			node = rubble
+		"seal_gate":
+			var gate := SealGate.new()
+			gate.setup(GATE_FLAG, GameState.has_flag(GATE_FLAG))
+			at += Vector2(TILE / 2.0, TILE / 2.0)            # centred on its 2x2 gateway
+			node = gate
+			gate.ready.connect(func() -> void: gate.refresh(GameState.seal_count()))
 		"torch":
 			var torch := Torch.new()
 			torch.lit_up.connect(_on_torch_lit)
@@ -485,6 +506,9 @@ func _on_talk_requested(target: Node2D) -> void:
 	if target is Door:
 		_open_door(target)
 		return
+	if target is SealGate:
+		_try_seal_gate(target)
+		return
 	if target is KeyBlock:
 		_use_key(target)
 		return
@@ -536,7 +560,12 @@ func item_get(kind: String, amount: int = 1) -> void:
 	var new_heart := grant(kind, amount)
 	player.hold_up(ItemDB.icon(kind))
 	Audio.sfx("heart_piece" if kind == "heart_piece" and not new_heart else "item_get")
-	var pages: Array = DialogueData.pages_for(ItemDB.text_key(kind), GameState)
+	var text := ItemDB.text_key(kind)
+	if kind == "seal":                                  # each seal has its own words
+		var idx := int(dungeons.get(dungeon_of(current_id()), {}).get("seal", 0))
+		if idx > 0 and DialogueData.has("get_seal_%d" % idx):
+			text = "get_seal_%d" % idx
+	var pages: Array = DialogueData.pages_for(text, GameState)
 	if new_heart and kind == "heart_piece":
 		pages.append_array(DialogueData.pages_for(ItemDB.text_key("heart_container"), GameState))
 	_after_dialogue = func() -> void: player.end_hold()
@@ -574,7 +603,7 @@ func grant(kind: String, amount: int = 1) -> bool:
 			return true
 		"map", "compass", "big_key":
 			GameState.give_dungeon_item(dungeon_of(current_id()), kind)
-		"glove":
+		"glove", "boots", "fire_rod":
 			GameState.give_item(kind)
 		"seal":
 			var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
@@ -746,6 +775,11 @@ func _on_boss_defeated(room: String) -> void:
 			Juice.play_fx("poof", e.global_position, current["actors"])
 			e.queue_free()                                    # the boss's brood dies with it
 	_open_doors_when(flag)
+	var info: Dictionary = dungeons.get(dungeon_of(room), {})
+	if String(info.get("ending", "")) != "":
+		await get_tree().create_timer(ENDING_DELAY).timeout
+		play_ending(String(info["ending"]))
+		return
 	await get_tree().create_timer(BOSS_REWARD_DELAY).timeout
 	if current_id() == room:
 		_spawn_boss_reward(current)
@@ -757,6 +791,8 @@ func _spawn_boss_reward(rec: Dictionary) -> void:
 	var container_flag := "heart_container:" + room
 	var at: Vector2 = rec["rect"].get_center() + REWARD_DROP
 	var info: Dictionary = dungeons.get(dungeon_of(room), {})
+	if int(info.get("seal", 0)) < 0:
+		return                                            # the keep has no reward: its end is the act's end
 	if not GameState.has_flag(container_flag):
 		var c: Area2D = PICKUP_SCRIPT.new()
 		c.kind = "heart_container"
@@ -770,6 +806,41 @@ func _spawn_boss_reward(rec: Dictionary) -> void:
 		seal.kind = "seal"
 		seal.position = at - REWARD_DROP + SEAL_DROP
 		rec["actors"].add_child.call_deferred(seal)
+
+
+# The keep's gate: it opens for good once all three family seals are home.
+func _try_seal_gate(gate: SealGate) -> void:
+	gate.refresh(GameState.seal_count())
+	if GameState.seal_count() < GameState.SEAL_COUNT:
+		say("seal_gate")
+		return
+	GameState.set_flag(GATE_FLAG)
+	gate.open_gate()
+	say("seal_gate_open")
+
+
+# The end of an act: the villain's last words, then the end card; then save (outside the dungeon) and go back to
+# the title. Act 1 ends when Caver's shade falls.
+func play_ending(act: String) -> void:
+	endings += 1
+	GameState.set_flag(ACT1_FLAG if act == "act1" else act + ":done")
+	_after_dialogue = func() -> void:
+		var card: Array = DialogueData.pages_for("act1_card", GameState)
+		end_card.open(DialogueData.speaker("act1_card"), card)
+	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
+	dialogue.open(DialogueData.pages_for("caver_banish", GameState), DialogueData.speaker("caver_banish"),
+			box_at_top(on_screen))
+
+
+# After the end card: Joe is saved standing outside the keep (Phase 8 continues from there), then the title.
+func _on_end_card_finished() -> void:
+	var info: Dictionary = dungeons.get(dungeon_of(current_id()), {})
+	var entrance: Dictionary = areas.get(String(info.get("entrance", "")), {})
+	if not entrance.is_empty() and not entrance["exits"].is_empty():
+		var e: Dictionary = entrance["exits"][0]
+		_enter(String(e["to"]), cell_feet(String(e["to"]), e["spawn_cell"]), FACINGS[String(e["facing"])])
+	save_game()
+	quit_to_title()
 
 
 # Back out to the overworld in front of the dungeon's entrance (after the seal).
@@ -787,7 +858,8 @@ func leave_dungeon() -> void:
 # True when nothing else owns the screen (no scroll, fade, conversation, menu or death in progress).
 func can_open_menu() -> bool:
 	return not transitioning and not dialogue.is_open and not pause_menu.is_open and not item_menu.is_open \
-			and not game_over.is_open and not map_screen.is_open and not player.is_dead() and not player.is_falling()
+			and not game_over.is_open and not map_screen.is_open and not end_card.is_open and not player.is_dead() \
+			and not player.is_falling()
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-16
-Version: 1.5.0
+Last edit date: 2026-10-19
+Version: 1.6.0
 -->
 
 # Known issues
@@ -15,7 +15,6 @@ Version: 1.5.0
 - Ledges only face south (ALttP also has east/west ledges); add them when a level needs one.
 - The villagers' lines follow the draft story (docs/GDD.md section 2), which the owner has not confirmed; the
   title subtitle "A STORY BEFORE THE CHAPEL" is a placeholder.
-- Magic does not refill yet (no magic jars until the drop table grows); the lantern costs 2 of 32 units per flame.
 - Bombs cannot be lifted and thrown yet (ALttP can); arrows also cut bushes (ALttP's do not).
 - The boomerang only stuns; in ALttP it also defeats a few weak enemies.
 - Torches go out when the area is left, so both meadow torches must be lit on one visit.
@@ -32,3 +31,8 @@ Version: 1.5.0
 - Enemies cannot fall into pits (they treat them as walls); a thrown pot or bomb over a pit does not fall either.
 - Only one dungeon exists, so the overworld map only shows areas already visited and has no markers for dungeons.
 - A dungeon death continues at the current room's entry (ALttP sends you to the dungeon entrance).
+- All dungeons share the Moss Shrine's stone tiles and entrance facade; Ram's Hollow, the Frost Vault and the keep
+  get their own palettes in the polish phase. The keep's wall reads as a flat dark block from above.
+- The end of Act 1 returns to the title: the Dark World (Phase 8) will continue from the save outside the keep.
+- Caver's shade, the Iron Ram and the Frost Wraith are first drafts (patterns, HP, names await the owner).
+- The dash cannot cross pits or ledges and does not knock items off trees (ALttP's boots do).

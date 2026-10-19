@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 2.0.0
+# Last edit date: 2026-10-19
+# Version: 2.1.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -19,7 +19,8 @@ extends RefCounted
 ##                     +  pillar   s  exit stairs   E  5x3 shrine entrance (overworld; door at (2,2))
 ## Object cells (ground painted, the World builds the node from the area's "objects"): C chest, L torch,
 ## k cracked rock, l key block, h heart piece, [ door, @ floor switch, & push block, $ big chest (2x1), r heavy rock.
-## Y = the dungeon boss.
+## k cracked rock ... b rubble (the dash breaks it). A bat. Bosses: Y Grand Slime, U Iron Ram, F Frost Wraith,
+## V Caver's shade.
 ## The source of these rows is tools/gen_areas.py (areas) or TestField.layout (test arenas).
 
 const TILE := 16
@@ -27,7 +28,8 @@ const ATLAS_TEX := preload("res://assets/tiles/overworld_light.png")
 const ATLAS_JSON := "res://assets/tiles/overworld_light.json"
 const LAYER_WORLD := 1
 const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemies/Guard.gd",
-		"Q": "res://src/enemies/Spitter.gd", "Y": "res://src/enemies/GrandSlime.gd"}
+		"Q": "res://src/enemies/Spitter.gd", "Y": "res://src/enemies/GrandSlime.gd", "A": "res://src/enemies/Bat.gd",
+		"U": "res://src/enemies/IronRam.gd", "F": "res://src/enemies/FrostWraith.gd", "V": "res://src/enemies/CaverShade.gd"}
 const GRASS := {".": "grass_a", ",": "grass_b", "*": "flowers"}
 const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b",
 		"+": "pillar", "s": "dstairs"}

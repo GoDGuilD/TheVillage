@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 3.0.1
+# Last edit date: 2026-10-19
+# Version: 4.0.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -43,20 +43,21 @@ HOUSE_DOOR = (2, 3)
 SHRINE_DOOR = (2, 2)
 # Solid: N villager, C chest, L torch, k cracked rock, l key block, % dungeon wall, + pillar, o pit (Joe falls),
 # [ door, & push block, r heavy rock (all solid bodies or impassable cells).
-SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&r")
-ACTORS = set("BOZGQPhY")          # h = a heart piece lying on the ground, Y = a dungeon boss
-OPENABLE = set("kl[&r")            # solid until a bomb / key / push / glove opens them (reachability: open)
+SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&rb")    # ... b = rubble (the dash boots break it)
+ACTORS = set("BOZGQPhYAUFV")      # h heart piece; A bat; bosses: Y Grand Slime, U Iron Ram, F Frost Wraith, V Caver
+OPENABLE = set("kl[&rb")           # solid until a bomb / key / push / glove / dash opens them (reachability: open)
 GROUND = set(".,*#_M=;@s")         # = ; dungeon floor, @ floor switch, s exit stairs
 VALID = SOLID | ACTORS | GROUND | {"x"} | set(MULTI)
-ENEMIES = set("ZGQY")
+ENEMIES = set("ZGQYAUFV")
 FACING_STEP = {"down": (0, 1), "up": (0, -1), "left": (-1, 0), "right": (1, 0)}
 # Everything a chest, gift or ware may hand out - mirrors ItemDB.KINDS in src/items/ItemDB.gd (test_items.gd
 # checks that every kind used by the areas exists there).
 ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "heart_piece", "heart_container", "gems",
-              "map", "compass", "big_key", "glove"}
+              "map", "compass", "big_key", "glove", "boots", "fire_rod"}
 WARE_IDS = {"bombs", "arrows", "heart_piece"}                       # ItemDB.WARES
 OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h", "door": "[",
-                 "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r"}
+                 "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r", "rubble": "b"}
+GLYPHLESS = {"seal_gate"}          # objects drawn over plain cells (no glyph of their own)
 DOORWAYS = {"n": (11, 0), "s": (11, 12), "w": (0, 6), "e": (22, 6)}   # top-left cell of each 2x2 dungeon doorway
 OPEN_LO, OPEN_HI = 10, 14         # edge openings are 4 tiles wide, centred on each side of a screen pair
 # Openings: north/south at columns 22..25 of a 2-screen-wide area, east/west at rows 12..15 of a 2-screen-tall one.
@@ -223,7 +224,7 @@ def build_south_road(rng):
     """South road: a cliff band crossed by a one-way ledge (hop down) with a ramp back up, guards on patrol.
     The far south is closed by boulders - the road to Caver's keep opens later (power glove)."""
     g = Grid(*size_of((2, 1)))
-    g.tree_border({"n": (22, 25)})
+    g.tree_border({"n": (22, 25), "s": (22, 25)})
     g.rect(2, 6, g.w - 3, 7, "^")                      # cliff band across the area
     g.rect(16, 6, 27, 6, "v")                          # where the road meets the band: a ledge you can hop down
     g.rect(16, 7, 27, 7, "#")                          # landing strip (the cliff's lower row becomes road)
@@ -238,6 +239,41 @@ def build_south_road(rng):
     g.place([(6, 3), (7, 3), (44, 10)], "B")
     g.scatter(rng, [",", ","], 50)
     return g, []
+
+
+def build_south_fields(rng):
+    """South Fields: the valley's far end. Caver's keep (a stone wall with the seal gate) in the north-west,
+    Ram's Hollow in the west, the Frost Vault fenced off in the east behind rubble only a dash can break."""
+    g = Grid(*size_of((2, 2)))
+    g.tree_border({"n": (22, 25)})
+    g.rect(22, 0, 25, 21, "#")                         # the road down from the South Road
+    g.rect(4, 20, 43, 21, "#")                         # and across the fields
+    # Caver's keep: a block of dark wall; the gate (2x2 at 15-16, 5-6) opens into it once the seals are home.
+    g.rect(12, 2, 19, 6, "%")
+    g.rect(15, 6, 16, 6, "=")                          # the gateway floor under the gate's lower half
+    g.rect(15, 7, 21, 8, "#")
+    # Ram's Hollow (west).
+    g.piece(5, 13, "E")
+    g.rect(7, 16, 7, 19, "#")
+    # The Frost Vault (east), inside a fence; the only way in is through the rubble at (40, 17).
+    g.piece(38, 12, "E")
+    g.rect(36, 10, 44, 10, "f")
+    g.rect(36, 17, 44, 17, "f")
+    g.rect(36, 11, 36, 16, "f")
+    g.rect(44, 11, 44, 16, "f")
+    g.set(40, 17, ".")                                 # the gap in the fence (rubble goes here)
+    g.rect(40, 15, 40, 16, "#")
+    g.rect(40, 18, 40, 19, "#")
+    g.place([(10, 23), (30, 24), (32, 12)], "G")
+    g.place([(18, 14), (29, 9)], "A")
+    g.place([(6, 24), (14, 11), (33, 23)], "Z")
+    g.place([(3, 9), (4, 9), (27, 13), (28, 13), (45, 22), (45, 23)], "B")
+    g.place([(10, 9), (31, 16), (20, 24)], "R")
+    g.scatter(rng, [",", ",", "*"], 110)
+    doors = [{"cell": [15, 6], "to": "keep_entrance"}, {"cell": [16, 6], "to": "keep_entrance"},
+             {"cell": [5 + SHRINE_DOOR[0], 13 + SHRINE_DOOR[1]], "to": "d2_entrance"},
+             {"cell": [38 + SHRINE_DOOR[0], 12 + SHRINE_DOOR[1]], "to": "d3_entrance"}]
+    return g, doors
 
 
 # --------------------------------------------------------------------------- interiors
@@ -489,8 +525,18 @@ def lint_world(areas, problems):
         if p["needs_big"] and not p["big_key"]:
             problems.append("%s: a big door or big chest but no big key" % name)
     every = [o for a in areas for o in a.get("objects", [])]
-    if any(o["kind"] == "heavy_rock" for o in every) and not any(o.get("item") == "glove" for o in every):
+    held = {o.get("item") for o in every}
+    if any(o["kind"] == "heavy_rock" for o in every) and "glove" not in held:
         problems.append("world: heavy rocks but no power glove anywhere")
+    if any(o["kind"] == "rubble" for o in every) and "boots" not in held:
+        problems.append("world: rubble but no dash boots anywhere")
+    if any("F" in r for a in areas for r in a["rows"]) and "fire_rod" not in held:
+        problems.append("world: a Frost Wraith but no fire rod anywhere")
+    seals = sorted(info["seal"] for info, _ in DUNGEONS if info["seal"] >= 0)
+    if seals != [0, 1, 2]:
+        problems.append("world: the dungeons hold seals %s (need 0, 1, 2)" % seals)
+    if any(o["kind"] == "seal_gate" for o in every) and not any(info.get("ending") for info, _ in DUNGEONS):
+        problems.append("world: a seal gate but no dungeon behind it ends the act")
 
 
 def lint_objects(a, seen, problems):
@@ -502,6 +548,10 @@ def lint_objects(a, seen, problems):
         if o["kind"] == "door":                                   # doors cover a 2x2 doorway
             x, y = o["cell"]
             covered |= {(x + dx, y + dy) for dx in (0, 1) for dy in (0, 1)}
+    for o in a.get("objects", []):
+        if o["kind"] == "seal_gate":                              # the gate covers a 2x2 gateway
+            x, y = o["cell"]
+            covered |= {(x + dx, y + dy) for dx in (0, 1) for dy in (0, 1)}
     for y, r in enumerate(rows):
         for x, g in enumerate(r):
             if g in OBJECT_GLYPHS.values() and (x, y) not in covered:
@@ -509,6 +559,8 @@ def lint_objects(a, seen, problems):
     torches = [o for o in a.get("objects", []) if o["kind"] == "torch"]
     switch_flags = {o.get("flag") for o in a.get("objects", []) if o["kind"] == "switch"}
     for (x, y), o in listed.items():
+        if o["kind"] in GLYPHLESS:
+            continue
         if o["kind"] == "door":
             # A boss door starts open (floor) and shuts behind Joe; every other door fills its doorway with [.
             want = "=" if o["type"] == "boss" else "["
@@ -590,6 +642,7 @@ OVERWORLD = [
     ("west_woods", "West Woods", (-1, 1), (1, 2), build_west_woods),
     ("east_lake", "East Lake", (2, 1), (1, 2), build_east_lake),
     ("south_road", "South Road", (0, 3), (2, 1), build_south_road),
+    ("south_fields", "South Fields", (0, 4), (2, 2), build_south_fields),
 ]
 INTERIORS = [
     ("joe_house", "Joe's House", "bedroom", True),
@@ -617,7 +670,11 @@ OBJECTS = {
     "east_lake": [("chest", 10, 7, {"item": "small_key"}), ("heavy_rock", 21, 21, {}), ("heart_piece", 21, 22, {}),
                   ("heavy_rock", 21, 23, {})],
     "south_road": [("rock", 42, 8, {}), ("key_block", 42, 9, {}), ("rock", 42, 10, {}), ("rock", 42, 11, {}),
-                   ("chest", 44, 8, {"item": "bow"})],
+                   ("chest", 44, 8, {"item": "bow"}),
+                   # The road south: heavy rocks across the gap in the trees (the power glove lifts them).
+                   ("heavy_rock", 22, 12, {}), ("heavy_rock", 23, 12, {}), ("heavy_rock", 24, 12, {}),
+                   ("heavy_rock", 25, 12, {})],
+    "south_fields": [("seal_gate", 15, 5, {}), ("rubble", 40, 17, {})],
 }
 # Boni's wares on her counter (table cells): area -> [(x, y, ware id)].
 WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")]}
@@ -628,6 +685,8 @@ SIGNS = {
     "west_woods": [(18, 11, "sign_woods"), (13, 7, "sign_shrine")],
     "east_lake": [(4, 11, "sign_lake")],
     "south_road": [(21, 4, "sign_south_road")],
+    "south_fields": [(21, 3, "sign_fields"), (9, 17, "sign_rams_hollow"), (41, 19, "sign_frost_vault"),
+                     (14, 8, "sign_keep")],
 }
 
 
@@ -736,6 +795,114 @@ def d1_rooms():
     return rooms
 
 
+ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "O", "B", "+", "o", ";")
+
+
+def make_room(rooms, aid, gx, gy, doors, fill, extra=None):
+    """Build one dungeon room (room_grid + its contents) and append it to `rooms` like d1_rooms does."""
+    g, objs = room_grid(doors)
+    for kind, x, y, data in fill(g) or []:
+        if kind in ROOM_GLYPHS:
+            g.set(x, y, kind)
+            continue
+        if kind == "big_chest":
+            g.piece(x, y, "$")
+        else:
+            g.place([(x, y)], OBJECT_GLYPHS[kind])
+        objs.append(dict({"kind": kind, "cell": [x, y]}, **data))
+    rooms.append((aid, gx, gy, g, objs, extra or {}))
+
+
+D2 = {"id": "d2", "name": "Ram's Hollow", "seal": 1, "entrance": "d2_entrance", "boss_room": "d2_boss",
+      "boss_flag": "boss:d2"}
+D3 = {"id": "d3", "name": "Frost Vault", "seal": 2, "entrance": "d3_entrance", "boss_room": "d3_boss",
+      "boss_flag": "boss:d3"}
+KEEP = {"id": "keep", "name": "Caver's Keep", "seal": -1, "entrance": "keep_entrance", "boss_room": "keep_throne",
+        "boss_flag": "boss:keep", "ending": "act1"}
+
+
+def d2_rooms():
+    """Ram's Hollow: clear the east room for the map and the way north (big key, a small key), open the west
+    room with the key (big chest: Dash Boots), then the big door to the Iron Ram."""
+    rooms = []
+    make_room(rooms, "d2_entrance", 1, 2, {"n": ("open",), "s": ("stairs",)}, lambda g: [
+        ("chest", 4, 3, {"item": "compass", "amount": 1, "reveal": ""}), ("+", 7, 6, {}), ("+", 16, 6, {}),
+        ("A", 9, 4, {}), ("A", 15, 9, {}), ("O", 20, 3, {}), ("O", 20, 10, {})])
+
+    def hall(g):
+        g.rect(4, 4, 8, 5, "o")
+        g.rect(15, 8, 19, 9, "o")
+        return [("+", 11, 4, {}), ("+", 12, 9, {}), ("G", 6, 9, {}), ("Z", 17, 4, {})]
+    make_room(rooms, "d2_hall", 1, 1, {"s": ("open",), "e": ("open",), "w": ("locked", "d2_hall_west", ""),
+                                       "n": ("big", "d2_hall_north", "")}, hall)
+    make_room(rooms, "d2_east", 2, 1, {"w": ("open",), "n": ("shutter", "d2_east_north", "cleared:d2_east")},
+              lambda g: [("chest", 19, 3, {"item": "map", "amount": 1, "reveal": ""}), ("G", 8, 5, {}),
+                         ("G", 14, 8, {}), ("A", 11, 4, {}), ("Q", 18, 9, {})], {"clear_flag": "cleared:d2_east"})
+
+    def northeast(g):
+        g.rect(9, 6, 14, 7, "o")
+        return [("chest", 5, 3, {"item": "small_key", "amount": 1, "reveal": ""}),
+                ("chest", 18, 3, {"item": "big_key", "amount": 1, "reveal": ""}), ("Z", 6, 9, {}), ("Z", 17, 9, {}),
+                ("A", 12, 3, {})]
+    make_room(rooms, "d2_northeast", 2, 0, {"s": ("shutter", "d2_east_north", "cleared:d2_east")}, northeast)
+    make_room(rooms, "d2_west", 0, 1, {"e": ("locked", "d2_hall_west", "")}, lambda g: [
+        ("big_chest", 10, 4, {"item": "boots"}), ("+", 5, 8, {}), ("+", 16, 8, {}), ("G", 6, 4, {}),
+        ("G", 15, 4, {})])
+    make_room(rooms, "d2_boss", 1, 0, {"s": ("boss", "d2_boss_door", D2["boss_flag"])},
+              lambda g: [("U", 11, 5, {})], {"boss_flag": D2["boss_flag"]})
+    return rooms
+
+
+def d3_rooms():
+    """The Frost Vault: light the west room's torches for the small key, open the east room (dash through the
+    rubble to the big chest: Fire Rod; its switch opens the way to the big key), then the Frost Wraith."""
+    rooms = []
+    make_room(rooms, "d3_entrance", 1, 2, {"n": ("open",), "s": ("stairs",)}, lambda g: [
+        ("+", 6, 5, {}), ("+", 17, 5, {}), ("A", 8, 8, {}), ("A", 15, 4, {}), ("Z", 12, 9, {}), (";", 10, 3, {})])
+
+    def hub(g):
+        g.rect(9, 4, 14, 5, "o")
+        return [("+", 4, 9, {}), ("+", 19, 9, {}), ("G", 6, 4, {}), ("Q", 17, 8, {})]
+    make_room(rooms, "d3_hub", 1, 1, {"s": ("open",), "w": ("open",), "e": ("locked", "d3_hub_east", ""),
+                                      "n": ("big", "d3_hub_north", "")}, hub)
+    make_room(rooms, "d3_west", 0, 1, {"e": ("open",)}, lambda g: [
+        ("torch", 6, 3, {}), ("torch", 15, 3, {}),
+        ("chest", 10, 6, {"item": "small_key", "amount": 1, "reveal": "torches"}),
+        ("chest", 4, 10, {"item": "map", "amount": 1, "reveal": ""}), ("A", 8, 9, {}), ("A", 16, 8, {})])
+
+    def east(g):
+        g.rect(2, 5, 21, 5, "+")                           # a pillar wall across the room...
+        g.set(12, 5, "=")                                  # ...with one gap, choked with rubble
+        return [("rubble", 12, 5, {}), ("big_chest", 8, 2, {"item": "fire_rod"}),
+                ("switch", 17, 3, {"flag": "switch:d3_east", "heavy": False}),
+                ("chest", 4, 9, {"item": "compass", "amount": 1, "reveal": ""}), ("G", 15, 9, {}), ("Z", 8, 8, {})]
+    make_room(rooms, "d3_east", 2, 1, {"w": ("locked", "d3_hub_east", ""),
+                                       "n": ("shutter", "d3_east_north", "switch:d3_east")}, east)
+    make_room(rooms, "d3_northeast", 2, 0, {"s": ("shutter", "d3_east_north", "switch:d3_east")}, lambda g: [
+        ("chest", 12, 3, {"item": "big_key", "amount": 1, "reveal": ""}), ("G", 6, 7, {}), ("G", 17, 7, {}),
+        ("A", 12, 8, {})])
+    make_room(rooms, "d3_boss", 1, 0, {"s": ("boss", "d3_boss_door", D3["boss_flag"])},
+              lambda g: [("+", 4, 3, {}), ("+", 19, 3, {}), ("F", 11, 5, {})], {"boss_flag": D3["boss_flag"]})
+    return rooms
+
+
+def keep_rooms():
+    """Caver's Keep: a guarded hall, then the throne room where Caver's shade waits (the end of Act 1)."""
+    rooms = []
+    make_room(rooms, "keep_entrance", 0, 1, {"s": ("stairs",), "e": ("open",)}, lambda g: [
+        ("+", 6, 4, {}), ("+", 6, 9, {}), ("+", 17, 4, {}), ("+", 17, 9, {}), ("G", 12, 4, {}), ("A", 12, 9, {})])
+    make_room(rooms, "keep_gallery", 1, 1, {"w": ("open",), "n": ("open",)}, lambda g: [
+        ("+", 5, 4, {}), ("+", 18, 4, {}), ("+", 5, 9, {}), ("+", 18, 9, {}), ("G", 8, 6, {}), ("G", 16, 7, {}),
+        ("A", 12, 9, {})])
+    make_room(rooms, "keep_throne", 1, 0, {"s": ("boss", "keep_throne_door", KEEP["boss_flag"])},
+              lambda g: [("+", 3, 3, {}), ("+", 20, 3, {}), ("V", 11, 5, {})], {"boss_flag": KEEP["boss_flag"]})
+    return rooms
+
+
+DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms)]
+DUNGEON_STRIDE = 200                     # tiles between two dungeons' room grids
+
+
 def add_people_and_signs(g, aid):
     """Stand the area's villagers and signs on the grid (N / S glyphs) and return their JSON lists."""
     npcs, signs = [], []
@@ -750,7 +917,8 @@ def add_people_and_signs(g, aid):
         if kind == "rock":
             g.place([(x, y)], "R")
             continue
-        g.place([(x, y)], OBJECT_GLYPHS[kind])
+        if kind not in GLYPHLESS:
+            g.place([(x, y)], OBJECT_GLYPHS[kind])
         obj = {"kind": kind, "cell": [x, y]}
         if kind == "chest":
             obj.update({"item": extra["item"], "amount": extra.get("amount", 1), "reveal": extra.get("reveal", "")})
@@ -777,12 +945,14 @@ def assemble():
         areas.append({"id": aid, "name": name, "kind": "interior", "size_screens": [1, 1],
                       "origin_tiles": [INTERIOR_BASE[0] + i * INTERIOR_STRIDE, INTERIOR_BASE[1]],
                       "rows": rows, "doors": [], "exits": [], **extras})
-    for aid, gx, gy, g, objects, extra in d1_rooms():
-        extras = add_people_and_signs(g, aid)
-        extras["objects"] = objects + extras["objects"]
-        areas.append({"id": aid, "name": D1["name"], "kind": "dungeon", "dungeon": D1["id"], "size_screens": [1, 1],
-                      "origin_tiles": [DUNGEON_BASE[0] + gx * SCREEN[0], DUNGEON_BASE[1] + gy * SCREEN[1]],
-                      "grid": [gx, gy], "rows": g.rows(), "doors": [], "exits": [], **extras, **extra})
+    for i, (info, rooms_of) in enumerate(DUNGEONS):
+        base = (DUNGEON_BASE[0] + i * DUNGEON_STRIDE, DUNGEON_BASE[1])
+        for aid, gx, gy, g, objects, extra in rooms_of():
+            extras = add_people_and_signs(g, aid)
+            extras["objects"] = objects + extras["objects"]
+            areas.append({"id": aid, "name": info["name"], "kind": "dungeon", "dungeon": info["id"],
+                          "size_screens": [1, 1], "origin_tiles": [base[0] + gx * SCREEN[0], base[1] + gy * SCREEN[1]],
+                          "grid": [gx, gy], "rows": g.rows(), "doors": [], "exits": [], **extras, **extra})
     # Pair doors with what they lead into: the door leads to the cell above the target's mat / stairs; the mat or
     # stairs lead back below the door.
     for a in list(areas):
@@ -805,7 +975,7 @@ def write(areas):
         with open(os.path.join(OUT_DIR, a["id"] + ".json"), "w", encoding="utf-8", newline="\n") as fh:
             json.dump(a, fh, indent=1)
     index = {"screen": list(SCREEN), "start": START_AREA, "areas": [a["id"] for a in areas],
-             "dungeons": {D1["id"]: {k: v for k, v in D1.items() if k != "id"}}}
+             "dungeons": {info["id"]: {k: v for k, v in info.items() if k != "id"} for info, _ in DUNGEONS}}
     with open(os.path.join(OUT_DIR, "index.json"), "w", encoding="utf-8", newline="\n") as fh:
         json.dump(index, fh, indent=1)
 

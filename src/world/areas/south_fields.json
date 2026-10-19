@@ -1,0 +1,142 @@
+{
+ "id": "south_fields",
+ "name": "South Fields",
+ "kind": "overworld",
+ "size_screens": [
+  2,
+  2
+ ],
+ "origin_tiles": [
+  0,
+  56
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTx####TxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxx####xxxxxxxxxxxxxxxxxxxxxx",
+  "Tx..........%%%%%%%%..####............,.......Tx",
+  "xx..........%%%%%%%%*S####..........*..,......xx",
+  "Tx...*,.....%%%%%%%%..####..............*.....Tx",
+  "xx...,...*..%%%%%%%%..####....................xx",
+  "Tx........,.%%%==%%%..####............,.......Tx",
+  "xx...,.........###########..............,.....xx",
+  "Tx............S###########..,*.........*......Tx",
+  "xx.BB..*..R.........*.####...A....,..........,xx",
+  "Tx...............*....####..........fffffffff.Tx",
+  "xx....,...*...Z.,...,.####.,....,...f.......f.xx",
+  "Tx....................####......G...f.Exxxx.f.Tx",
+  "xx...Exxxx............####.BB,..,...f.xxxxx.f.xx",
+  "Tx...xxxxx......,.A...####,.....,.*.f.xxxxx.f,Tx",
+  "xx...xxxxx............####..........f.,.#...f.xx",
+  "Tx.....#..............####*....R....f...#...f.Tx",
+  "xx.....#.S............####..........ffffbffff.xx",
+  "Tx.....#.............,####............*.#...,*Tx",
+  "xx..*..#..,...*.......####.............,#S...,xx",
+  "Tx..########################################..Tx",
+  "xx..########################################..xx",
+  "Tx...................,......*...,..........,.BTx",
+  "xx.....*..G......,.,.*...........Z...........Bxx",
+  "Tx....Z,...........,R..,......G......*........Tx",
+  "xx.........................*................,.xx",
+  "TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [
+  {
+   "cell": [
+    15,
+    6
+   ],
+   "to": "keep_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  },
+  {
+   "cell": [
+    16,
+    6
+   ],
+   "to": "keep_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  },
+  {
+   "cell": [
+    7,
+    15
+   ],
+   "to": "d2_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  },
+  {
+   "cell": [
+    40,
+    14
+   ],
+   "to": "d3_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  }
+ ],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    21,
+    3
+   ],
+   "text": "sign_fields"
+  },
+  {
+   "cell": [
+    9,
+    17
+   ],
+   "text": "sign_rams_hollow"
+  },
+  {
+   "cell": [
+    41,
+    19
+   ],
+   "text": "sign_frost_vault"
+  },
+  {
+   "cell": [
+    14,
+    8
+   ],
+   "text": "sign_keep"
+  }
+ ],
+ "objects": [
+  {
+   "kind": "seal_gate",
+   "cell": [
+    15,
+    5
+   ]
+  },
+  {
+   "kind": "rubble",
+   "cell": [
+    40,
+    17
+   ]
+  }
+ ],
+ "wares": []
+}

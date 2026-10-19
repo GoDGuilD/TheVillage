@@ -4,8 +4,8 @@ Description: Code architecture of The Village: folders, autoloads, contracts, pl
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-16
-Version: 5.3.0
+Last edit date: 2026-10-19
+Version: 5.4.0
 -->
 
 # Architecture
@@ -20,19 +20,22 @@ src/
              DialogueData (dialogue.json reader), GameState / Audio / Juice (autoloads)
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
-  enemies/   BaseEnemy, Slime, Guard, Spitter, EnemyRock, GrandSlime (boss)
-  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb
+  enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, EnemyRock, EnemyShot, bosses: GrandSlime, IronRam,
+             FrostWraith, CaverShade (+ CaverOrb)
+  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
              tiles + actors), TestField (test arenas), Npc, SignPost, Chest, BigChest, Torch, CrackedRock, KeyBlock,
-             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Bush, Pot, Thrown, Pickup
+             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Bush, Pot, Thrown, Pickup
     areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
-  ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, MapScreen, GameOver, MenuList, PixelText,
+  ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, MapScreen, GameOver, EndCard, MenuList,
+             PixelText,
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd
-tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd
+tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
+             test_act1.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -91,6 +94,10 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   dungeon's name, entrance, boss room, boss flag and seal number. On every area change the World sets the key pool
   and the visited flag, closes the boss door behind Joe, and each frame checks the room's `clear_flag`. Doors are
   built open or shut from flags; shutters open when their `when` flag is set (room cleared, switch pressed, boss).
+- **Bosses and weaknesses.** `BaseEnemy._resists(hit)` runs before stun and damage; a resisted hit clanks. The
+  Iron Ram resists unless dazed, the Frost Wraith unless the HitBox element is "fire", Caver's shade unless it
+  is "orb" (an orb Joe batted back). Bosses carry `is_boss`; the World connects their `defeated` signal. A dungeon
+  whose table entry has `ending` (the keep) ends the act instead of giving a reward (`World.play_ending`).
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 
@@ -100,7 +107,8 @@ continues into) → `charge` (shuffle, facing locked, glint when charged) → `s
 `walk` → `hop` (walking south into a ledge: a 0.35 s arc to the first open cell past it, no collision).
 `idle` / `walk` → `lift` (interact on a liftable; a talkable in front takes priority) → `carry` → `throw` → `idle`.
 `idle` / `walk` → `use` (item button) → `idle`; any → `hold` (item-get pose, ended by the World); `idle` / `walk`
-→ `fall` (over a pit; the World takes a heart and calls `respawn_after_fall`).
+→ `fall` (over a pit; the World takes a heart and calls `respawn_after_fall`); `idle` / `walk` → `dash_charge`
+(dash button, boots) → `dash` (sword out; rubble breaks) → `bonk` on a wall → `idle`.
 Any state → `hurt` on a hit (knockback, then `idle`; i-frames and blinking run outside the state machine) or →
 `dead` at zero health (the World shows Game Over; a test field revives Joe at its spawn). A hit-stop pauses the state machine and the animation for a few frames.
 

@@ -4,8 +4,8 @@ Description: Log of every gotcha met, internal or external.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-16
-Version: 1.4.0
+Last edit date: 2026-10-19
+Version: 1.5.0
 -->
 
 # Bugs and gotchas
@@ -25,3 +25,5 @@ Version: 1.4.0
 - [Internal] **A member variable named like a method breaks the class** - Symptom: "Could not parse global class 'Chest'" and every script using Chest/BigChest failed. Root cause: Chest got a `reveal` variable next to its `reveal()` method. Fix: the variable is `reveal_by`. File: `src/world/Chest.gd`.
 - [External] **A tweened static body did not trigger an Area2D switch** - Symptom: the push block slid across the heavy floor switch without pressing it (headless runs). Root cause: overlap reporting between an Area2D and a StaticBody2D teleported by a tween is not reliable frame to frame. Fix: the block presses any switch it comes to rest on directly (group `floor_switch`, distance check). File: `src/world/PushBlock.gd`.
 - [Internal] **The family seal was grabbed the instant it appeared** - Symptom: after the heart container the seal's moment was skipped. Root cause: the seal spawned on the container's spot, where Joe was standing. Fix: it appears 32 px higher (`SEAL_DROP`). File: `src/world/World.gd`.
+- [Internal] **The seal gate could not be talked to** - Symptom: pressing interact in front of the keep's gate did nothing. Root cause: the 32-px gate's talk point sat 8 px below its centre, more than Joe's one-tile probe radius away from where he stands (in front of either half). Fix: the talk point is 2 px below the centre. File: `src/world/SealGate.gd`.
+- [External] **Static class names in a test compile before the autoloads** - Symptom: `test_act1.gd` failed with "Identifier not found: Audio" in Bush/IronRam and the whole World half-built. Root cause: `is IronRam` and `AreaBuilder.flag_at` in the test compile those classes (and their dependencies) before autoloads exist. Fix: compare `get_script().get_global_name()` and `load()` AreaBuilder. File: `tests/test_act1.gd`.

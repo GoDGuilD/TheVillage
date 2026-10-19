@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 1.1.0
+# Last edit date: 2026-10-19
+# Version: 1.2.0
 class_name ItemDB
 extends RefCounted
 ## "Kinds" are what chests, gifts, pickups and wares hand out. Y-items (GameState.ITEM_ORDER) are a subset.
@@ -30,13 +30,16 @@ const KINDS := {
 	"big_key": {"name": "BIG KEY", "icon": ICON_DIR + "big_key.png", "text": "get_big_key"},
 	"glove": {"name": "POWER GLOVE", "icon": ICON_DIR + "glove.png", "text": "get_glove"},
 	"seal": {"name": "FAMILY SEAL", "icon": "res://assets/sprites/dungeon/seal.png", "text": "get_seal"},
+	"boots": {"name": "DASH BOOTS", "icon": ICON_DIR + "boots.png", "text": "get_boots"},
+	"fire_rod": {"name": "FIRE ROD", "icon": ICON_DIR + "fire_rod.png", "text": "get_fire_rod"},
 }
 # Kinds that belong to the dungeon they were found in (GameState.dungeon_items).
 const DUNGEON_ITEMS := ["map", "compass", "big_key"]
 
 # Y-items that consume something when used: item -> ammo kind or "magic".
-const USES := {"bow": "arrows", "bombs": "bombs", "lantern": "magic"}
+const USES := {"bow": "arrows", "bombs": "bombs", "lantern": "magic", "fire_rod": "magic"}
 const LANTERN_MAGIC := 2                 # magic units (of GameState.MAX_MAGIC) per lantern flame
+const FIRE_ROD_MAGIC := 4                # per fireball
 
 # Boni's wares: ware -> {kind, amount, price, text (the offer), once (sold out after one sale)}
 const WARES := {

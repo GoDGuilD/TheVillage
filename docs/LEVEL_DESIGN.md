@@ -4,8 +4,8 @@ Description: How areas are built, linted and previewed; the glyph table.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-16
-Version: 1.3.0
+Last edit date: 2026-10-19
+Version: 1.4.0
 -->
 
 # Level design
@@ -48,7 +48,8 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `s` | exit stairs | `E` | 5x3 shrine entrance (overworld; door at (2,2)) |
 | `[` | door cells (2x2 doorway) | `@` | floor switch |
 | `&` | push block | `$` | big chest (2x1) |
-| `r` | heavy rock (power glove) | `Y` | the dungeon boss |
+| `r` | heavy rock (power glove) | `b` | rubble (dash boots) |
+| `A` | bat | `Y` `U` `F` `V` | bosses: Grand Slime, Iron Ram, Frost Wraith, Caver's shade |
 
 ## Villagers and signs
 Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
@@ -71,6 +72,9 @@ exit stairs. Door specs are `(type, id, when)`; a door between two rooms is list
 Room extras: `clear_flag` (set when its enemies are gone) and `boss_flag`. Rooms sit at `DUNGEON_BASE` +
 grid x 24 / y 14 tiles; the index carries the dungeon table (`name`, `seal`, `entrance`, `boss_room`, `boss_flag`).
 `tmp/dungeon_d1_preview.png` shows the whole dungeon.
+New dungeons use `make_room(rooms, id, gx, gy, doors, fill, extra)` and are listed in `DUNGEONS` (each gets its own
+grid `DUNGEON_STRIDE` tiles apart). A dungeon's table entry may carry `ending` instead of a seal (`seal: -1`): its
+boss ends the act. Objects in `GLYPHLESS` (the keep's `seal_gate`) sit on plain cells and cover a 2x2 gateway.
 
 ## Lint
 Sizes, unknown glyphs, multi-cell pieces (fit, fillers covered exactly once), ledge landings, edge openings,
@@ -82,5 +86,6 @@ small keys as key blocks, wares sit on tables reachable from below. Reachability
 rocks, doors, push blocks and heavy rocks as open. Dungeons: edge openings only lead into rooms of the same
 dungeon, doors fill their doorway (boss doors start as floor), small keys per dungeon >= locked doors (a shared
 door counts once), a big key exists wherever a big door or big chest does, switch-revealed chests have their
-switch, and heavy rocks need a glove somewhere in the world. Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
+switch, heavy rocks need a glove somewhere in the world, rubble needs the boots, a Frost Wraith needs the fire rod,
+the seals 0-2 each belong to one dungeon, and a seal gate needs a dungeon with an ending. Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

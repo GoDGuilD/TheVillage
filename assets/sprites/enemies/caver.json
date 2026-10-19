@@ -1,0 +1,20 @@
+{
+  "frame_size": [
+    32,
+    48
+  ],
+  "feet": [
+    16,
+    46
+  ],
+  "anims": {
+    "float": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "cast": {
+      "fps": 6.0,
+      "loop": true
+    }
+  }
+}

@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-16
-Version: 5.3.0
+Last edit date: 2026-10-19
+Version: 5.4.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,38 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.1.0] - 2026-10-19 — Phase 7: the rest of Act 1
+
+### Added
+- **The road south**: four heavy rocks close the gap in the South Road's trees (the Power Glove opens it) into the
+  new **South Fields** (2x2 screens): Caver's keep behind a stone wall and its seal gate, Ram's Hollow in the
+  west, the Frost Vault fenced off in the east behind rubble.
+- **Ram's Hollow** (dungeon 2, 6 rooms): clear the east room for the map and the way north (small key, big key),
+  the locked west room holds the big chest with the **Dash Boots**; boss: the **Iron Ram** (lines up and charges;
+  armour turns every blow unless it is dazed after hitting a wall). Second family seal.
+- **Frost Vault** (dungeon 3, 6 rooms): light the west torches for the small key, dash through the rubble in the
+  east room to the big chest with the **Fire Rod**, its switch opens the way to the big key; boss: the **Frost
+  Wraith** (loops the room, casts fans of ice shards, only fire hurts it). Third family seal.
+- **Caver's Keep** (3 rooms) behind the **seal gate** (opens for good with all three seals; its sockets light up
+  per seal): Caver's shade fades between four spots and throws magic orbs; only orbs batted back with the sword
+  wound him. Three wounds: his last words, the **end-of-act card** (`EndCard`), a save outside the keep
+  (`act1:done`) and back to the title.
+- **Dash Boots** (dash button): run on the spot 0.3 s, then dash at 220 px/s with the sword out (2 damage), break
+  rubble, bonk on walls (shake, knock back). **Fire Rod** (Y-item, 4 magic): fireballs (fire element, 4 damage)
+  that light torches on the way. **Magic jars** in the drop table (small +4, big +16).
+- Enemies: the **bat** (erratic flyer, crosses pits, one hit), and the three bosses above; `EnemyShot` (generic
+  blockable projectile), `CaverOrb` (bat-back orb). `BaseEnemy._resists(hit)`: resisted hits clank.
+- Generators: `tools/gen_act1.py` (boots/fire rod icons, fireball, magic jars, rubble, ice shard, orbs, seal gate,
+  dash dust, bat / Iron Ram / Frost Wraith / Caver packs); `gen_sfx.py` + dash, bonk, fireball, ice_shard, orb,
+  clank, magic_jar, act_end (50 effects). `gen_areas.py` v4: South Fields, `make_room` + `d2_rooms`, `d3_rooms`,
+  `keep_rooms`, the `DUNGEONS` table, glyphless objects (the seal gate), rubble `b`, enemy glyphs `A U F V`; lint
+  for boots/fire rod/three seals/the act's ending.
+- `tests/test_act1.gd` (54 checks), `tools/capture_act1.gd`.
+
+### Changed
+- Seals have their own get texts (`get_seal_1`, `get_seal_2`); the keep has no reward but the act's end.
+- 368 checks in 7 suites, all passing.
 
 ## [7.0.0] - 2026-10-16 — Phase 6: dungeon framework + the Moss Shrine
 

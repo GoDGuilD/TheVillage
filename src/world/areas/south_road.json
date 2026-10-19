@@ -23,8 +23,8 @@
   "xx..............##########################l...xx",
   "Tx...,..............G...............G.....R.B.Tx",
   "xx........R.R.R......,........R.R.R...,...R,..xx",
-  "TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
-  "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  "TxTxTxTxTxTxTxTxTxTxTxrrrrTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxx....xxxxxxxxxxxxxxxxxxxxxx"
  ],
  "doors": [],
  "exits": [],
@@ -55,6 +55,34 @@
    "item": "bow",
    "amount": 1,
    "reveal": ""
+  },
+  {
+   "kind": "heavy_rock",
+   "cell": [
+    22,
+    12
+   ]
+  },
+  {
+   "kind": "heavy_rock",
+   "cell": [
+    23,
+    12
+   ]
+  },
+  {
+   "kind": "heavy_rock",
+   "cell": [
+    24,
+    12
+   ]
+  },
+  {
+   "kind": "heavy_rock",
+   "cell": [
+    25,
+    12
+   ]
   }
  ],
  "wares": []

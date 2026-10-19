@@ -3,10 +3,10 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 1.1.1
+# Last edit date: 2026-10-19
+# Version: 1.1.2
 extends Area2D
-## `kind` is "heart", a key of GameState.GEM_VALUES, or a permanent kind (heart_piece, heart_container,
+## `kind` is "heart", a magic jar ("magic_small" / "magic_big"), a key of GameState.GEM_VALUES, or a permanent kind (heart_piece, heart_container,
 ## small_key) that never expires and does not pop. Detects the Player body layer only; in group "pickup" so the
 ## boomerang can carry it back to Joe.
 
@@ -24,6 +24,7 @@ const GEM_FRAME := Vector2i(10, 14)
 const GEM_FPS := 3.0
 const LAYER_PLAYER := 2
 const PICK_RADIUS := 6.0
+const JAR_DIR := "res://assets/sprites/items/"
 const PERMANENT := {"heart_piece": "res://assets/sprites/items/heart_piece.png",
 		"heart_container": "res://assets/sprites/items/heart_container.png",
 		"small_key": "res://assets/sprites/items/small_key.png", "seal": "res://assets/sprites/dungeon/seal.png"}
@@ -48,6 +49,10 @@ func _ready() -> void:
 		p.texture = load(PERMANENT[kind])
 		_sprite = p
 		_age = POP_TIME                              # no pop: it was lying here all along
+	elif kind == "magic_small" or kind == "magic_big":
+		var j := Sprite2D.new()
+		j.texture = load(JAR_DIR + kind + ".png")
+		_sprite = j
 	elif kind == "heart":
 		var s := Sprite2D.new()
 		s.texture = load(PROP_DIR + "heart.png")

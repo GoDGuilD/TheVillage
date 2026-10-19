@@ -10,6 +10,7 @@
   "west_woods",
   "east_lake",
   "south_road",
+  "south_fields",
   "joe_house",
   "tato_house",
   "boni_shop",
@@ -21,7 +22,22 @@
   "d1_east",
   "d1_northeast",
   "d1_ante",
-  "d1_boss"
+  "d1_boss",
+  "d2_entrance",
+  "d2_hall",
+  "d2_east",
+  "d2_northeast",
+  "d2_west",
+  "d2_boss",
+  "d3_entrance",
+  "d3_hub",
+  "d3_west",
+  "d3_east",
+  "d3_northeast",
+  "d3_boss",
+  "keep_entrance",
+  "keep_gallery",
+  "keep_throne"
  ],
  "dungeons": {
   "d1": {
@@ -30,6 +46,28 @@
    "entrance": "d1_entrance",
    "boss_room": "d1_boss",
    "boss_flag": "boss:d1"
+  },
+  "d2": {
+   "name": "Ram's Hollow",
+   "seal": 1,
+   "entrance": "d2_entrance",
+   "boss_room": "d2_boss",
+   "boss_flag": "boss:d2"
+  },
+  "d3": {
+   "name": "Frost Vault",
+   "seal": 2,
+   "entrance": "d3_entrance",
+   "boss_room": "d3_boss",
+   "boss_flag": "boss:d3"
+  },
+  "keep": {
+   "name": "Caver's Keep",
+   "seal": -1,
+   "entrance": "keep_entrance",
+   "boss_room": "keep_throne",
+   "boss_flag": "boss:keep",
+   "ending": "act1"
   }
  }
 }

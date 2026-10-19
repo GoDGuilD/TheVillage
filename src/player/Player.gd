@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 2.4.1
+# Last edit date: 2026-10-19
+# Version: 2.4.2
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -47,6 +47,7 @@ var carrying := ""                        # kind of the lifted object ("pot", "b
 var carried_sprite: Sprite2D
 var held_sprite: Sprite2D                 # a found item held over his head (state "hold")
 var used_item := ""                       # the Y-item used last (tests)
+var _dust_left := 0.0                     # s until the next dash dust puff
 
 var _sword_shape: CollisionShape2D
 var _manifest: Dictionary = {}
@@ -252,6 +253,14 @@ func _try_item() -> bool:
 	return true
 
 
+# Dash button with the boots: run on the spot, then dash (state "dash_charge" -> "dash").
+func _try_dash() -> bool:
+	if not Input.is_action_just_pressed("dash") or not GameState.has_item("boots"):
+		return false
+	fsm.transition_to("dash_charge")
+	return true
+
+
 func _wants_attack() -> bool:
 	return Input.is_action_just_pressed("attack") or _attack_buffer > 0.0
 
@@ -329,7 +338,7 @@ func state_idle_update(delta: float) -> void:
 	if _wants_attack():
 		fsm.transition_to("attack")
 		return
-	if _try_lift() or _try_item():
+	if _try_lift() or _try_item() or _try_dash():
 		return
 	if _move_input() != Vector2.ZERO:
 		fsm.transition_to("walk")
@@ -341,7 +350,7 @@ func state_walk_update(delta: float) -> void:
 	if _wants_attack():
 		fsm.transition_to("attack")
 		return
-	if _try_lift() or _try_item():
+	if _try_lift() or _try_item() or _try_dash():
 		return
 	var dir := _move_input()
 	if dir == Vector2.ZERO:
@@ -558,6 +567,90 @@ func state_hold_update(_delta: float) -> void:
 	pass
 
 
+# --- states: dashing (boots) ---------------------------------------------------------------------
+
+func state_dash_charge_enter() -> void:
+	velocity = Vector2.ZERO
+	_timer = PlayerTuning.DASH_CHARGE
+	_dust_left = 0.0
+	_play("walk")
+	sprite.speed_scale = 2.0
+
+
+func state_dash_charge_update(delta: float) -> void:
+	_puff_dust(delta)
+	_timer -= delta
+	if _timer <= 0.0:
+		fsm.transition_to("dash")
+
+
+func state_dash_charge_exit() -> void:
+	sprite.speed_scale = 1.0
+
+
+func state_dash_enter() -> void:
+	Audio.sfx("dash")
+	_place_sword()
+	sword.damage = PlayerTuning.DASH_DAMAGE
+	sword.set_active(true)
+	_play("charge")
+
+
+# Straight ahead until a wall (bonk), a pit, or the stick pointing elsewhere; rubble breaks on the way.
+func state_dash_update(delta: float) -> void:
+	if _check_pit():
+		return
+	var dir_in := _move_input()
+	if dir_in != Vector2.ZERO and dir_in.normalized().dot(Vector2(facing)) < PlayerTuning.DASH_KEEP_DOT:
+		fsm.transition_to("idle")
+		return
+	_puff_dust(delta)
+	velocity = Vector2(facing) * PlayerTuning.DASH_SPEED
+	var before := global_position
+	move_and_slide()
+	if get_slide_collision_count() == 0:
+		return
+	var broke := false
+	for i in get_slide_collision_count():
+		var other := get_slide_collision(i).get_collider()
+		if other != null and other.has_method("dash_break"):
+			other.call("dash_break")
+			broke = true
+	if not broke and global_position.distance_to(before) < PlayerTuning.DASH_SPEED * delta * 0.5:
+		fsm.transition_to("bonk")
+
+
+func state_dash_exit() -> void:
+	sword.set_active(false)
+	sword.damage = PlayerTuning.SWORD_DAMAGE
+
+
+func is_dashing() -> bool:
+	return fsm.current_state == "dash"
+
+
+func _puff_dust(delta: float) -> void:
+	_dust_left -= delta
+	if _dust_left <= 0.0:
+		_dust_left = PlayerTuning.DASH_DUST_EVERY
+		Juice.play_fx("dust", global_position, get_parent())
+
+
+func state_bonk_enter() -> void:
+	Audio.sfx("bonk")
+	Juice.shake(PlayerTuning.BONK_SHAKE.x, PlayerTuning.BONK_SHAKE.y)
+	velocity = -Vector2(facing) * PlayerTuning.BONK_SPEED
+	_timer = PlayerTuning.BONK_TIME
+	_play("hurt")
+
+
+func state_bonk_update(delta: float) -> void:
+	move_and_slide()
+	_timer -= delta
+	if _timer <= 0.0:
+		fsm.transition_to("idle")
+
+
 # --- states: falling ----------------------------------------------------------------------------
 
 func state_fall_enter() -> void:
@@ -769,6 +862,9 @@ func collect(kind: String) -> void:
 	if kind == "heart":
 		health.heal(PlayerTuning.HEART_HEAL)
 		Audio.sfx("pickup_heart")
+	elif GameState.MAGIC_JARS.has(kind):
+		GameState.add_magic(int(GameState.MAGIC_JARS[kind]))
+		Audio.sfx("magic_jar")
 	elif GameState.GEM_VALUES.has(kind):
 		GameState.add_gems(int(GameState.GEM_VALUES[kind]))
 		Audio.sfx("pickup_gem")

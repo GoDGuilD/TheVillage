@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-16
-Version: 1.5.0
+Last edit date: 2026-10-19
+Version: 1.6.0
 -->
 
 # Roadmap
@@ -22,8 +22,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 4 | HUD, menus, saves, dialogue | Full HUD (item box, magic meter, keys), area-name captions, item menu, title + pause menus, save/load, NPCs with dialogue boxes (Tato, Boni, Janga), readable signs, Game Over screen | Done (61 UI checks pass) |
 | 5 | Items I | Chests, small keys, boomerang, bow, bombs, lantern, heart pieces/containers, Boni's shop stock | Done (67 item checks pass) |
 | 6 | Dungeon framework + Dungeon 1 | Dungeon rooms, locked/shutter doors, switches, push blocks, pits, dungeon map/compass/big key, first boss, first family seal (+ the power glove) | Done (62 dungeon checks pass) |
-| 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, the road south opened, Caver's keep, Act 1 ending | Next |
-| 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub | Planned |
+| 7 | Light World dungeons 2–3 | Two more dungeons, dash boots, the road south opened, Caver's keep, Act 1 ending (+ fire rod, magic jars) | Done (54 Act 1 checks pass) |
+| 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub (Act 2 starts where Act 1's save left Joe) | Next |
 | 9–12 | Umbra, Ignis, Tempus, Silva | One region + dungeon + boss each, with their key items (grapple, fire rod, etc.) | Planned |
 | 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
 | 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
@@ -90,3 +90,12 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] The Grand Slime, heart container, first family seal, the way out; the Power Glove and heavy rocks
 - [x] `gen_areas.py` v3 dungeon rooms + lint; 5 new sounds (42); `tests/test_dungeon.gd`: 62 checks; `tools/capture_dungeon.gd`
 - [ ] Owner playtest: dungeon layout and difficulty, boss tuning, the dungeon's name (Moss Shrine is a placeholder)
+
+## Phase 7 detail
+- [x] Road south (heavy rocks + the glove) into the South Fields; the keep wall and seal gate; two shrine entrances, rubble
+- [x] Ram's Hollow (6 rooms, Dash Boots, Iron Ram, seal 2) and the Frost Vault (6 rooms, Fire Rod, Frost Wraith, seal 3) via `make_room` / `DUNGEONS`
+- [x] Dash Boots (charge, dash, bonk, rubble, dash damage); Fire Rod (fireballs, torches, magic); magic jars
+- [x] Bats; `BaseEnemy._resists`; `EnemyShot`; Caver's shade and the bat-back orb
+- [x] Caver's Keep (3 rooms), the end of Act 1 (`EndCard`, save outside the keep, back to the title)
+- [x] `tools/gen_act1.py`; 8 new sounds (50); `tests/test_act1.gd`: 54 checks; `tools/capture_act1.gd`
+- [ ] Owner playtest: dungeon 2-3 layouts, boss difficulty, the end card's words, dungeon/boss names (placeholders)

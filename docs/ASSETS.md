@@ -4,8 +4,8 @@ Description: Asset inventory.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-16
-Version: 1.5.0
+Last edit date: 2026-10-19
+Version: 1.6.0
 -->
 
 # Assets
@@ -26,9 +26,11 @@ Version: 1.5.0
 | `assets/sprites/dungeon/` | doors (locked/big/shutter x n/s/e/w), floor switch, push block, big chest, heavy rock, family seal | `tools/gen_dungeon.py` |
 | `assets/sprites/enemies/grand_slime*` | the Moss Shrine's boss (idle, hop; 48x56) | `tools/gen_dungeon.py` |
 | `assets/ui/items/map,compass,big_key,glove.png` | dungeon item and glove icons | `tools/gen_dungeon.py` |
+| `assets/sprites/enemies/bat*`, `iron_ram*`, `frost_wraith*`, `caver*` | the bat and the Act 1 bosses | `tools/gen_act1.py` |
+| `assets/sprites/items/fireball, magic_small/big, rubble, ice_shard, orb, orb_back`, `dungeon/seal_gate, seal_socket`, `ui/items/boots, fire_rod`, `vfx/dust` (+ `vfx_act1.json`) | Act 1 items, props and effects | `tools/gen_act1.py` |
 | `assets/data/dialogue.json` | every villager line and sign text | hand-written (story lines are a draft) |
 | `src/world/areas/` | `index.json` + 9 area files (5 overworld, 4 interiors) with villagers and signs | `tools/gen_areas.py` |
-| `assets/audio/sfx/` | 42 effects: sword_slash, sword_spin, charge_ready, enemy_hit, enemy_die, hurt, player_die, bush_cut, lift, throw, shatter, pickup_heart, pickup_gem, shield_block, spit, ledge_hop, land, door, menu_move, menu_select, menu_back, text_blip, pause, save_done, game_over, item_get, heart_piece, chest_open, boomerang, arrow_shot, arrow_hit, bomb_place, explode, unlock, lantern, shop_buy, error, fall, shutter, switch_click, block_push, boss_die | `tools/gen_sfx.py` |
+| `assets/audio/sfx/` | 50 effects: sword_slash, sword_spin, charge_ready, enemy_hit, enemy_die, hurt, player_die, bush_cut, lift, throw, shatter, pickup_heart, pickup_gem, shield_block, spit, ledge_hop, land, door, menu_move, menu_select, menu_back, text_blip, pause, save_done, game_over, item_get, heart_piece, chest_open, boomerang, arrow_shot, arrow_hit, bomb_place, explode, unlock, lantern, shop_buy, error, fall, shutter, switch_click, block_push, boss_die, dash, bonk, fireball, ice_shard, orb, clank, magic_jar, act_end | `tools/gen_sfx.py` |
 | `assets/shaders/` | `flash.gdshader` (white hit flash) | ported from Chapel |
 | `assets/branding/` | icon and splash from the 2024 UE5 prototype | recovered |
 | `assets/reference/joe/` | 2024 character sheet and pixel frames | recovered, reference only |

@@ -4,8 +4,8 @@ Description: Game design document for The Village - the top-down, A Link to the 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-16
-Version: 2.5.0
+Last edit date: 2026-10-19
+Version: 2.6.0
 -->
 
 # Game Design Document — The Village
@@ -71,7 +71,7 @@ direction is taken from the dominant axis (vertical wins a perfect diagonal).
 | Sword | J / Space | South (A / Cross) — SNES B |
 | Interact / lift / talk | E / Enter | East (B / Circle) — SNES A |
 | Use item (equipped Y-item) | K | West (X / Square) — SNES Y |
-| Dash (Pegasus-style boots, later) | L / Shift | Right stick click |
+| Dash (with the Dash Boots) | L / Shift | Right stick click |
 | Map (dungeon rooms / visited areas) | Tab | North (Y / Triangle) — SNES X |
 | Inventory | I | Left shoulder |
 | Pause | Esc | Start |
@@ -118,6 +118,11 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
   immune to the boomerang. Reward: a heart container, then the first family seal, then Joe is outside again.
   Rules: small keys belong to their dungeon; falling into a pit costs a heart; the map shows every room once found,
   the compass marks the boss.
+  **Implemented in Phase 7** (names are placeholders): the **South Fields** past the South Road's heavy rocks;
+  **Ram's Hollow** (Dash Boots; boss the Iron Ram - dodge its charge into a wall, hit it while dazed; seal 2);
+  **Frost Vault** behind rubble (Fire Rod; boss the Frost Wraith - only fire hurts it; seal 3); **Caver's Keep**
+  behind the seal gate (all three seals): Caver's shade throws orbs Joe bats back with the sword; three hits end
+  Act 1 (his last words, the end card; the game is saved outside the keep).
 
 ## 7. Items (ALttP equivalents in brackets)
 
@@ -131,6 +136,9 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 | Small key | chest in East Lake | opens one key block |
 | Pieces of heart | meadow torch chest, behind the woods' cracked rock, by East Lake (behind heavy rocks), Boni (100 gems) | four make a heart container |
 | Power Glove | the Moss Shrine's big chest | lift and throw heavy rocks |
+| Dash Boots | Ram's Hollow's big chest | dash (L / Shift): sword out, breaks rubble, bonks on walls |
+| Fire Rod | the Frost Vault's big chest | fireballs for 4 magic; burn ice, light torches from afar |
+| Magic jars | drops (8% of the table) | small +4, big +16 magic |
 
 Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems.
 

@@ -4,8 +4,8 @@ Description: Internal scripting API of the main classes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-16
-Version: 2.2.0
+Last edit date: 2026-10-19
+Version: 2.3.0
 -->
 
 # API
@@ -15,13 +15,16 @@ The game has no network API; this is the internal API other scripts and tests re
 ## Player (`src/player/Player.gd`)
 - Signals: `health_changed(current, maximum)`, `died`, `talk_requested(target)`, `item_collected(kind)`, `fell`.
 - Properties: `facing: Vector2i`, `health`, `sprite`, `sword: HitBox`, `spin_box: HitBox`, `hurt_box`, `fsm`
-  (states `idle walk hop attack charge spin lift carry throw use hold fall hurt dead`), `held_sprite`, `used_item`, `charged`, `carrying` (`""`, `"pot"`, `"bush"`),
+  (states `idle walk hop attack charge spin lift carry throw use hold fall dash_charge dash bonk hurt dead`), `held_sprite`, `used_item`, `charged`, `carrying` (`""`, `"pot"`, `"bush"`),
   `_input_override` (tests).
 - Calls: `is_invincible()`, `is_dead()`, `is_hopping()`, `freeze(seconds)`, `unfreeze()`, `blocks_from(source_position)`, `liftable_in_front()`, `talkable_in_front()`,
-  `revive(at)`, `collect(kind)`, `hold_up(texture)`, `end_hold()`, `is_falling()`, `respawn_after_fall(at, facing)`.
+  `revive(at)`, `collect(kind)`, `hold_up(texture)`, `end_hold()`, `is_falling()`, `respawn_after_fall(at, facing)`, `is_dashing()`.
 
 ## Enemies (`src/enemies/`)
-- `GrandSlime` (boss): `is_boss`, `minions`, `angry()`.
+- `GrandSlime` (boss): `is_boss`, `minions`, `angry()`. `IronRam`: `state`, `charges`, `is_dazed()`. `FrostWraith`:
+  `casts`, `cast()`. `CaverShade`: `throws`, `throw_orb()`, `phase`. `Bat`. `CaverOrb`: `bat_back()`, `batted`,
+  `caster` (group `orb`). `EnemyShot`: `direction`, `texture`, `deflect()` (group `enemy_shot`).
+- `BaseEnemy._resists(hit) -> bool` (override; resisted hits clank).
 - `BaseEnemy`: `stun_immune`; signal `defeated(at)`; `player` (set by the field), `health`, `facing`, `freeze()`, `is_dead()`;
   static `spawn_drop(parent, at)`.
 - `Guard.chasing`, `Spitter.spit()` / `shots`, `EnemyRock.deflect()` / `deflected`.
@@ -35,7 +38,8 @@ The game has no network API; this is the internal API other scripts and tests re
   instant (test) move; `save_game() -> bool`, `quit_to_title()`, `can_open_menu()`, `box_at_top(screen_pos)`,
   `say(key)`, `item_get(kind, amount)`, `grant(kind, amount) -> bool` (true = new heart container), `buy(ware_node)`,
   static `object_flag(kind, area, cell)`, `item_gets` (tests); dungeons: `dungeons`, `map_screen`, `group_of(id)`,
-  `area_at(point, group)`, `dungeon_of(id)`, `leave_dungeon()`, `falls` (tests).
+  `area_at(point, group)`, `dungeon_of(id)`, `leave_dungeon()`, `falls` (tests); Act 1: `end_card`, `play_ending(act)`,
+  `endings` (tests), `GATE_FLAG`, `ACT1_FLAG`.
 
 ## AreaBuilder (`src/world/AreaBuilder.gd`, static)
 - `tileset()`, `build(rows, actors, indoor, with_enemies, origin) -> {tiles, bushes, pots, enemies, spawn, doors,
@@ -52,7 +56,8 @@ The game has no network API; this is the internal API other scripts and tests re
 - `Door` (`setup(id, type, dir, when, open)`, `open_door()`, `close_door()`, `flag()`, `door_id`, `type`, `when`,
   `is_open`), `FloorSwitch` (signal `pressed_down(flag)`; `press()`, `pressed`, `heavy`; group `floor_switch`),
   `PushBlock` (signal `moved`; `push(dir, delta)`, `try_move(dir)`, `pushes`), `BigChest` (a Chest with
-  `needs_big_key`), `HeavyRock` (liftable with the glove). `Chest` adds `reveal_by`, `reveal_flag`.
+  `needs_big_key`), `HeavyRock` (liftable with the glove), `Rubble` (signal `broken`; `dash_break()`, group
+  `dashable`), `SealGate` (`setup(flag, open)`, `refresh(seals)`, `open_gate()`, `is_open`). `Chest` adds `reveal_by`, `reveal_flag`.
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 
@@ -83,6 +88,7 @@ The game has no network API; this is the internal API other scripts and tests re
   `picked(choice)`; `open()`, `is_ready_to_choose()`, `menu`; choices `CONTINUE`, `SAVE_CONTINUE`, `SAVE_QUIT`).
 - `MenuList`: signals `chosen(index)`, `cancelled`, `moved(index)`; `set_items([{label, enabled}])`, `confirm()`,
   `selected`, `items`, `active`. `PixelText`: `make()`, `measure()`, `line_height()`, `wrap(text, max_px)`.
+- `EndCard`: signal `finished`; `open(title, lines)`, `close()`, `is_open`, `ready_to_close`, `lines_shown`.
 - `MapScreen`: signal `closed`; `open(areas, current, dungeons)`, `close()`, `is_open`, `shown_rooms`, `here`,
   `boss_marked`. `Hud.show_zero_keys`.
 - `TitleScreen`: `menu`, `menu_items()`, `start_game(continue_save)`.
@@ -90,6 +96,7 @@ The game has no network API; this is the internal API other scripts and tests re
 ## Items (`src/items/`)
 - `ItemDB` (static): `KINDS`, `DUNGEON_ITEMS`, `USES`, `WARES`, `LANTERN_MAGIC`, `has()`, `display_name()`, `icon()`, `text_key()`.
 - `ItemUse` (static): `use(player, item, aim) -> bool`, `torch_near(tree, at)`.
+- `Fireball` (`direction`, `burst()`; group `fireball`; element "fire").
 - `Boomerang` (signal `returned`; `direction`, `owner_node`, `coming_back`, `carried`, `turn_back()`; group
   `boomerang`), `Arrow` (`direction`, `stuck`; group `arrow`), `Bomb` (signal `exploded`; `fuse_left`, `explode()`;
   group `bomb`).
