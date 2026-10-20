@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-23
-Version: 5.8.0
+Last edit date: 2026-10-20
+Version: 5.8.1
 -->
 
 # Changelog — The Village
@@ -22,6 +22,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.5.1] - 2026-10-20 — Animated GoDGuilD logo
+
+### Added
+- **Title screen**: the 2026 animated GoDGuilD logo sits small in the bottom-right corner (52x42 px, linear filtering over the pixel art): it builds itself in, idles, and every 25-55 s glitches out and rebuilds itself. `src/ui/GgLogo.gd` plays three spritesheets in `assets/ui/gg_logo/`, all copied from the GoDGuilD logo package (same player as Cheesy-BOM!, Zero Ascent 2 and Chapel of Dreams). Patch number only, so 7.6.0 stays free for Phase 12.
 
 ## [7.5.0] - 2026-10-23 — Phase 11: Tempus
 

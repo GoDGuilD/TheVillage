@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.1.0
 extends Node2D
 ## The backdrop is the real village, painted by AreaBuilder from its generated area (no enemies), so the title
 ## always matches the game. CONTINUE hands the save to the World through SaveGame.pending.
@@ -12,6 +12,13 @@ extends Node2D
 const WORLD_SCENE := "res://src/world/World.tscn"
 const BACKDROP_AREA := "res://src/world/areas/el_pueblo.json"
 const LOGO_TEXTURE := preload("res://assets/ui/title_logo.png")
+# Animated GoDGuilD logo (src/ui/GgLogo.gd + assets/ui/gg_logo/, copies from the 2026 logo package),
+# small in the bottom-right corner. Linear filtering: the project default (nearest) would alias the
+# downscaled chrome art.
+const GG_LOGO := preload("res://src/ui/GgLogo.gd")
+const GG_LOGO_DIR := "res://assets/ui/gg_logo/"
+const GG_LOGO_SIZE := Vector2(52, 42)          # keeps the logo art's 1920x1560 aspect
+const GG_LOGO_MARGIN := 5.0
 const TILE := 16.0
 const LOGO_Y := 34.0
 const SUBTITLE_Y := 76.0
@@ -55,6 +62,17 @@ func _ready() -> void:
 	menu.chosen.connect(_on_chosen)
 	ui.add_child(PixelText.make("ARROWS + ENTER", Vector2(UiTheme.VIEW.x / 2.0, HINT_Y), UiTheme.DIM_TEXT,
 			PixelText.FONT_SMALL, PixelText.Align.CENTER))
+	_add_studio_logo(ui)
+
+
+# Bottom-right animated GoDGuilD logo (intro, idle, occasional glitch replay).
+func _add_studio_logo(parent: Node) -> void:
+	var gg: TextureRect = GG_LOGO.new()
+	gg.sheet_dir = GG_LOGO_DIR
+	gg.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	gg.position = UiTheme.VIEW - GG_LOGO_SIZE - Vector2(GG_LOGO_MARGIN, GG_LOGO_MARGIN)
+	gg.size = GG_LOGO_SIZE
+	parent.add_child(gg)
 
 
 # CONTINUE is only enabled when a save exists.
