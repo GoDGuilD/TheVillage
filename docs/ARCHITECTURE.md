@@ -4,8 +4,8 @@ Description: Code architecture of The Village: folders, autoloads, contracts, pl
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-23
-Version: 5.8.0
+Last edit date: 2026-10-20
+Version: 5.9.0
 -->
 
 # Architecture
@@ -21,7 +21,8 @@ src/
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
   enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, Cinder, Cogbug, EnemyRock, EnemyShot, bosses:
-             GrandSlime, IronRam, FrostWraith, CaverShade (+ CaverOrb), GloomMoth, MagmaWyrm, ClockWarden
+             GrandSlime, IronRam, FrostWraith, CaverShade (+ CaverOrb), GloomMoth, MagmaWyrm, ClockWarden,
+             Thornheart; Snapvine (rooted)
   items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball, Grapple, IceBolt, HammerBlow
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
              tiles + actors), TestField (test arenas), Npc, SignPost, Chest, BigChest, Torch, CrackedRock, KeyBlock,
@@ -33,10 +34,10 @@ src/
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_tempus.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd, capture_tempus.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_tempus.py, gen_silva.py (+ silva_art.py), gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd, capture_tempus.gd, capture_silva.gd
 tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
-             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd, test_tempus.gd
+             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd, test_tempus.gd, test_silva.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -124,6 +125,12 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   `TICK_TIME` and flips `tick_phase`; `_apply_ticks` raises the matching colour. A block asked to rise while Joe
   stands in its cell stays `pending` and rises once he leaves. Sunk blocks and flat pegs move their node up a few
   pixels so the y-sorted actors draw over them (a negative z_index would hide them under the ground).
+- **Deep water and the flippers.** Water cells are solid in the atlas manifest but flagged `water`, so AreaBuilder
+  puts their collision on a third TileSet physics layer (10, `LAYER_WATER`) instead of the world layer. Joe's
+  `collision_mask` comes from `Player.solid_mask()` every frame: it includes the water layer until he has the
+  flippers. Enemies and push blocks always mask it; projectiles and thrown objects mask only the world layer, so
+  they fly over water as they fly over pits. When Joe's feet are over a `water` cell he enters state `swim`
+  (slower, no sword or items). `World._solid_at` treats water as solid for a mirror landing unless he can swim.
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 

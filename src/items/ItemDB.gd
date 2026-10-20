@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-23
-# Version: 1.5.0
+# Last edit date: 2026-10-20
+# Version: 1.5.1
 class_name ItemDB
 extends RefCounted
 ## "Kinds" are what chests, gifts, pickups and wares hand out. Y-items (GameState.ITEM_ORDER) are a subset.
@@ -36,6 +36,7 @@ const KINDS := {
 	"grapple": {"name": "GRAPPLE", "icon": ICON_DIR + "grapple.png", "text": "get_grapple"},
 	"ice_rod": {"name": "ICE ROD", "icon": ICON_DIR + "ice_rod.png", "text": "get_ice_rod"},
 	"hammer": {"name": "HAMMER", "icon": ICON_DIR + "hammer.png", "text": "get_hammer"},
+	"flippers": {"name": "FLIPPERS", "icon": ICON_DIR + "flippers.png", "text": "get_flippers"},
 	"crystal": {"name": "CRYSTAL", "icon": "res://assets/sprites/dungeon/crystal.png", "text": "get_crystal"},
 	"magic": {"name": "MAGIC", "icon": SPRITE_DIR + "magic_big.png", "text": "get_magic"},
 }

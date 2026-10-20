@@ -155,6 +155,21 @@
       "fps": 12.0,
       "loop": false
     },
+    "swim_down": {
+      "frames": 2,
+      "fps": 4.0,
+      "loop": true
+    },
+    "swim_up": {
+      "frames": 2,
+      "fps": 4.0,
+      "loop": true
+    },
+    "swim_side": {
+      "frames": 2,
+      "fps": 4.0,
+      "loop": true
+    },
     "spin": {
       "frames": 8,
       "fps": 24.0,

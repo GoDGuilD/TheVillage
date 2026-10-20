@@ -24,6 +24,7 @@
   "dw_umbra_vale",
   "dw_cinder_barrens",
   "dw_clockwork_wastes",
+  "dw_silva_tangle",
   "d1_entrance",
   "d1_hub",
   "d1_west",
@@ -61,7 +62,12 @@
   "d6_hall",
   "d6_west",
   "d6_east",
-  "d6_boss"
+  "d6_boss",
+  "d7_entrance",
+  "d7_hall",
+  "d7_west",
+  "d7_east",
+  "d7_boss"
  ],
  "act2_spawn": {
   "area": "dw_el_pueblo",
@@ -120,6 +126,13 @@
    "entrance": "d6_entrance",
    "boss_room": "d6_boss",
    "boss_flag": "boss:d6"
+  },
+  "d7": {
+   "name": "Silva Grove",
+   "crystal": 3,
+   "entrance": "d7_entrance",
+   "boss_room": "d7_boss",
+   "boss_flag": "boss:d7"
   }
  }
 }

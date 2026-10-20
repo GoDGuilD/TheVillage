@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 1.5.0
+# Last edit date: 2026-10-20
+# Version: 1.5.1
 class_name BaseEnemy
 extends CharacterBody2D
 ## Subclasses set the pack/stat variables in _init() and override _think(delta) (AI) and optionally _anim_base().
@@ -22,6 +22,7 @@ const LAYER_ENEMY_HITBOX := 16
 const LAYER_ENEMY_HURTBOX := 64
 const LAYER_PROPS := 128
 const LAYER_PIT := 256                   # AreaBuilder.LAYER_PIT
+const LAYER_WATER := 512                 # AreaBuilder.LAYER_WATER: no enemy swims
 const KNOCK_TIME := 0.15                 # stun while being pushed back by a hit
 const IFRAMES := 0.3                     # one slash can only hit once
 const HIT_STOP := 0.05                   # freeze for both sides when a hit lands
@@ -59,7 +60,7 @@ var _dead := false
 func _ready() -> void:
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	collision_layer = LAYER_ENEMIES
-	collision_mask = LAYER_WORLD | LAYER_PROPS | LAYER_PIT     # pits are walls to enemies
+	collision_mask = LAYER_WORLD | LAYER_PROPS | LAYER_PIT | LAYER_WATER     # pits and deep water are walls to them
 	var feet := CollisionShape2D.new()
 	var fr := RectangleShape2D.new()
 	fr.size = FEET_BOX

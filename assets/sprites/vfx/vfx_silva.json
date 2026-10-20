@@ -1,0 +1,10 @@
+{
+  "splash.png": {
+    "frame_size": [
+      24,
+      16
+    ],
+    "fps": 14.0,
+    "origin": "center"
+  }
+}

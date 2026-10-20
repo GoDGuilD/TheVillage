@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-23
-# Version: 6.2.0
+# Last edit date: 2026-10-20
+# Version: 6.3.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -694,7 +694,7 @@ func grant(kind: String, amount: int = 1) -> bool:
 			return true
 		"map", "compass", "big_key":
 			GameState.give_dungeon_item(dungeon_of(current_id()), kind)
-		"glove", "boots", "fire_rod", "moon_mirror", "grapple", "ice_rod", "hammer":
+		"glove", "boots", "fire_rod", "moon_mirror", "grapple", "ice_rod", "hammer", "flippers":
 			GameState.give_item(kind)
 		"magic":
 			GameState.add_magic(amount)
@@ -1004,10 +1004,13 @@ func _world_warp(group: String, mirror: bool) -> void:
 	transitioning = false
 
 
-# True if the current area's tile under `feet` is solid (a mirror warp may not land there).
+# True if the current area's tile under `feet` is solid (a mirror warp may not land there); deep water counts
+# unless Joe has the flippers.
 func _solid_at(feet: Vector2) -> bool:
 	var tiles: TileMapLayer = current["tiles"]
 	var td := tiles.get_cell_tile_data(tiles.local_to_map(tiles.to_local(feet + SOLID_PROBE)))
+	if td != null and bool(td.get_custom_data("water")):
+		return not GameState.has_item("flippers")
 	return td != null and td.get_collision_polygons_count(0) > 0
 
 

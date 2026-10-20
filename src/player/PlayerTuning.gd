@@ -1,10 +1,10 @@
 # File: PlayerTuning.gd
-# Description: Single home for every movement/combat feel constant of top-down Joe (walk, nudge, sword, spin, shield, lift/throw, hurt).
+# Description: Single home for every movement/combat feel constant of top-down Joe (walk, nudge, sword, spin, shield, lift/throw, swim, hurt).
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 2.5.1
+# Last edit date: 2026-10-20
+# Version: 2.6.0
 class_name PlayerTuning
 extends RefCounted
 
@@ -84,6 +84,10 @@ const DASH_DUST_EVERY := 0.08         # s between dust puffs
 const BONK_TIME := 0.25               # s knocked back after dashing into a wall
 const BONK_SPEED := 70.0
 const BONK_SHAKE := Vector2(2.0, 0.15)
+
+# --- Swimming (the flippers, Phase 12) -------------------------------------------------------------------
+const SWIM_SPEED := 60.0              # px/s in deep water (no sword, items, lifting or dash while swimming)
+const WATER_PROBE := Vector2(0, -3)   # the point under Joe that must be over deep water for him to swim
 
 # --- Health and being hurt ------------------------------------------------------
 const MAX_HP := 6                     # half-heart units: 6 = three hearts, like ALttP's start

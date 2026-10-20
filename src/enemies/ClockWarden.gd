@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-23
-# Last edit date: 2026-10-23
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.0.1
 class_name ClockWarden
 extends BaseEnemy
 ## States: "walk" (plods toward Joe; every TICK_TIME s throws GEARS gears - cardinal and diagonal ticks
@@ -96,7 +96,7 @@ func _think(delta: float) -> void:
 	_tick_left -= delta
 	if _tick_left > 0.0:
 		return
-	var angry := health.current_health * 2 <= max_hp
+	var angry := health.current_health * 2 <= health.max_health
 	_tick_left = TICK_TIME_ANGRY if angry else TICK_TIME
 	ticks += 1
 	Audio.sfx("tick")

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-21
-# Version: 1.4.0
+# Last edit date: 2026-10-20
+# Version: 1.5.0
 class_name ItemMenu
 extends CanvasLayer
 ## Slots follow GameState.ITEM_ORDER; an item shows once found (icons in assets/ui/items/, Phase 5).
@@ -17,6 +17,8 @@ const SWORD_TEX := preload("res://assets/ui/menu/icon_sword.png")
 const SHIELD_TEX := preload("res://assets/ui/menu/icon_shield.png")
 const GLOVE_TEX := preload("res://assets/ui/items/glove.png")
 const BOOTS_TEX := preload("res://assets/ui/items/boots.png")
+const FLIPPERS_TEX := preload("res://assets/ui/items/flippers.png")
+const EQUIP_COLUMN := 60.0               # the second equipment column (boots, flippers), clear of the heart pieces
 const SEAL_EMPTY_TEX := preload("res://assets/ui/menu/seal_empty.png")
 const SEAL_FULL_TEX := preload("res://assets/ui/menu/seal_full.png")
 const CRYSTAL_EMPTY_TEX := preload("res://assets/ui/menu/crystal_empty.png")
@@ -57,6 +59,8 @@ var _glove_icon: Sprite2D
 var _glove_label: PixelText
 var _boots_icon: Sprite2D
 var _boots_label: PixelText
+var _flippers_icon: Sprite2D
+var _flippers_label: PixelText
 
 
 func _ready() -> void:
@@ -85,8 +89,11 @@ func _ready() -> void:
 	_label("SHIELD", PANEL_POS + EQUIP_OFFSET + Vector2(22, 4 + EQUIP_STEP), UiTheme.TEXT)
 	_glove_icon = _sprite(GLOVE_TEX, PANEL_POS + EQUIP_OFFSET + Vector2(0, EQUIP_STEP * 2), false)
 	_glove_label = _label("GLOVE", PANEL_POS + EQUIP_OFFSET + Vector2(22, 4 + EQUIP_STEP * 2), UiTheme.TEXT)
-	_boots_icon = _sprite(BOOTS_TEX, PANEL_POS + EQUIP_OFFSET + Vector2(0, EQUIP_STEP * 3), false)
-	_boots_label = _label("BOOTS", PANEL_POS + EQUIP_OFFSET + Vector2(22, 4 + EQUIP_STEP * 3), UiTheme.TEXT)
+	_boots_icon = _sprite(BOOTS_TEX, PANEL_POS + EQUIP_OFFSET + Vector2(EQUIP_COLUMN, 0), false)
+	_boots_label = _label("BOOTS", PANEL_POS + EQUIP_OFFSET + Vector2(EQUIP_COLUMN + 22, 4), UiTheme.TEXT)
+	_flippers_icon = _sprite(FLIPPERS_TEX, PANEL_POS + EQUIP_OFFSET + Vector2(EQUIP_COLUMN, EQUIP_STEP), false)
+	_flippers_label = _label("FLIPPERS", PANEL_POS + EQUIP_OFFSET + Vector2(EQUIP_COLUMN + 22, 4 + EQUIP_STEP),
+			UiTheme.TEXT)
 	_label("FAMILY SEALS", PANEL_POS + SEALS_OFFSET + Vector2(0, -14), UiTheme.GOLD)
 	for i in GameState.SEAL_COUNT:
 		_seals.append(_sprite(SEAL_EMPTY_TEX, PANEL_POS + SEALS_OFFSET + Vector2(i * SEAL_STEP, 0), false))
@@ -150,6 +157,8 @@ func _refresh() -> void:
 	_glove_label.visible = _glove_icon.visible
 	_boots_icon.visible = GameState.has_item("boots")
 	_boots_label.visible = _boots_icon.visible
+	_flippers_icon.visible = GameState.has_item("flippers")
+	_flippers_label.visible = _flippers_icon.visible
 	var pieces := AtlasTexture.new()
 	pieces.atlas = PIECES_TEX
 	pieces.region = Rect2(GameState.heart_pieces * PIECES_FRAME.x, 0, PIECES_FRAME.x, PIECES_FRAME.y)

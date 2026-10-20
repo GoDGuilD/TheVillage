@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-21
-# Last edit date: 2026-10-21
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.0.1
 class_name GloomMoth
 extends BaseEnemy
 ## States: "fly" (drifts on a slow loop around its home, every SHOT_EVERY s throws a fan of dust at Joe; resists
@@ -111,7 +111,7 @@ func _on_hurt(damage: int, source_position: Vector2, _knockback: Vector2) -> voi
 
 func _think(delta: float) -> void:
 	velocity = Vector2.ZERO
-	var angry := health.current_health * 2 <= max_hp
+	var angry := health.current_health * 2 <= health.max_health
 	if is_grounded():
 		_timer -= delta
 		if _timer <= 0.0:

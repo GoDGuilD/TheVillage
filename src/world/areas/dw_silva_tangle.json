@@ -1,0 +1,79 @@
+{
+ "id": "dw_silva_tangle",
+ "name": "Silva Tangle",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  1,
+  2
+ ],
+ "origin_tiles": [
+  -48,
+  14
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "Txgggggg~~~gggggggggggTx",
+  "xxgTxggg~~~gggExxxxgggxx",
+  "Txgxxggg~~~gggxxxxxgggTx",
+  "xxgggggg~~~gggxxxxxgggxx",
+  "Txgggggg~~~gggg###ggggTx",
+  "xxgggggg~~~gggg###ggggxx",
+  "Txggjggg~~~gggg###ggggTx",
+  "xxgggggg~~~gBBg###ggjgxx",
+  "Txgggggg~~~gggg###ggggTx",
+  "xxgggggg~~~gggg###Sgggxx",
+  "TxBggggg~~~gggg#########",
+  "xxgggggg~~~gggg#########",
+  "Txgghggg~~~ggjg#########",
+  "xxgggggg~~~gggg#########",
+  "Txgggggg~~~gggggggggggTx",
+  "xxgggjgg~~~gTxggggTxggxx",
+  "Txgggggg~~~gxxggggxxgBTx",
+  "xxgggggg~~~gggggjggggBxx",
+  "Txgggggg~~~gggggggggggTx",
+  "xxggTxgg~~~gggTxgggTxgxx",
+  "Txggxxgg~~~gggxxgggxxgTx",
+  "xxgggggg~~~gggggggggAgxx",
+  "Txgggggg~~~gggggggggggTx",
+  "xxgggggg~~~gggggggggggxx",
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [
+  {
+   "cell": [
+    16,
+    5
+   ],
+   "to": "d7_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  }
+ ],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    18,
+    11
+   ],
+   "text": "dw_sign_grove"
+  }
+ ],
+ "objects": [
+  {
+   "kind": "heart_piece",
+   "cell": [
+    4,
+    14
+   ]
+  }
+ ],
+ "wares": []
+}

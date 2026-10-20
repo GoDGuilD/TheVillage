@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-23
-Version: 1.10.0
+Last edit date: 2026-10-20
+Version: 1.11.0
 -->
 
 # Roadmap
@@ -27,7 +27,7 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 9 | Umbra | The Umbral Vale, the Umbra Sanctum (dark rooms), the Grapple and hook posts, lurkers, the Gloom Moth, the first dimension crystal, the Shade Market | Done (45 Umbra checks pass) |
 | 10 | Ignis | The Cinder Barrens and lava, the Ice Rod (frozen enemies, lava crust), cinders, the Ignis Forge, the Magma Wyrm, the second crystal | Done (36 Ignis checks pass) |
 | 11 | Tempus | The Clockwork Wastes and tick blocks, the Hammer and pegs, cogbugs, the Tempus Clocktower, the Clock Warden, the third crystal | Done (32 Tempus checks pass) |
-| 12 | Silva | The last region + dungeon + boss, with its key item (flippers?) and the fourth crystal | Next |
+| 12 | Silva | The Silva Tangle and swimming, the Flippers, snapvines, the Silva Grove, the Thornheart, the fourth crystal | Done (35 Silva checks pass) |
 | 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
 | 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
 | 15 | Release | Credits, icon, export preset, performance baseline, store material | Planned |
@@ -139,3 +139,12 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] The Tempus Clocktower (5 rooms), cogbugs, the Clock Warden (gears, time stop, cracked armour), the Crystal of Tempus
 - [x] `tests/test_tempus.gd`: 32 checks; `tools/capture_tempus.gd`
 - [ ] Owner playtest: tick speed, the time stop, the warden's difficulty, names (wastes, clocktower, warden)
+
+
+## Phase 12 detail
+- [x] `tools/gen_silva.py` (+ `silva_art.py`), Joe's swim strips, three sounds; deep water on its own physics layer
+- [x] The Flippers and swimming (state `swim`); the mirror may not land in deep water without them
+- [x] The Silva Tangle (Dark World-only, west of the Thorn Woods behind pegs; the river and its piece of heart)
+- [x] The Silva Grove (5 rooms, grove pools), snapvines, the Thornheart (seeds, fire opens it), the Crystal of Silva
+- [x] `tests/test_silva.gd`: 35 checks; `tools/capture_silva.gd`
+- [ ] Owner playtest: swim speed, the snapvine's reach, the Thornheart's difficulty, names (tangle, grove, thornheart)

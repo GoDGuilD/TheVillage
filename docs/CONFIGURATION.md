@@ -4,8 +4,8 @@ Description: Configuration parameters.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-23
-Version: 1.10.0
+Last edit date: 2026-10-20
+Version: 1.11.0
 -->
 
 # Configuration
@@ -37,6 +37,9 @@ Version: 1.10.0
 | `src/world/World.gd` (`TICK_TIME`), `src/items/HammerBlow.gd` (`DAMAGE`, `RADIUS`, `PEG_REACH`), `ItemUse.HAMMER_AHEAD` | Tempus's clock speed; the hammer's hit |
 | `src/enemies/Cogbug.gd`, `ClockWarden.gd` | Cogbug speed and flip time; the warden's tick, gears, time stop, cracked time |
 | `tools/gen_areas.py` (`D6`, `d6_rooms()`, `build_clockwork_wastes`) | Tempus's places |
+| `src/player/PlayerTuning.gd` (`SWIM_SPEED`, `WATER_PROBE`) | Swimming speed; the point that must be over deep water |
+| `src/enemies/Snapvine.gd`, `Thornheart.gd` | The snapvine's reach, lunge and timing; the Thornheart's seeds, ring, open time |
+| `tools/gen_areas.py` (`D7`, `d7_rooms()`, `build_silva_tangle`) | Silva's places |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

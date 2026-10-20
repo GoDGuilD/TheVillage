@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-23
-# Version: 1.11.0
+# Last edit date: 2026-10-20
+# Version: 1.12.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -407,3 +407,26 @@ TICK_A_LIGHT   = _hex("#f8c860")
 TICK_B_DARK    = _hex("#105c68")    # teal tick blocks (raised on odd ticks)
 TICK_B_MID     = _hex("#28a8b0")
 TICK_B_LIGHT   = _hex("#80e0e0")
+
+# --- Silva (Phase 12): jungle ground, grove water, the flippers, snapvines, the Thornheart --------------------------
+JUNGLE_DARK    = _hex("#123c2c")    # Silva ground: deep moss (kept un-recoloured in the Dark World)
+JUNGLE_MID     = _hex("#1e5a3c")
+JUNGLE_LIGHT   = _hex("#3a8048")
+JUNGLE_ROOT    = _hex("#4c3424")
+GROVE_DARK     = _hex("#0c3438")    # the Silva Grove's murky pools
+GROVE_MID      = _hex("#16585a")
+GROVE_LIGHT    = _hex("#3c8c80")
+GROVE_FOAM     = _hex("#a8e0c0")
+FLIPPER_DARK   = _hex("#145c74")
+FLIPPER_MID    = _hex("#2ca0b8")
+FLIPPER_LIGHT  = _hex("#8ce0e8")
+VINE_DARK      = _hex("#1c4820")    # snapvines and the Thornheart
+VINE_MID       = _hex("#3c8030")
+VINE_LIGHT     = _hex("#80c048")
+PETAL_DARK     = _hex("#801c48")
+PETAL_MID      = _hex("#c83c70")
+PETAL_LIGHT    = _hex("#f088a8")
+THORN          = _hex("#e8dca0")
+SEED_DARK      = _hex("#5c3c10")
+SEED_MID       = _hex("#a87828")
+RIPPLE         = _hex("#d8f0ff")    # rings around Joe while he swims

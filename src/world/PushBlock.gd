@@ -1,10 +1,10 @@
 # File: PushBlock.gd
-# Description: A stone block Joe can push one tile at a time by walking into it for a moment; it only moves into free floor (not walls, props or pits).
+# Description: A stone block Joe can push one tile at a time by walking into it for a moment; it only moves into free floor (not walls, props, pits or deep water).
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-16
-# Last edit date: 2026-10-16
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.1.0
 class_name PushBlock
 extends StaticBody2D
 ## Joe's walk reports every body he bumps (`push(dir, delta)`); a steady push of PUSH_TIME in one direction slides
@@ -20,6 +20,7 @@ const SLIDE_TIME := 0.25
 const LAYER_WORLD := 1
 const LAYER_PROPS := 128
 const LAYER_PIT := 256
+const LAYER_WATER := 512                 # AreaBuilder.LAYER_WATER (deep water is not free floor)
 const PROBE_SIZE := Vector2(12, 12)
 const SWITCH_SNAP := 4.0                 # px: the block rests on a switch when this close to its centre
 
@@ -86,6 +87,6 @@ func _free_at(at: Vector2) -> bool:
 	r.size = PROBE_SIZE
 	q.shape = r
 	q.transform = Transform2D(0.0, at)
-	q.collision_mask = LAYER_WORLD | LAYER_PROPS | LAYER_PIT
+	q.collision_mask = LAYER_WORLD | LAYER_PROPS | LAYER_PIT | LAYER_WATER
 	q.exclude = [get_rid()]
 	return get_world_2d().direct_space_state.intersect_shape(q, 1).is_empty()

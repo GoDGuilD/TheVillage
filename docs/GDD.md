@@ -4,8 +4,8 @@ Description: Game design document for The Village - the top-down, A Link to the 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-23
-Version: 2.10.0
+Last edit date: 2026-10-20
+Version: 2.11.0
 -->
 
 # Game Design Document — The Village
@@ -150,6 +150,13 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
   chest, a wall of pegs and two pegs before the boss. Enemies: **cogbugs**, armoured beetles the hammer flips over.
   Boss: the **Clock Warden** - throws gears on every tick and stops Joe in time on every third; the hammer cracks
   its armour for the sword. Reward: a heart container, then the **Crystal of Tempus**.
+  **Implemented in Phase 12 - Silva** (names are placeholders): the Thorn Woods' west edge opens onto the **Silva
+  Tangle** (Dark World only) behind a row of pegs - so Tempus comes first. Jungle ground, a river of deep water with
+  a piece of heart on the far bank. Enemies: **snapvines**, rooted plants that lunge at Joe. The **Silva Grove**
+  (5 rooms): pools everywhere, the big key behind pegs, the **Flippers** in the big chest, a pool barring the way
+  to the boss. Boss: the **Thornheart** - a bud bound in thorns on an island; it spits seeds, and only the fire
+  rod burns its thorns back so the sword can reach its heart. Reward: a heart container, then the **Crystal of
+  Silva**, the last of the four.
 
 ## 7. Items (ALttP equivalents in brackets)
 
@@ -171,6 +178,7 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 | Magic refill | the Shade Market, 40 gems | fills the magic meter |
 | Ice Rod | the Ignis Forge's big chest | ice bolts for 4 magic: freeze enemies 3 s; freeze lava into a 6-s crust |
 | Hammer | the Tempus Clocktower's big chest | a heavy blow (4 damage): pounds pegs flat, flips cogbugs, cracks armour |
+| Flippers | the Silva Grove's big chest | gear: swim in deep water (slower; no sword or items while swimming) |
 
 Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems. The Shade Market (Hollow Pueblo): bombs 5 for 30,
 arrows 10 for 25, magic refill 40.

@@ -3,12 +3,13 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-19
-# Version: 1.1.1
+# Last edit date: 2026-10-20
+# Version: 1.1.2
 extends Node
 
 const FX_DIR := "res://assets/sprites/vfx/"
-const FX_MANIFESTS := ["vfx_manifest.json", "vfx_items.json", "vfx_act1.json"]   # gen_props / gen_items / gen_act1
+const FX_MANIFESTS := ["vfx_manifest.json", "vfx_items.json", "vfx_act1.json", "vfx_silva.json"]   # gen_props /
+		# gen_items / gen_act1 / gen_silva
 const FX_Z := 60                          # effects draw over actors
 
 # Debug/test counters.

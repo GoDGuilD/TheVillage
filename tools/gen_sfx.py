@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-23
-# Version: 3.6.0
+# Last edit date: 2026-10-20
+# Version: 3.7.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -530,6 +530,36 @@ def time_stop():
     return s * env
 
 
+# --- Phase 12: Silva ----------------------------------------------------------------------
+
+def splash():
+    # Joe dropping into deep water: a noisy wash with a low plunk under it.
+    t = tt(0.4)
+    n = len(t)
+    plunk = np.sin(2 * np.pi * np.cumsum(180 + 260 * np.exp(-t * 25)) / SR) * decay(n, 0.06)
+    wash = bandpass(noise(n), 1400 + 1800 * np.exp(-t * 8), 1.2) * decay(n, 0.15, 0.01)
+    return 0.6 * plunk + 1.4 * wash
+
+
+def snap():
+    # A snapvine's jaws: two fast woody clacks.
+    t = tt(0.16)
+    n = len(t)
+    one = (np.sin(2 * np.pi * 1300 * t) + 0.6 * crush(noise(n), 2)) * decay(n, 0.012)
+    two = np.roll(one, int(0.07 * SR)) * 0.7
+    two[:int(0.07 * SR)] = 0.0
+    return one + two
+
+
+def bloom():
+    # The Thornheart's thorns burning back: a soft rising chord that opens.
+    t = tt(0.6)
+    n = len(t)
+    f = sweep(260, 520, 0.6, 0.7)
+    s = tri(f) + 0.6 * tri(f * 1.5) + 0.4 * tri(f * 2.0)
+    return s * np.minimum(1.0, t * 6) * decay(n, 0.35)
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -552,6 +582,7 @@ SFX = {
     "warp": (warp, -5.5), "chain": (chain, -7.0), "clink": (clink, -6.0),
     "freeze": (freeze, -6.0), "lava_burst": (lava_burst, -5.0), "sizzle": (sizzle, -8.0),
     "pound": (pound, -4.0), "tick": (tick, -10.0), "time_stop": (time_stop, -8.0),
+    "splash": (splash, -6.0), "snap": (snap, -6.5), "bloom": (bloom, -6.5),
 }
 
 

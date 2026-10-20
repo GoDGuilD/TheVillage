@@ -1,14 +1,15 @@
 # File: gen_tiles.py
-# Description: Generates the Light World tile atlas (grass, path, water, ledges, cliffs, trees, houses, fence, sign, interiors, dungeon stone, pits, stairs, the shrine facade) with a flag manifest, plus bush/leaf sprites.
+# Description: Generates the Light World tile atlas (grass, path, water, ledges, cliffs, trees, houses, fence, sign, interiors, dungeon stone, pits, stairs, the shrine facade, Ignis lava and ash, Silva jungle ground and grove pools) with a flag manifest, plus bush/leaf sprites.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 3.1.0
+# Last edit date: 2026-10-20
+# Version: 3.2.0
 #
 # Run:  python -I tools/gen_tiles.py   (writes assets/tiles/overworld_light.png + .json, assets/sprites/world/, tmp/tiles_preview.png)
 #
-# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and flags it (solid, ledge, door, exit, pit, low = the grapple flies over it, lava),
+# The atlas is a grid of 16x16 cells. Its JSON manifest names every cell and flags it (solid, ledge, door, exit, pit, low = the grapple flies over it, lava,
+# water = deep water: a wall of its own physics layer that the flippers let Joe swim through),
 # so the game builds its TileSet from the manifest at runtime (no hand-made .tres to keep in sync).
 # Multi-cell pieces (2x2 tree, 5x4 houses) are named <piece>_<x>_<y>; the area painter places them by anchor.
 import json
@@ -26,6 +27,7 @@ from sprite_lib import Canvas, upscale
 import terrain_art as ta
 import dungeon_art as da
 import ignis_art as ia
+import silva_art as sa
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TILE_DIR = os.path.join(ROOT, "assets", "tiles")
@@ -157,7 +159,7 @@ def make_atlas():
         for dx in (-1, 0, 1):
             col, row = 1 + dx, 5 + dy
             ta.water(c, col * T, row * T, rng, dy == -1, dy == 1, dx == -1, dx == 1)
-            put("water_%d_%d" % (dx, dy), col, row, solid=True, low=True)   # low: the grapple flies over it
+            put("water_%d_%d" % (dx, dy), col, row, solid=True, low=True, water=True)   # low: the grapple flies over it
     # Ledges (hop down southward): left end, middle, right end, single.
     for i, (name, cl, cr) in enumerate((("ledge_l", True, False), ("ledge_m", False, False),
                                         ("ledge_r", False, True), ("ledge_s", True, True))):
@@ -201,6 +203,16 @@ def make_atlas():
     ia.crust(c, 7 * T, 10 * T, irng); put("crust", 7, 10)
     ia.ash(c, 7 * T, 11 * T, irng); put("ash", 7, 11)
     ia.ash(c, 8 * T, 11 * T, irng, embers=3); put("ash_b", 8, 11)
+    # Silva (Phase 12): the grove's pool nine-slice at columns 9-11, rows 4-6 (deep water like the lakes: solid
+    # until the flippers, low for the grapple) and two jungle grounds at columns 12-13, row 4. Own stream again.
+    srng = random.Random(1212)
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            col, row = 10 + dx, 5 + dy
+            sa.grove_water(c, col * T, row * T, srng, dy == -1, dy == 1, dx == -1, dx == 1)
+            put("dwater_%d_%d" % (dx, dy), col, row, solid=True, low=True, water=True)
+    sa.jungle(c, 12 * T, 4 * T, srng); put("jungle", 12, 4)
+    sa.jungle(c, 13 * T, 4 * T, srng, roots=True); put("jungle_b", 13, 4)
     # The Moss Shrine facade (5x3, door cell walkable) at columns 9-13, rows 9-11.
     da.shrine(c, 9 * T, 9 * T, rng)
     for ty in range(da.SHRINE_H):

@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-23
-Version: 1.10.0
+Last edit date: 2026-10-20
+Version: 1.11.0
 -->
 
 # Known issues
@@ -53,3 +53,7 @@ Version: 1.10.0
 - Tick blocks rise under enemies (only Joe is waited for). The clock keeps one phase for the whole game, so an
   area's blocks may be in either state on entry. The hammer swing has no Joe animation of its own (the throw pose).
 - The Clock Warden's time stop cannot be avoided; gears are not blockable by the shield.
+- Shots and thrown objects fly over deep water (they used to stop at it). Joe's hurt pose while swimming shows his
+  whole body. The snapvine's vine is a straight line.
+- The lint cannot prove water gates (deep water is always a step for it) or the pegs in front of the Silva Tangle
+  (an edge opening is an entry); `test_silva.gd` checks both in the game.

@@ -125,6 +125,7 @@ pause={
 2d_physics/layer_7="EnemyHurtBox"
 2d_physics/layer_8="Props"
 2d_physics/layer_9="Pits"
+2d_physics/layer_10="Water"
 
 [rendering]
 

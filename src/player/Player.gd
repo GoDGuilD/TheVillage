@@ -1,17 +1,18 @@
 # File: Player.gd
-# Description: Top-down Joe: ALttP walking (facing rule, corner nudge, ledge hops), slash, charge + spin attack, shield block, lift/carry/throw, pickups, hurt and death.
+# Description: Top-down Joe: ALttP walking (facing rule, corner nudge, ledge hops), slash, charge + spin attack, shield block, lift/carry/throw, swimming (the flippers), pickups, hurt and death.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 2.5.1
+# Last edit date: 2026-10-20
+# Version: 2.6.0
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
 ## so his head can overlap the tile above a wall. Children are built in code in _ready() so the scene file
 ## stays a one-liner and every number comes from PlayerTuning.
 ##
-## States: idle, walk, hop, attack, charge, spin, lift, carry, throw, hurt, dead.
+## States: idle, walk, hop, attack, charge, spin, lift, carry, throw, use, pulled, hold, dash_charge, dash, bonk,
+## fall, swim, hurt, dead.
 
 signal health_changed(current: int, maximum: int)
 signal died
@@ -32,6 +33,7 @@ const LAYER_PLAYER_HITBOX := 8
 const LAYER_ENEMY_HITBOX := 16
 const LAYER_PLAYER_HURTBOX := 32
 const LAYER_PROPS := 128
+const LAYER_WATER := 512                  # AreaBuilder.LAYER_WATER: deep water stops him until he has the flippers
 const SWORD_TIP := 18.0                   # px from the body centre to the held sword's tip (glint position)
 const DROP_TRAVEL := 2.0                  # a carried object dropped by a hit breaks right at Joe's feet
 
@@ -65,13 +67,14 @@ var _hop_from := Vector2.ZERO
 var _hop_to := Vector2.ZERO
 var _pull_to := Vector2.ZERO              # where the grapple is dragging Joe (state "pulled")
 var _pull_hook: Node2D = null             # the grapple doing the dragging
+var _hurt_in_water := false              # hit while swimming: no second splash when he goes back to swimming
 var _input_override = null                # tests may set a Vector2 here instead of reading the keyboard
 
 
 func _ready() -> void:
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	collision_layer = LAYER_PLAYER
-	collision_mask = LAYER_WORLD | LAYER_PROPS
+	collision_mask = solid_mask()
 	_build_children()
 	health.max_health = PlayerTuning.MAX_HP
 	health.current_health = PlayerTuning.MAX_HP
@@ -167,6 +170,8 @@ func _physics_process(delta: float) -> void:
 		return
 	fsm.set_physics_process(true)
 	sprite.speed_scale = 1.0
+	if fsm.current_state != "pulled":
+		collision_mask = solid_mask()        # the flippers may have just been found
 	_attack_buffer = maxf(0.0, _attack_buffer - delta)
 	if _iframes_left > 0.0:
 		_iframes_left -= delta
@@ -174,6 +179,11 @@ func _physics_process(delta: float) -> void:
 		sprite.visible = _iframes_left <= 0.0 or int(_iframes_left * PlayerTuning.BLINK_HZ * 2.0) % 2 == 0
 		if _iframes_left <= 0.0:
 			hurt_box.recheck()               # still touching an enemy? take the next hit now
+
+
+# What stops Joe: walls and props, and deep water until he has the flippers.
+func solid_mask() -> int:
+	return LAYER_WORLD | LAYER_PROPS | (0 if GameState.has_item("flippers") else LAYER_WATER)
 
 
 # --- input helpers --------------------------------------------------------------
@@ -335,8 +345,21 @@ func _check_pit() -> bool:
 	return true
 
 
+# True (and swimming starts) when Joe's feet are over deep water (only possible with the flippers).
+func _check_water() -> bool:
+	if not in_water():
+		_hurt_in_water = false
+		return false
+	fsm.transition_to("swim")
+	return true
+
+
+func in_water() -> bool:
+	return AreaBuilder.flag_at(get_tree(), global_position + PlayerTuning.WATER_PROBE, "water")
+
+
 func state_idle_update(delta: float) -> void:
-	if _check_pit():
+	if _check_pit() or _check_water():
 		return
 	if _wants_attack():
 		fsm.transition_to("attack")
@@ -361,7 +384,7 @@ func state_walk_update(delta: float) -> void:
 		return
 	_update_facing(dir)
 	_play("walk")
-	if _check_pit():
+	if _check_pit() or _check_water():
 		return
 	_walk(dir, delta)
 	# Walking south into a ledge hops down it (ALttP); ledges are solid from every other side.
@@ -571,7 +594,7 @@ func state_pulled_update(delta: float) -> void:
 
 
 func state_pulled_exit() -> void:
-	collision_mask = LAYER_WORLD | LAYER_PROPS
+	collision_mask = solid_mask()
 	if is_instance_valid(_pull_hook):
 		_pull_hook.call("release")
 	_pull_hook = null
@@ -643,7 +666,7 @@ func state_dash_enter() -> void:
 
 # Straight ahead until a wall (bonk), a pit, or the stick pointing elsewhere; rubble breaks on the way.
 func state_dash_update(delta: float) -> void:
-	if _check_pit():
+	if _check_pit() or _check_water():
 		return
 	var dir_in := _move_input()
 	if dir_in != Vector2.ZERO and dir_in.normalized().dot(Vector2(facing)) < PlayerTuning.DASH_KEEP_DOT:
@@ -732,6 +755,41 @@ func respawn_after_fall(at: Vector2, face: Vector2i) -> void:
 	fsm.transition_to("idle")
 
 
+# --- states: swimming (the flippers) ------------------------------------------------------------
+
+# In deep water: slow strokes in any direction, nothing else (no sword, items, lifting or dash), like ALttP.
+func state_swim_enter() -> void:
+	sword.set_active(false)
+	spin_box.set_active(false)
+	charged = false
+	if carrying != "":
+		_release_carried(DROP_TRAVEL)
+	get_node("Shadow").visible = false
+	if not _hurt_in_water:
+		Audio.sfx("splash")
+		Juice.play_fx("splash", global_position, get_parent())
+	_hurt_in_water = false
+	_play("swim")
+
+
+func state_swim_update(delta: float) -> void:
+	if not in_water():
+		fsm.transition_to("walk" if _move_input() != Vector2.ZERO else "idle")
+		return
+	var dir := _move_input()
+	_update_facing(dir)
+	_play("swim")
+	_walk(dir, delta, PlayerTuning.SWIM_SPEED)
+
+
+func state_swim_exit() -> void:
+	get_node("Shadow").visible = true
+
+
+func is_swimming() -> bool:
+	return fsm.current_state == "swim"
+
+
 # --- states: lifting and throwing -------------------------------------------------------
 
 func state_lift_enter() -> void:
@@ -763,6 +821,7 @@ func state_carry_update(delta: float) -> void:
 	_update_facing(dir)
 	_play("carry_walk" if dir != Vector2.ZERO else "carry")
 	_walk(dir, delta)
+	_check_water()                           # wading in drops what he carries (state "swim")
 
 
 func state_throw_enter() -> void:
@@ -881,6 +940,7 @@ func _on_hurt(damage: int, source_position: Vector2, _kb: Vector2) -> void:
 	_knockback = (away.normalized() if away.length() > 0.01 else -Vector2(facing)) * PlayerTuning.HURT_KNOCKBACK_SPEED
 	_iframes_left = PlayerTuning.IFRAMES
 	HitFlash.flash(sprite)
+	_hurt_in_water = is_swimming()
 	fsm.transition_to("hurt")
 
 

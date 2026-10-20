@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-20
-Version: 5.8.1
+Version: 5.9.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,45 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.6.0] - 2026-10-20 — Phase 12: Silva
+
+### Added
+- **The Silva Tangle** (`dw_silva_tangle`, Dark World only): the Thorn Woods' west edge opens onto it behind a row
+  of pegs, so the hammer (Tempus) comes first. Jungle ground (`g`), snapvines, the Silva Grove in the north-east,
+  and a river of deep water with a piece of heart on its far bank.
+- **The Flippers** (gear, like the glove and boots; the Silva Grove's big chest): Joe walks into deep water and
+  swims (state `swim`: 60 px/s, no sword, items, lifting or dash; a splash, ripples, his shadow hidden). Deep water
+  now collides on its own physics layer (10, `Water`; `AreaBuilder.LAYER_WATER`): Joe masks it until he has the
+  flippers (`Player.solid_mask()`), enemies and push blocks always do. A Moon Mirror warp may not land in deep water
+  unless Joe can swim. Joe's swim strips come from `gen_joe.py`.
+- **Snapvines** (`Snapvine`, glyph `j`): rooted carnivorous plants. When Joe comes near, one shakes, then lunges
+  its jaws at him on a stretching vine and pulls back. Hits never move it.
+- **The Silva Grove** (dungeon 7, 5 rooms; murky pools painted with their own nine-slice): the entrance's small
+  key opens the east room; the big key waits behind a fence of pegs; the big chest holds the Flippers; a pool bars
+  the hall's north doorway; a pool with an islet holds the compass.
+- **The Thornheart** (`Thornheart`, glyph `e`): a giant bud bound in thorny vines on an island in a moat. It
+  spits fans of seeds (every third volley a ring). Every hit but fire clanks off; a fire-rod hit burns the thorns
+  back for 4 s, and while it is open the sword reaches its heart (three hits close it again). Reward: a heart
+  container, then the **Crystal of Silva**, the fourth and last.
+- Art: `tools/gen_silva.py` (flippers icon, seed shot, snapvine root, splash effect, the `snapvine` and
+  `thornheart` packs) and `tools/silva_art.py` (jungle ground and grove pools, drawn by `gen_tiles.py` on its own
+  random stream so no older cell changes). Sounds: `splash`, `snap`, `bloom` (62 effects).
+- Dialogue 1.8.0: `dw_sign_grove`, `get_flippers`, `get_crystal_3`.
+- The lint: deep water is a step (the flippers); a Thornheart needs flippers and a fire rod somewhere.
+- `tests/test_silva.gd` (35 checks) and `tools/capture_silva.gd`.
+
+### Changed
+- Arrows, fireballs, ice bolts, the boomerang, thrown pots and enemy shots now fly over deep water, as they fly
+  over pits (they collide with the world layer only).
+- The item menu's equipment has a second column: the boots and flippers sit beside the sword and shield.
+- The Silva sign in the Thorn Woods points west. `test_world.gd` knows the new area and door.
+- 544 checks in 12 suites, all passing.
+
+### Fixed
+- The Gloom Moth, the Magma Wyrm and the Clock Warden turned "angry" at a quarter of their health in the Dark World
+  instead of half: the threshold read the undoubled `max_hp`. It now reads `health.max_health`.
+- In the item menu the BOOTS label overlapped the HEART PIECES title.
 
 ## [7.5.1] - 2026-10-20 — Animated GoDGuilD logo
 

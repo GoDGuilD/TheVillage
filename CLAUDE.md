@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-23
-Version: 2.10.0
+Last edit date: 2026-10-20
+Version: 2.11.0
 -->
 
 # The Village
@@ -91,3 +91,8 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   that must be drawn under actors move their node up (`SUNK_LIFT`/`FLAT_LIFT`) instead of a negative z. Eleven
   suites (509 checks; `test_tempus.gd` 32). After a scroll test, wait for `World.transitioning` to clear before
   `_enter` (the scroll's end resets Joe's entry point).
+- Phase 12 (Silva): deep water collides on physics layer 10 (`LAYER_WATER`, TileSet flag `water`), not the world
+  layer; Joe masks it until he has the flippers (`Player.solid_mask()`), enemies and push blocks always do, shots
+  fly over it. Swimming is Player state `swim`. `~` in a dungeon paints the grove pools. Twelve suites (544 checks;
+  `test_silva.gd` 35). `gen_joe.py` redraws the sword strips slightly differently from the committed PNGs (old
+  drift): after running it keep only the strips you meant to change.

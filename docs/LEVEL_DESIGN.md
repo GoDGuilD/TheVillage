@@ -4,8 +4,8 @@ Description: How areas are built, linted and previewed; the glyph table.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-23
-Version: 1.8.0
+Last edit date: 2026-10-20
+Version: 1.9.0
 -->
 
 # Level design
@@ -32,7 +32,7 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | Glyph | Meaning | Glyph | Meaning |
 |---|---|---|---|
 | `.` `,` `*` | grass, tufts, flowers | `#` | dirt path (autotiled) |
-| `~` | water (autotiled, solid) | `v` | ledge: hop down southward, solid otherwise |
+| `~` | deep water (autotiled; solid until the flippers; a grove pool in a dungeon) | `v` | ledge: hop down southward, solid otherwise |
 | `^` | cliff (solid) | `f` | fence |
 | `S` | sign | `R` | rock (solid) |
 | `T` | 2x2 tree (anchor; `x` fillers) | `H` / `J` | 5x4 cottage, red / blue roof; door at (2,3) |
@@ -55,6 +55,8 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `a` | ash ground (Ignis) | `c` `I` | cinder; boss: the Magma Wyrm |
 | `u` `n` | tick blocks, amber / teal (Tempus) | `p` | peg (solid; the hammer pounds it flat) |
 | `z` | cogbug (the hammer flips it) | `t` | boss: the Clock Warden |
+| `g` | jungle ground (Silva) | `j` | snapvine (rooted, lunges) |
+| `e` | boss: the Thornheart (on an island: fire opens it) | | |
 
 ## Villagers and signs
 Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
@@ -109,6 +111,9 @@ any reachable cell, an unbroken run of lava straight ahead leads to the first wa
 (`ice_hops`); a Magma Wyrm needs an ice rod somewhere. Tick blocks count as ground (one colour is always down;
 use `tick_row` / `tick_col` so the colours alternate); pegs count as openable, and pegs or a Clock Warden need a
 hammer somewhere. Note: a dungeon's exit spawn is an entry of its overworld area, so a gate *in front of* a
-dungeon's door is not proven by the lint - test it in the game (`test_tempus.gd` does for the molten time). Rooms can be `"dark": True`
+dungeon's door is not proven by the lint - test it in the game (`test_tempus.gd` does for the molten time).
+Deep water is a step for the lint (the flippers), so water gates are never proven by it either; a Thornheart needs
+flippers and a fire rod somewhere. The same blind spot covers edge openings: a scroll opening is an entry of its
+area, so the Thorn Woods' pegs in front of the Silva Tangle are tested in the game (`test_silva.gd`). Rooms can be `"dark": True`
 (give them torches). Dark World-only lands go in `DARK_ONLY` (they keep `world: "dark"` and have no twin). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

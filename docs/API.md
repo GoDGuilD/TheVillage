@@ -4,8 +4,8 @@ Description: Internal scripting API of the main classes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-23
-Version: 2.7.0
+Last edit date: 2026-10-20
+Version: 2.8.0
 -->
 
 # API
@@ -73,6 +73,9 @@ The game has no network API; this is the internal API other scripts and tests re
   `set_raised(on)`, `amber`, `raised`, `pending`), `HammerBlow` (group `hammer_blow`; `pounded`). `World.tick_phase`,
   `ticks`, `TICK_TIME`. `Cogbug` (`flipped`, `flips`, `FLIP_TIME`), `ClockWarden` (`state`, `is_cracked()`, `ticks`,
   `time_stops`, `cracks`, `shots_fired`).
+- `Player.solid_mask() -> int`, `in_water() -> bool`, `is_swimming() -> bool` (state `swim`). `World._solid_at(feet)`
+  (deep water counts unless Joe has the flippers). `Snapvine` (`state`: wait/wind/lunge/hold/back, `head`, `lunges`,
+  `REACH`, `LUNGE_DIST`), `Thornheart` (`state`, `is_open()`, `volleys`, `blooms`, `shots_fired`, `OPEN_TIME`).
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 

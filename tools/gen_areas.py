@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-23
-# Version: 5.3.0
+# Last edit date: 2026-10-20
+# Version: 5.4.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -44,21 +44,24 @@ SHRINE_DOOR = (2, 2)
 # Solid: N villager, C chest, L torch, k cracked rock, l key block, % dungeon wall, + pillar, o pit (Joe falls),
 # [ door, & push block, r heavy rock (all solid bodies or impassable cells).
 SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&rb|!p")  # ... b rubble (dash boots), | hook post, ! lava, p peg (hammer)
-ACTORS = set("BOZGQPhYAUFVXmcIzt")  # h heart piece; A bat; X lurker; c cinder; z cogbug; bosses: Y Grand Slime,
-                                     # U Iron Ram, F Frost Wraith, V Caver, m Gloom Moth, I Magma Wyrm, t Clock Warden
+ACTORS = set("BOZGQPhYAUFVXmcIztje")  # h heart piece; A bat; X lurker; c cinder; z cogbug; j snapvine; bosses:
+                                       # Y Grand Slime, U Iron Ram, F Frost Wraith, V Caver, m Gloom Moth, I Magma
+                                       # Wyrm, t Clock Warden, e Thornheart
 OPENABLE = set("kl[&rbp")          # solid until a bomb / key / push / glove / dash / hammer opens them (reachability: open)
-GROUND = set(".,*#_M=;@sanu")      # = ; dungeon floor, @ floor switch, s exit stairs, a ash (Ignis), u n tick blocks
-                                   # (amber / teal: one colour is always down, so they count as ground)
+GROUND = set(".,*#_M=;@sanug")     # = ; dungeon floor, @ floor switch, s exit stairs, a ash (Ignis), u n tick blocks
+                                   # (amber / teal: one colour is always down, so they count as ground), g jungle (Silva)
 VALID = SOLID | ACTORS | GROUND | {"x"} | set(MULTI)
-ENEMIES = set("ZGQYAUFVXmcIzt")
+ENEMIES = set("ZGQYAUFVXmcIztje")
 LOW = set("o~!")                  # pits, water and lava: the grapple's chain flies over them
+WATER = "~"                       # deep water: the flippers swim it (reachability: a step like any ground)
 ICE_REACH = 8                     # tiles an ice bolt flies (IceBolt.MAX_DISTANCE): it freezes every lava cell on the way
 GRAPPLE_REACH = 7                 # tiles from Joe to a hook post the grapple can still bite (Grapple.RANGE)
 FACING_STEP = {"down": (0, 1), "up": (0, -1), "left": (-1, 0), "right": (1, 0)}
 # Everything a chest, gift or ware may hand out - mirrors ItemDB.KINDS in src/items/ItemDB.gd (test_items.gd
 # checks that every kind used by the areas exists there).
 ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "heart_piece", "heart_container", "gems",
-              "map", "compass", "big_key", "glove", "boots", "fire_rod", "grapple", "magic", "ice_rod", "hammer"}
+              "map", "compass", "big_key", "glove", "boots", "fire_rod", "grapple", "magic", "ice_rod", "hammer",
+              "flippers"}
 WARE_IDS = {"bombs", "arrows", "heart_piece", "dw_bombs", "dw_arrows", "dw_magic"}   # ItemDB.WARES
 OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h", "door": "[",
                  "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r", "rubble": "b",
@@ -354,6 +357,24 @@ def build_clockwork_wastes(rng):
     return g, [{"cell": [4 + SHRINE_DOOR[0], 2 + SHRINE_DOOR[1]], "to": "d6_entrance"}]
 
 
+def build_silva_tangle(rng):
+    """The Silva Tangle (Silva's land, Dark World only, west of the Thorn Woods, whose pegs - the hammer - keep it
+    shut, so Tempus comes first): jungle ground, snapvines, the Silva Grove in the north-east, and a river of deep
+    water no one crosses without the flippers (they are in the Grove) with a piece of heart on its far bank."""
+    g = Grid(*size_of((1, 2)), fill="g")
+    g.tree_border({"e": (12, 15)})
+    g.rect(15, 12, 23, 15, "#")                        # the path in from the Thorn Woods
+    g.rect(8, 2, 10, 25, "~")                          # the river
+    g.piece(14, 3, "E")                                # the Silva Grove
+    g.rect(15, 6, 17, 11, "#")
+    for x, y in ((12, 17), (18, 17), (14, 21), (19, 21), (3, 3), (4, 21)):
+        g.piece(x, y, "T")
+    g.place([(13, 14), (20, 9), (16, 19), (4, 8), (5, 17)], "j")
+    g.place([(12, 9), (13, 9), (21, 18), (21, 19), (2, 12)], "B")
+    g.place([(20, 23)], "A")
+    return g, [{"cell": [14 + SHRINE_DOOR[0], 3 + SHRINE_DOOR[1]], "to": "d7_entrance"}]
+
+
 def build_interior(kind, rng, spawn=False):
     """A 16x11 room: two-row north wall (top + face, with shelves), side walls, furniture, exit mat at the bottom."""
     g = Grid(16, 11, "_")
@@ -490,7 +511,8 @@ def ice_hops(rows, solid, x, y):
 
 
 def neighbours_walk(rows, solid, x, y):
-    """Cells reachable in one step from (x, y); walking south onto a ledge lands on the first cell past it."""
+    """Cells reachable in one step from (x, y); walking south onto a ledge lands on the first cell past it; deep
+    water is a step too (the flippers)."""
     h, w = len(rows), len(rows[0])
     yield from grapple_hops(rows, solid, x, y)
     yield from ice_hops(rows, solid, x, y)
@@ -503,7 +525,7 @@ def neighbours_walk(rows, solid, x, y):
                 ny += 1
             if ny < h and not solid[ny][nx]:
                 yield nx, ny
-        elif not solid[ny][nx]:
+        elif not solid[ny][nx] or rows[ny][nx] == WATER:
             yield nx, ny
 
 
@@ -675,6 +697,8 @@ def lint_world(areas, problems):
         problems.append("world: a Magma Wyrm but no ice rod anywhere")
     if any(("p" in r or "t" in r) for a in areas for r in a["rows"]) and "hammer" not in held:
         problems.append("world: pegs or a Clock Warden but no hammer anywhere")
+    if any("e" in r for a in areas for r in a["rows"]) and ("flippers" not in held or "fire_rod" not in held):
+        problems.append("world: a Thornheart but no flippers (its island) or no fire rod (its thorns) anywhere")
     if seals != [0, 1, 2]:
         problems.append("world: the dungeons hold seals %s (need 0, 1, 2)" % seals)
     if any(o["kind"] == "seal_gate" for o in every) and not any(info.get("ending") for info, _ in DUNGEONS):
@@ -826,6 +850,7 @@ OBJECTS = {
     # Ignis: the posts across the lava river (the way in needs Umbra's grapple) and the lava pool's heart piece.
     "dw_cinder_barrens": [("hook_post", 10, 13, {}), ("hook_post", 2, 10, {}), ("heart_piece", 15, 20, {})],
     "dw_clockwork_wastes": [("heart_piece", 7, 23, {})],
+    "dw_silva_tangle": [("heart_piece", 4, 14, {})],             # across the river: the flippers
 }
 # Boni's wares on her counter (table cells): area -> [(x, y, ware id)].
 WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")],
@@ -948,8 +973,8 @@ def d1_rooms():
     return rooms
 
 
-ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "c", "I", "z", "t", "O", "B", "+", "o", "!", ";",
-               "u", "n", "p")
+ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "c", "I", "z", "t", "j", "e", "O", "B", "+", "o",
+               "!", ";", "u", "n", "p", "~")
 
 
 def make_room(rooms, aid, gx, gy, doors, fill, extra=None):
@@ -1195,8 +1220,56 @@ def d6_rooms():
     return rooms
 
 
+# The Silva Grove (Dark World dungeon 4): the fourth and last dimension crystal.
+D7 = {"id": "d7", "name": "Silva Grove", "crystal": 3, "entrance": "d7_entrance", "boss_room": "d7_boss",
+      "boss_flag": "boss:d7"}
+
+
+def d7_rooms():
+    """The Silva Grove: pools everywhere; the entrance's small key opens the east room, the big key waits behind a
+    fence of pegs in the west room, the east room's big chest holds the Flippers, which swim the pool barring the
+    hall's north doorway; then the Thornheart on its island (the fire rod burns its thorns back)."""
+    rooms = []
+
+    def entrance(g):
+        g.rect(3, 3, 6, 4, "~")
+        g.rect(17, 3, 20, 4, "~")
+        return [("chest", 11, 4, {"item": "small_key", "amount": 1, "reveal": ""}), ("j", 7, 8, {}), ("j", 16, 8, {}),
+                ("O", 3, 10, {}), ("O", 20, 10, {})]
+    make_room(rooms, "d7_entrance", 1, 2, {"n": ("open",), "s": ("stairs",)}, entrance)
+
+    def hall(g):
+        g.rect(8, 2, 15, 4, "~")                                 # a pool in front of the north doorway
+        return [("chest", 4, 9, {"item": "map", "amount": 1, "reveal": ""}), ("j", 18, 8, {}), ("A", 7, 7, {})]
+    make_room(rooms, "d7_hall", 1, 1, {"s": ("open",), "w": ("open",), "e": ("locked", "d7_hall_east", ""),
+                                       "n": ("open",)}, hall)
+
+    def west(g):
+        g.rect(2, 6, 7, 6, "p")                                  # pegs fence the big key's corner
+        g.rect(7, 2, 7, 5, "p")
+        g.rect(11, 4, 18, 9, "~")                                # a pool with an islet (the compass: swim there)
+        g.rect(14, 6, 15, 7, "=")
+        return [("chest", 4, 3, {"item": "big_key", "amount": 1, "reveal": ""}),
+                ("chest", 14, 6, {"item": "compass", "amount": 1, "reveal": ""}), ("j", 9, 10, {}), ("A", 19, 3, {})]
+    make_room(rooms, "d7_west", 0, 1, {"e": ("open",)}, west)
+
+    def east(g):
+        g.rect(13, 2, 15, 11, "~")                               # a channel splits the room
+        return [("big_chest", 4, 3, {"item": "flippers"}),
+                ("chest", 19, 9, {"item": "gems", "amount": 50, "reveal": ""}), ("j", 18, 5, {}), ("j", 8, 9, {})]
+    make_room(rooms, "d7_east", 2, 1, {"w": ("locked", "d7_hall_east", "")}, east)
+
+    def boss(g):
+        g.rect(4, 3, 19, 10, "~")                                # a moat around the Thornheart's island
+        g.rect(7, 5, 16, 8, "=")
+        return [("e", 11, 7, {})]
+    make_room(rooms, "d7_boss", 1, 0, {"s": ("boss", "d7_boss_door", D7["boss_flag"])}, boss,
+              {"boss_flag": D7["boss_flag"]})
+    return rooms
+
+
 DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms), (D4, d4_rooms), (D5, d5_rooms),
-            (D6, d6_rooms)]
+            (D6, d6_rooms), (D7, d7_rooms)]
 DUNGEON_STRIDE = 200                     # tiles between two dungeons' room grids
 
 
@@ -1215,12 +1288,15 @@ DARK_EDITS = {
     "el_pueblo": lambda g: (g.piece(8, 17, "K"), g.piece(11, 17, "K")),   # the Shade Market's stall
     "east_lake": lambda g: g.rect(20, 12, 23, 15, "#"),                   # the shore path runs on east, to Ignis
     "south_road": lambda g: g.rect(0, 8, 1, 11, "#"),                     # the road's west end opens, to Tempus
+    # The woods' west edge opens onto Silva, behind a row of pegs (the hammer).
+    "west_woods": lambda g: (g.rect(0, 12, 5, 15, "#"), g.rect(3, 12, 3, 15, "p")),
 }
 # Dark World-only areas (the dimensions' lands): no Light World twin, so the Moon Mirror does nothing there.
 DARK_ONLY = [
     ("dw_umbra_vale", "Umbral Vale", (0, -1), (2, 1), build_umbra_vale),
     ("dw_cinder_barrens", "Cinder Barrens", (3, 1), (1, 2), build_cinder_barrens),
     ("dw_clockwork_wastes", "Clockwork Wastes", (-1, 3), (1, 2), build_clockwork_wastes),
+    ("dw_silva_tangle", "Silva Tangle", (-2, 1), (1, 2), build_silva_tangle),
 ]
 DARK_EXTRA = {                            # Dark World enemies added on top of the Light World's
     "el_pueblo": [(10, 20, "A"), (36, 9, "Z"), (40, 21, "G")],
@@ -1241,6 +1317,7 @@ SIGNS.update({
     "dw_umbra_vale": [(20, 7, "dw_sign_sanctum")],
     "dw_cinder_barrens": [(13, 6, "dw_sign_forge")],
     "dw_clockwork_wastes": [(18, 13, "dw_sign_clockyard")],
+    "dw_silva_tangle": [(18, 11, "dw_sign_grove")],
 })
 
 

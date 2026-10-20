@@ -1,10 +1,10 @@
 # File: gen_joe.py
-# Description: Generates Joe's top-down sprite strips (idle, walk, slash, hurt, charge, spin, lift, carry, throw; shield on) plus his shadow and an animation manifest.
+# Description: Generates Joe's top-down sprite strips (idle, walk, slash, hurt, charge, spin, lift, carry, throw, swim; shield on) plus his shadow and an animation manifest.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 2.0.0
+# Last edit date: 2026-10-20
+# Version: 2.1.0
 #
 # Run:  python -I tools/gen_joe.py   (from the project root; writes assets/sprites/joe/ and tmp/joe_preview.png)
 #
@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from palette import (BOOT_DARK, BOOT_MID, CLEAR, COAT_DARK, COAT_LIGHT, COAT_MID, EYE_GREEN, GOLD, GOLD_DARK,
                      HAIR_DARK, HAIR_LIGHT, HAIR_MID, HILT_DARK, OUTLINE, PANTS_DARK, PANTS_MID, SCARF_DARK,
                      SCARF_RED, SHADOW, SHIELD_DARK, SHIELD_FACE, SHIELD_RIM, SKIN_DARK, SKIN_LIGHT, SKIN_MID,
-                     SLASH_A, SLASH_B, SPIN_A, SPIN_B, STEEL_DARK, STEEL_LIGHT, STEEL_MID)
+                     SLASH_A, SLASH_B, SPIN_A, SPIN_B, STEEL_DARK, STEEL_LIGHT, STEEL_MID, RIPPLE)
 from sprite_lib import Canvas, pack_strip, upscale
 from PIL import Image
 
@@ -75,7 +75,11 @@ THROW_HEIGHTS = [0.6, 0.0]       # arm height per throw frame
 # Animation table written to the manifest: name -> (frames per facing, fps, loop).
 ANIMS = {"idle": (2, 2.0, True), "walk": (6, 12.0, True), "attack": (len(ATTACK_FRAMES), 22.0, False),
          "hurt": (1, 1.0, False), "charge": (len(CHARGE_WALK_FRAMES), 8.0, True), "lift": (2, 10.0, False),
-         "carry": (1, 1.0, True), "carry_walk": (6, 12.0, True), "throw": (2, 12.0, False)}
+         "carry": (1, 1.0, True), "carry_walk": (6, 12.0, True), "throw": (2, 12.0, False),
+         "swim": (2, 4.0, True)}
+SWIM_SINK = 3              # px Joe's body sits lower while swimming (the water hides his legs)
+SWIM_LINE = FEET[1] - 6    # rows from here down are under water (cleared, then ripples drawn on the line)
+SWIM_STROKES = {"side": (1, 4), "down": (1, 4), "up": (1, 4)}   # walk-cycle poses whose arms make the strokes
 SPIN_FPS = 24.0
 
 
@@ -478,9 +482,43 @@ def frame_throw(facing, i):
     return c
 
 
+def frame_swim(facing, i):
+    """Swimming (the flippers): the walk pose's arms paddle, the body sunk to the chest, rings on the water."""
+    walk_i = SWIM_STROKES[facing][i]
+    if facing == "side":
+        stride, lift, bob, arm = WALK_SIDE[walk_i]
+        pose = {"arm": arm * 2}
+    else:
+        lift_l, lift_r, bob, arm_l, arm_r = WALK_VERT[walk_i]
+        pose = {"arm_l": arm_l * 2, "arm_r": arm_r * 2}
+    c = Canvas(FRAME, FRAME)
+    _draw_figure(c, facing, FEET[0], FEET[1] + SWIM_SINK + i, pose)
+    c.outline(OUTLINE)
+    for y in range(SWIM_LINE, FRAME):                       # under water: gone
+        for x in range(FRAME):
+            c.set(x, y, CLEAR)
+    # Paddling hands breaking the surface: both sides seen from the front or back, the leading one from the side.
+    hands = (-9, 9) if facing != "side" else (8,)
+    for k, hx in enumerate(hands):
+        up = (k + i) % 2 == 0
+        hy = SWIM_LINE - (3 if up else 1)
+        c.rect(FEET[0] + hx - 1, hy, 3, 2, SKIN_MID)
+        c.set(FEET[0] + hx - 1, hy, SKIN_LIGHT)
+        c.set(FEET[0] + hx - 2, hy, OUTLINE)
+        c.set(FEET[0] + hx + 2, hy, OUTLINE)
+        c.rect(FEET[0] + hx - 1, hy - 1, 3, 1, OUTLINE)
+    # Two broken rings around him on the waterline; the gaps move between the frames.
+    for k in range(-11, 12):
+        if (k + i * 2) % 5 != 0:
+            c.set(FEET[0] + k, SWIM_LINE - (0 if abs(k) > 6 else 1), RIPPLE)
+    for k in (-13, -12, 12, 13):
+        c.set(FEET[0] + k + (1 if i else -1), SWIM_LINE + 1, RIPPLE)
+    return c
+
+
 BUILDERS = {"idle": frame_idle, "walk": frame_walk, "attack": frame_attack, "hurt": frame_hurt,
             "charge": frame_charge, "lift": frame_lift, "carry": frame_carry, "carry_walk": frame_carry_walk,
-            "throw": frame_throw}
+            "throw": frame_throw, "swim": frame_swim}
 
 
 def make_shadow():

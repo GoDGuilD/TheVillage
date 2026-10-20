@@ -446,7 +446,8 @@
         4
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_0_-1": {
       "cell": [
@@ -454,7 +455,8 @@
         4
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_1_-1": {
       "cell": [
@@ -462,7 +464,8 @@
         4
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_-1_0": {
       "cell": [
@@ -470,7 +473,8 @@
         5
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_0_0": {
       "cell": [
@@ -478,7 +482,8 @@
         5
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_1_0": {
       "cell": [
@@ -486,7 +491,8 @@
         5
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_-1_1": {
       "cell": [
@@ -494,7 +500,8 @@
         6
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_0_1": {
       "cell": [
@@ -502,7 +509,8 @@
         6
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "water_1_1": {
       "cell": [
@@ -510,7 +518,8 @@
         6
       ],
       "solid": true,
-      "low": true
+      "low": true,
+      "water": true
     },
     "ledge_l": {
       "cell": [
@@ -868,6 +877,101 @@
       "cell": [
         8,
         11
+      ],
+      "solid": false
+    },
+    "dwater_-1_-1": {
+      "cell": [
+        9,
+        4
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_0_-1": {
+      "cell": [
+        10,
+        4
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_1_-1": {
+      "cell": [
+        11,
+        4
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_-1_0": {
+      "cell": [
+        9,
+        5
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_0_0": {
+      "cell": [
+        10,
+        5
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_1_0": {
+      "cell": [
+        11,
+        5
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_-1_1": {
+      "cell": [
+        9,
+        6
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_0_1": {
+      "cell": [
+        10,
+        6
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "dwater_1_1": {
+      "cell": [
+        11,
+        6
+      ],
+      "solid": true,
+      "low": true,
+      "water": true
+    },
+    "jungle": {
+      "cell": [
+        12,
+        4
+      ],
+      "solid": false
+    },
+    "jungle_b": {
+      "cell": [
+        13,
+        4
       ],
       "solid": false
     },

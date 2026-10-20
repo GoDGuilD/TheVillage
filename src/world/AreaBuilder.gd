@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-23
-# Version: 2.4.0
+# Last edit date: 2026-10-20
+# Version: 2.5.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -20,7 +20,7 @@ extends RefCounted
 ## Object cells (ground painted, the World builds the node from the area's "objects"): C chest, L torch,
 ## k cracked rock, l key block, h heart piece, [ door, @ floor switch, & push block, $ big chest (2x1), r heavy rock.
 ## k cracked rock ... b rubble (the dash breaks it). A bat. Bosses: Y Grand Slime, U Iron Ram, F Frost Wraith,
-## V Caver's shade.
+## V Caver's shade. Silva (Phase 12): g jungle ground, j snapvine, e the Thornheart; ~ in a dungeon is a grove pool.
 ## The source of these rows is tools/gen_areas.py (areas) or TestField.layout (test arenas).
 
 const TILE := 16
@@ -33,7 +33,8 @@ const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemi
 		"U": "res://src/enemies/IronRam.gd", "F": "res://src/enemies/FrostWraith.gd", "V": "res://src/enemies/CaverShade.gd",
 		"X": "res://src/enemies/Lurker.gd", "m": "res://src/enemies/GloomMoth.gd",
 		"c": "res://src/enemies/Cinder.gd", "I": "res://src/enemies/MagmaWyrm.gd",
-		"z": "res://src/enemies/Cogbug.gd", "t": "res://src/enemies/ClockWarden.gd"}
+		"z": "res://src/enemies/Cogbug.gd", "t": "res://src/enemies/ClockWarden.gd",
+		"j": "res://src/enemies/Snapvine.gd", "e": "res://src/enemies/Thornheart.gd"}
 const GRASS := {".": "grass_a", ",": "grass_b", "*": "flowers"}
 const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b",
 		"+": "pillar", "s": "dstairs"}
@@ -45,9 +46,11 @@ const HOUSE_DOOR := Vector2i(2, 3)
 const SHRINE_SIZE := Vector2i(5, 3)
 const SHRINE_DOOR := Vector2i(2, 2)
 const LAYER_PIT := 256                   # pits are walls for enemies only (Joe walks in and falls)
+const LAYER_WATER := 512                 # deep water: a wall for everyone who masks it (Joe stops masking it once he
+                                         # has the flippers; shots and the grapple fly over it)
 # Custom data layers on the TileSet (read by Player and the World).
-const DATA_FLAGS := ["ledge", "door", "exit", "pit", "low", "lava"]   # low: water, pits and lava (the grapple
-                                                                       # flies over them); lava: the ice rod freezes it
+const DATA_FLAGS := ["ledge", "door", "exit", "pit", "low", "lava", "water"]   # low: water, pits and lava (the
+		# grapple flies over them); lava: the ice rod freezes it; water: deep water (swim with the flippers)
 
 static var _tilesets: Dictionary = {}    # false -> Light World TileSet, true -> Dark World TileSet
 static var _cells: Dictionary = {}       # atlas cell name -> Vector2i
@@ -55,7 +58,8 @@ static var _crust_under: Dictionary = {}          # frozen lava: key -> the lava
 static var _crust_gen: Dictionary = {}            # key -> how many times it was frozen (newest timer wins)
 
 
-# The shared TileSet, built once from the atlas manifest: one physics layer, flag custom-data layers.
+# The shared TileSet, built once from the atlas manifest: physics layers for walls, pits and deep water (a solid
+# cell flagged `water` collides on LAYER_WATER instead of LAYER_WORLD), flag custom-data layers.
 static func tileset(dark: bool = false) -> TileSet:
 	if _tilesets.has(dark):
 		return _tilesets[dark]
@@ -68,6 +72,9 @@ static func tileset(dark: bool = false) -> TileSet:
 	ts.add_physics_layer()
 	ts.set_physics_layer_collision_layer(1, LAYER_PIT)
 	ts.set_physics_layer_collision_mask(1, 0)
+	ts.add_physics_layer()
+	ts.set_physics_layer_collision_layer(2, LAYER_WATER)
+	ts.set_physics_layer_collision_mask(2, 0)
 	for i in DATA_FLAGS.size():
 		ts.add_custom_data_layer()
 		ts.set_custom_data_layer_name(i, DATA_FLAGS[i])
@@ -85,8 +92,9 @@ static func tileset(dark: bool = false) -> TileSet:
 		src.create_tile(at)
 		var td := src.get_tile_data(at, 0)
 		if info["solid"]:
-			td.add_collision_polygon(0)
-			td.set_collision_polygon_points(0, 0, square)
+			var layer := 2 if info.get("water", false) else 0
+			td.add_collision_polygon(layer)
+			td.set_collision_polygon_points(layer, 0, square)
 		if info.get("pit", false):
 			td.add_collision_polygon(1)
 			td.set_collision_polygon_points(1, 0, square)
@@ -169,13 +177,15 @@ static func _paint_cell(tiles: TileMapLayer, rows: Array, x: int, y: int, g: Str
 	elif g == "#":
 		_put(tiles, x, y, _nine(rows, x, y, "#", "path"))
 	elif g == "~":
-		_put(tiles, x, y, _nine(rows, x, y, "~", "water"))
+		_put(tiles, x, y, _nine(rows, x, y, "~", "dwater" if dungeon else "water"))   # a grove pool in a dungeon
 	elif g == "o":
 		_put(tiles, x, y, _nine(rows, x, y, "o", "pit"))
 	elif g == "!":
 		_put(tiles, x, y, _nine(rows, x, y, "!", "lava"))
 	elif g == "a":
 		_put(tiles, x, y, _ash(x, y))
+	elif g == "g":
+		_put(tiles, x, y, _jungle(x, y))
 	elif g in DWALLS:
 		var under := glyph(rows, x, y + 1)
 		_put(tiles, x, y, "dwall_face" if under != "" and not under in DWALLS else "dwall_top")
@@ -216,12 +226,19 @@ static func _paint_cell(tiles: TileMapLayer, rows: Array, x: int, y: int, g: Str
 		_put(tiles, x, y + 1, "bed_b")
 	else:
 		var ground := "floor" if indoor else ("grass_a" if not _near(rows, x, y, "a") else _ash(x, y))
+		if not indoor and _near(rows, x, y, "g"):
+			ground = _jungle(x, y)
 		_put(tiles, x, y, "dfloor" if dungeon else ground)   # actors/objects on plain ground (ash next to ash)
 
 
 # Ignis ground: plain ash with an ember-flecked cell here and there (a fixed pattern, so rebuilds look the same).
 static func _ash(x: int, y: int) -> String:
 	return "ash_b" if (x * 7 + y * 13) % 5 == 0 else "ash"
+
+
+# Silva ground: moss with a root across it here and there (a fixed pattern, like the ash).
+static func _jungle(x: int, y: int) -> String:
+	return "jungle_b" if (x * 5 + y * 11) % 7 == 0 else "jungle"
 
 
 # True if one of the four neighbours of (x, y) is glyph `g`.

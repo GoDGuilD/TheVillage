@@ -1,0 +1,20 @@
+{
+  "frame_size": [
+    64,
+    64
+  ],
+  "feet": [
+    32,
+    58
+  ],
+  "anims": {
+    "closed": {
+      "fps": 2.0,
+      "loop": true
+    },
+    "open": {
+      "fps": 6.0,
+      "loop": true
+    }
+  }
+}

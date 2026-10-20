@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-22
-# Last edit date: 2026-10-22
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.0.1
 class_name MagmaWyrm
 extends BaseEnemy
 ## Cycle: "under" (hidden, untouchable) -> "rise" at a lava cell of its room -> "up" (spits two fans of embers; its
@@ -119,7 +119,7 @@ func _set_out(on: bool) -> void:
 
 func _go_under() -> void:
 	state = "under"
-	var angry := health.current_health * 2 <= max_hp
+	var angry := health.current_health * 2 <= health.max_health
 	_timer = UNDER_TIME_ANGRY if angry else UNDER_TIME
 	_set_out(false)
 
@@ -160,7 +160,7 @@ func _think(delta: float) -> void:
 		"up":
 			if _spat < SPIT_AT.size() and UP_TIME - _timer >= float(SPIT_AT[_spat]):
 				_spat += 1
-				var angry := health.current_health * 2 <= max_hp
+				var angry := health.current_health * 2 <= health.max_health
 				_spit(SHOTS_ANGRY if angry else SHOTS)
 			if _timer <= 0.0:
 				_sink()

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-20
-# Last edit date: 2026-10-22
-# Version: 1.1.0
+# Last edit date: 2026-10-20
+# Version: 1.2.0
 #
 # Run AFTER gen_tiles.py:  python -I tools/gen_dark.py
 # Writes assets/tiles/overworld_dark.png (same cells and manifest as overworld_light.json), assets/sprites/world/
@@ -54,8 +54,9 @@ def dusk(c):
     return (int(r2 * 255), int(g2 * 255), int(b2 * 255), a)
 
 
-# Cells that keep their Light World colours in the Dark World (Ignis's lava, crust and ash are already its own).
-KEEP_PREFIXES = ("lava_", "crust", "ash")
+# Cells that keep their Light World colours in the Dark World (Ignis's lava, crust and ash, Silva's jungle and
+# grove pools are already their own).
+KEEP_PREFIXES = ("lava_", "crust", "ash", "jungle", "dwater_")
 
 
 def kept_cells():
