@@ -1,10 +1,10 @@
 # File: ItemDB.gd
-# Description: Static catalogue of everything Joe can receive (items, ammo, keys, heart pieces/containers, gems, dungeon items, the glove, family seals, crystals, the grapple, the ice rod): display names, icons, the text shown on getting them, and Boni's shop wares with prices.
+# Description: Static catalogue of everything Joe can receive (items, ammo, keys, heart pieces/containers, gems, dungeon items, the glove, family seals, crystals, the grapple, the ice rod, the hammer): display names, icons, the text shown on getting them, and Boni's shop wares with prices.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 1.4.0
+# Last edit date: 2026-10-23
+# Version: 1.5.0
 class_name ItemDB
 extends RefCounted
 ## "Kinds" are what chests, gifts, pickups and wares hand out. Y-items (GameState.ITEM_ORDER) are a subset.
@@ -35,6 +35,7 @@ const KINDS := {
 	"moon_mirror": {"name": "MOON MIRROR", "icon": ICON_DIR + "moon_mirror.png", "text": "get_moon_mirror"},
 	"grapple": {"name": "GRAPPLE", "icon": ICON_DIR + "grapple.png", "text": "get_grapple"},
 	"ice_rod": {"name": "ICE ROD", "icon": ICON_DIR + "ice_rod.png", "text": "get_ice_rod"},
+	"hammer": {"name": "HAMMER", "icon": ICON_DIR + "hammer.png", "text": "get_hammer"},
 	"crystal": {"name": "CRYSTAL", "icon": "res://assets/sprites/dungeon/crystal.png", "text": "get_crystal"},
 	"magic": {"name": "MAGIC", "icon": SPRITE_DIR + "magic_big.png", "text": "get_magic"},
 }

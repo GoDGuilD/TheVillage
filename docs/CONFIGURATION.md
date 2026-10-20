@@ -4,8 +4,8 @@ Description: Configuration parameters.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-22
-Version: 1.9.0
+Last edit date: 2026-10-23
+Version: 1.10.0
 -->
 
 # Configuration
@@ -34,6 +34,9 @@ Version: 1.9.0
 | `src/items/IceBolt.gd` (`SPEED`, `MAX_DISTANCE`, `CRUST_TIME`), `ItemDB.ICE_ROD_MAGIC`, `BaseEnemy.ICE_TIME` | The ice rod: reach, how long crust holds, cost, freeze time |
 | `src/enemies/Cinder.gd`, `MagmaWyrm.gd`, `src/world/GroundFlame.gd` | Cinder stats; the wyrm's timings, spits, frozen time; flame life and damage |
 | `tools/gen_areas.py` (`D5`, `d5_rooms()`, `build_cinder_barrens`, `ICE_REACH`) | Ignis's places |
+| `src/world/World.gd` (`TICK_TIME`), `src/items/HammerBlow.gd` (`DAMAGE`, `RADIUS`, `PEG_REACH`), `ItemUse.HAMMER_AHEAD` | Tempus's clock speed; the hammer's hit |
+| `src/enemies/Cogbug.gd`, `ClockWarden.gd` | Cogbug speed and flip time; the warden's tick, gears, time stop, cracked time |
+| `tools/gen_areas.py` (`D6`, `d6_rooms()`, `build_clockwork_wastes`) | Tempus's places |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

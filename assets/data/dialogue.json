@@ -5,8 +5,8 @@
   "Author": "Jose-Jorge HERNANDEZ",
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
-  "Last edit date": "2026-10-22",
-  "Version": "1.6.0",
+  "Last edit date": "2026-10-23",
+  "Version": "1.7.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -357,7 +357,7 @@
  },
  "dw_sign_tempus": {
   "pages": [
-   "TEMPUS\nHere the road runs backwards. Not yet."
+   "TEMPUS\nWest: the Clockwork Wastes. The road there runs through molten time."
   ]
  },
  "dw_sign_fields": {
@@ -453,6 +453,22 @@
   "pages": [
    "You got the Crystal of Ignis! It burns without heat in your hand.",
    "Two more crystals wait in the Dark World."
+  ]
+ },
+ "dw_sign_clockyard": {
+  "pages": [
+   "CLOCKWORK WASTES\nThe blocks rise and fall with the broken clock. Wait for your moment."
+  ]
+ },
+ "get_hammer": {
+  "pages": [
+   "You got the Hammer! Swing it with the item button: it pounds pegs flat, flips clockwork bugs onto their backs and cracks armour."
+  ]
+ },
+ "get_crystal_2": {
+  "pages": [
+   "You got the Crystal of Tempus! Inside it, a second hand ticks backwards.",
+   "One crystal remains."
   ]
  }
 }

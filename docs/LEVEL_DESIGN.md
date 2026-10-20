@@ -4,8 +4,8 @@ Description: How areas are built, linted and previewed; the glyph table.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-22
-Version: 1.7.0
+Last edit date: 2026-10-23
+Version: 1.8.0
 -->
 
 # Level design
@@ -53,6 +53,8 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `X` | lurker (creeps while Joe looks away) | `m` | boss: the Gloom Moth |
 | `|` | hook post (solid; the grapple bites it) | `!` | lava (Joe burns; the grapple flies over; the ice rod freezes it) |
 | `a` | ash ground (Ignis) | `c` `I` | cinder; boss: the Magma Wyrm |
+| `u` `n` | tick blocks, amber / teal (Tempus) | `p` | peg (solid; the hammer pounds it flat) |
+| `z` | cogbug (the hammer flips it) | `t` | boss: the Clock Warden |
 
 ## Villagers and signs
 Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
@@ -104,6 +106,9 @@ reachable. The grapple counts as a way across: from any reachable cell, a straig
 water to a hook post at most 7 tiles away reaches the cell in front of the post (`grapple_hops`). Hook posts and
 a Gloom Moth need a grapple somewhere; crystals are numbered 0, 1, ... in order. The ice rod counts too: from
 any reachable cell, an unbroken run of lava straight ahead leads to the first walkable cell past it within 8 tiles
-(`ice_hops`); a Magma Wyrm needs an ice rod somewhere. Rooms can be `"dark": True`
+(`ice_hops`); a Magma Wyrm needs an ice rod somewhere. Tick blocks count as ground (one colour is always down;
+use `tick_row` / `tick_col` so the colours alternate); pegs count as openable, and pegs or a Clock Warden need a
+hammer somewhere. Note: a dungeon's exit spawn is an entry of its overworld area, so a gate *in front of* a
+dungeon's door is not proven by the lint - test it in the game (`test_tempus.gd` does for the molten time). Rooms can be `"dark": True`
 (give them torches). Dark World-only lands go in `DARK_ONLY` (they keep `world: "dark"` and have no twin). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

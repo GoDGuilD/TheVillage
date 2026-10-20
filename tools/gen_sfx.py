@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1, world warps, the grapple, Ignis) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1, world warps, the grapple, Ignis, Tempus) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 3.5.0
+# Last edit date: 2026-10-23
+# Version: 3.6.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -502,6 +502,34 @@ def sizzle():
     return 0.7 * crush(noise(n), 3) * decay(n, 0.14)
 
 
+# --- Phase 11: Tempus ---------------------------------------------------------------------
+
+def pound():
+    # The hammer: a heavy wooden thud with a short ring.
+    t = tt(0.3)
+    n = len(t)
+    f = 70 + 220 * np.exp(-t * 30)
+    thud = np.sin(2 * np.pi * np.cumsum(f) / SR) * decay(n, 0.1)
+    return thud + 0.3 * np.sin(2 * np.pi * 900 * t) * decay(n, 0.04) + 0.35 * crush(noise(n), 2) * decay(n, 0.015)
+
+
+def tick():
+    # The clockwork turning over: a dry wooden click.
+    t = tt(0.08)
+    n = len(t)
+    return (np.sin(2 * np.pi * 1800 * t) + 0.5 * np.sin(2 * np.pi * 3100 * t)) * decay(n, 0.012)
+
+
+def time_stop():
+    # The clock warden freezing time: a rising sweep that cuts off dead.
+    t = tt(0.5)
+    n = len(t)
+    f = 200 + 1600 * (t / t[-1]) ** 2
+    s = np.sign(np.sin(2 * np.pi * np.cumsum(f) / SR)) * 0.5 + 0.5 * np.sin(2 * np.pi * np.cumsum(f * 0.5) / SR)
+    env = np.minimum(1.0, t * 8) * (t < t[-1] * 0.9)
+    return s * env
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -523,6 +551,7 @@ SFX = {
     "orb": (orb, -6.0), "clank": (clank, -6.0), "magic_jar": (magic_jar, -6.5), "act_end": (act_end, -4.5),
     "warp": (warp, -5.5), "chain": (chain, -7.0), "clink": (clink, -6.0),
     "freeze": (freeze, -6.0), "lava_burst": (lava_burst, -5.0), "sizzle": (sizzle, -8.0),
+    "pound": (pound, -4.0), "tick": (tick, -10.0), "time_stop": (time_stop, -8.0),
 }
 
 

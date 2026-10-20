@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 2.3.0
+# Last edit date: 2026-10-23
+# Version: 2.4.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -32,7 +32,8 @@ const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemi
 		"Q": "res://src/enemies/Spitter.gd", "Y": "res://src/enemies/GrandSlime.gd", "A": "res://src/enemies/Bat.gd",
 		"U": "res://src/enemies/IronRam.gd", "F": "res://src/enemies/FrostWraith.gd", "V": "res://src/enemies/CaverShade.gd",
 		"X": "res://src/enemies/Lurker.gd", "m": "res://src/enemies/GloomMoth.gd",
-		"c": "res://src/enemies/Cinder.gd", "I": "res://src/enemies/MagmaWyrm.gd"}
+		"c": "res://src/enemies/Cinder.gd", "I": "res://src/enemies/MagmaWyrm.gd",
+		"z": "res://src/enemies/Cogbug.gd", "t": "res://src/enemies/ClockWarden.gd"}
 const GRASS := {".": "grass_a", ",": "grass_b", "*": "flowers"}
 const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b",
 		"+": "pillar", "s": "dstairs"}
@@ -103,7 +104,8 @@ static func build(rows: Array, actors: Node2D, indoor: bool = false, with_enemie
 	tiles.tile_set = tileset(dark)
 	tiles.position = origin
 	tiles.add_to_group("terrain")
-	var out := {"tiles": tiles, "bushes": [], "pots": [], "enemies": [], "spawn": null, "doors": [], "exits": []}
+	var out := {"tiles": tiles, "bushes": [], "pots": [], "enemies": [], "spawn": null, "doors": [], "exits": [],
+			"tick_blocks": [], "pegs": []}
 	for y in rows.size():
 		var row: String = rows[y]
 		for x in row.length():
@@ -121,6 +123,17 @@ static func build(rows: Array, actors: Node2D, indoor: bool = false, with_enemie
 				p.position = at
 				actors.add_child(p)
 				out["pots"].append(p)
+			elif g == "u" or g == "n":                       # Tempus tick blocks: u amber, n teal
+				var tb := TickBlock.new()
+				tb.setup(g == "u")
+				tb.position = at
+				actors.add_child(tb)
+				out["tick_blocks"].append(tb)
+			elif g == "p":                                   # a peg (the hammer pounds it flat)
+				var peg := Peg.new()
+				peg.position = at
+				actors.add_child(peg)
+				out["pegs"].append(peg)
 			elif ENEMY_SCRIPTS.has(g) and with_enemies:
 				var e: Node2D = load(ENEMY_SCRIPTS[g]).new()
 				e.position = feet

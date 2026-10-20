@@ -1,0 +1,20 @@
+{
+  "frame_size": [
+    40,
+    48
+  ],
+  "feet": [
+    20,
+    44
+  ],
+  "anims": {
+    "walk": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "cracked": {
+      "fps": 1.0,
+      "loop": false
+    }
+  }
+}

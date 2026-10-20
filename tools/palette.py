@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 1.10.0
+# Last edit date: 2026-10-23
+# Version: 1.11.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -387,3 +387,23 @@ WYRM_DARK      = _hex("#4c1410")
 WYRM_MID       = _hex("#a03420")
 WYRM_LIGHT     = _hex("#e0683c")
 WYRM_BELLY     = _hex("#f0b048")
+
+# --- Tempus (Phase 11): the hammer, pegs, tick blocks, gears, cogbugs, the clock warden ----------------------------
+HAMMER_HEAD    = _hex("#8890a8")
+HAMMER_DARK    = _hex("#4c5068")
+HAMMER_WOOD    = _hex("#a06c38")
+PEG_DARK       = _hex("#5c3c20")    # wooden pegs the hammer pounds flat
+PEG_MID        = _hex("#9c6c38")
+PEG_LIGHT      = _hex("#d0a060")
+BRASS_DARK     = _hex("#6c4c14")    # clockwork
+BRASS_MID      = _hex("#b88c2c")
+BRASS_LIGHT    = _hex("#f0d070")
+STEEL_DARK     = _hex("#38404c")
+STEEL_MID      = _hex("#68788c")
+STEEL_LIGHT    = _hex("#a8b8c8")
+TICK_A_DARK    = _hex("#8c5010")    # amber tick blocks (raised on even ticks)
+TICK_A_MID     = _hex("#e09028")
+TICK_A_LIGHT   = _hex("#f8c860")
+TICK_B_DARK    = _hex("#105c68")    # teal tick blocks (raised on odd ticks)
+TICK_B_MID     = _hex("#28a8b0")
+TICK_B_LIGHT   = _hex("#80e0e0")

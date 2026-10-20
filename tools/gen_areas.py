@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 5.2.0
+# Last edit date: 2026-10-23
+# Version: 5.3.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -43,13 +43,14 @@ HOUSE_DOOR = (2, 3)
 SHRINE_DOOR = (2, 2)
 # Solid: N villager, C chest, L torch, k cracked rock, l key block, % dungeon wall, + pillar, o pit (Joe falls),
 # [ door, & push block, r heavy rock (all solid bodies or impassable cells).
-SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&rb|!")  # ... b = rubble (the dash boots break it), | hook post, ! lava
-ACTORS = set("BOZGQPhYAUFVXmcI")  # h heart piece; A bat; X lurker; c cinder; bosses: Y Grand Slime, U Iron Ram,
-                                   # F Frost Wraith, V Caver, m Gloom Moth, I Magma Wyrm
-OPENABLE = set("kl[&rb")           # solid until a bomb / key / push / glove / dash opens them (reachability: open)
-GROUND = set(".,*#_M=;@sa")        # = ; dungeon floor, @ floor switch, s exit stairs, a ash (Ignis)
+SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&rb|!p")  # ... b rubble (dash boots), | hook post, ! lava, p peg (hammer)
+ACTORS = set("BOZGQPhYAUFVXmcIzt")  # h heart piece; A bat; X lurker; c cinder; z cogbug; bosses: Y Grand Slime,
+                                     # U Iron Ram, F Frost Wraith, V Caver, m Gloom Moth, I Magma Wyrm, t Clock Warden
+OPENABLE = set("kl[&rbp")          # solid until a bomb / key / push / glove / dash / hammer opens them (reachability: open)
+GROUND = set(".,*#_M=;@sanu")      # = ; dungeon floor, @ floor switch, s exit stairs, a ash (Ignis), u n tick blocks
+                                   # (amber / teal: one colour is always down, so they count as ground)
 VALID = SOLID | ACTORS | GROUND | {"x"} | set(MULTI)
-ENEMIES = set("ZGQYAUFVXmcI")
+ENEMIES = set("ZGQYAUFVXmcIzt")
 LOW = set("o~!")                  # pits, water and lava: the grapple's chain flies over them
 ICE_REACH = 8                     # tiles an ice bolt flies (IceBolt.MAX_DISTANCE): it freezes every lava cell on the way
 GRAPPLE_REACH = 7                 # tiles from Joe to a hook post the grapple can still bite (Grapple.RANGE)
@@ -57,7 +58,7 @@ FACING_STEP = {"down": (0, 1), "up": (0, -1), "left": (-1, 0), "right": (1, 0)}
 # Everything a chest, gift or ware may hand out - mirrors ItemDB.KINDS in src/items/ItemDB.gd (test_items.gd
 # checks that every kind used by the areas exists there).
 ITEM_KINDS = {"lantern", "boomerang", "bow", "bombs", "arrows", "small_key", "heart_piece", "heart_container", "gems",
-              "map", "compass", "big_key", "glove", "boots", "fire_rod", "grapple", "magic", "ice_rod"}
+              "map", "compass", "big_key", "glove", "boots", "fire_rod", "grapple", "magic", "ice_rod", "hammer"}
 WARE_IDS = {"bombs", "arrows", "heart_piece", "dw_bombs", "dw_arrows", "dw_magic"}   # ItemDB.WARES
 OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h", "door": "[",
                  "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r", "rubble": "b",
@@ -318,6 +319,39 @@ def build_cinder_barrens(rng):
     g.place([(12, 11), (19, 9), (10, 22)], "c")
     g.place([(17, 14)], "A")
     return g, [{"cell": [14 + SHRINE_DOOR[0], 2 + SHRINE_DOOR[1]], "to": "d5_entrance"}]
+
+
+def tick_row(g, x0, x1, y, start_amber=True):
+    """A fence of tick blocks from (x0, y) to (x1, y), colours alternating (so half of it is always down)."""
+    for x in range(x0, x1 + 1):
+        g.set(x, y, "u" if ((x - x0) % 2 == 0) == start_amber else "n")
+
+
+def tick_col(g, x, y0, y1, start_amber=True):
+    for y in range(y0, y1 + 1):
+        g.set(x, y, "u" if ((y - y0) % 2 == 0) == start_amber else "n")
+
+
+def build_clockwork_wastes(rng):
+    """The Clockwork Wastes (Tempus's land, Dark World only, west of the Broken Road): a band of molten time only the
+    ice rod crosses (so Ignis comes first), a fence of tick blocks, the Tempus Clocktower in the north-west, and in
+    the south-west a row of pegs (the hammer) and stones guarding a piece of heart."""
+    g = Grid(*size_of((1, 2)))
+    g.tree_border({"e": (8, 11)})
+    g.rect(18, 8, 23, 11, "#")                         # the path in from the Broken Road
+    g.rect(14, 2, 16, 25, "!")                         # molten time
+    g.piece(4, 2, "E")                                 # the Tempus Clocktower
+    g.rect(5, 5, 7, 7, "#")
+    tick_row(g, 2, 13, 10)
+    g.rect(13, 19, 13, 25, "R")                        # stones: no crossing straight into the south
+    g.rect(2, 18, 12, 18, "p")                         # pegs: the hammer opens the way south
+    g.place([(19, 4)], "G")
+    g.place([(6, 14)], "G")
+    g.place([(10, 12)], "A")
+    g.place([(5, 21), (11, 22)], "z")
+    g.place([(3, 13), (12, 15)], "B")
+    g.scatter(rng, [",", ","], 30)
+    return g, [{"cell": [4 + SHRINE_DOOR[0], 2 + SHRINE_DOOR[1]], "to": "d6_entrance"}]
 
 
 def build_interior(kind, rng, spawn=False):
@@ -639,6 +673,8 @@ def lint_world(areas, problems):
         problems.append("world: a Gloom Moth but no grapple anywhere")
     if any("I" in r for a in areas for r in a["rows"]) and "ice_rod" not in held:
         problems.append("world: a Magma Wyrm but no ice rod anywhere")
+    if any(("p" in r or "t" in r) for a in areas for r in a["rows"]) and "hammer" not in held:
+        problems.append("world: pegs or a Clock Warden but no hammer anywhere")
     if seals != [0, 1, 2]:
         problems.append("world: the dungeons hold seals %s (need 0, 1, 2)" % seals)
     if any(o["kind"] == "seal_gate" for o in every) and not any(info.get("ending") for info, _ in DUNGEONS):
@@ -789,6 +825,7 @@ OBJECTS = {
     "dw_umbra_vale": [("hook_post", 36, 6, {}), ("hook_post", 28, 7, {}), ("heart_piece", 34, 5, {})],
     # Ignis: the posts across the lava river (the way in needs Umbra's grapple) and the lava pool's heart piece.
     "dw_cinder_barrens": [("hook_post", 10, 13, {}), ("hook_post", 2, 10, {}), ("heart_piece", 15, 20, {})],
+    "dw_clockwork_wastes": [("heart_piece", 7, 23, {})],
 }
 # Boni's wares on her counter (table cells): area -> [(x, y, ware id)].
 WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")],
@@ -911,7 +948,8 @@ def d1_rooms():
     return rooms
 
 
-ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "c", "I", "O", "B", "+", "o", "!", ";")
+ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "c", "I", "z", "t", "O", "B", "+", "o", "!", ";",
+               "u", "n", "p")
 
 
 def make_room(rooms, aid, gx, gy, doors, fill, extra=None):
@@ -1110,7 +1148,55 @@ def d5_rooms():
     return rooms
 
 
-DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms), (D4, d4_rooms), (D5, d5_rooms)]
+# The Tempus Clocktower (Dark World dungeon 3): the third dimension crystal.
+D6 = {"id": "d6", "name": "Tempus Clocktower", "crystal": 2, "entrance": "d6_entrance", "boss_room": "d6_boss",
+      "boss_flag": "boss:d6"}
+
+
+def d6_rooms():
+    """The Tempus Clocktower: tick blocks everywhere; the entrance's small key opens the east room, the big key
+    sits inside a ring of tick blocks in the west room, the big chest's Hammer pounds the pegs in the east room and
+    those barring the hall's north doorway; then the Clock Warden."""
+    rooms = []
+
+    def entrance(g):
+        tick_row(g, 2, 21, 7)
+        return [("chest", 4, 3, {"item": "small_key", "amount": 1, "reveal": ""}), ("G", 16, 3, {}),
+                ("O", 3, 10, {}), ("O", 20, 10, {})]
+    make_room(rooms, "d6_entrance", 1, 2, {"n": ("open",), "s": ("stairs",)}, entrance)
+
+    def hall(g):
+        tick_col(g, 6, 3, 10)
+        tick_col(g, 17, 3, 10, False)
+        return [("p", 11, 2, {}), ("p", 12, 2, {}),               # pegs bar the way north
+                ("chest", 15, 4, {"item": "map", "amount": 1, "reveal": ""}), ("G", 9, 9, {}), ("A", 14, 7, {})]
+    make_room(rooms, "d6_hall", 1, 1, {"s": ("open",), "w": ("open",), "e": ("locked", "d6_hall_east", ""),
+                                       "n": ("open",)}, hall)
+
+    def west(g):
+        tick_row(g, 2, 7, 6)                                     # a ring of tick blocks around the big key
+        tick_col(g, 7, 2, 5, False)
+        return [("chest", 4, 3, {"item": "big_key", "amount": 1, "reveal": ""}),
+                ("chest", 18, 9, {"item": "compass", "amount": 1, "reveal": ""}), ("G", 12, 8, {}), ("G", 17, 4, {})]
+    make_room(rooms, "d6_west", 0, 1, {"e": ("open",)}, west)
+
+    def east(g):
+        g.rect(13, 2, 13, 11, "p")                               # a wall of pegs
+        return [("big_chest", 4, 3, {"item": "hammer"}),
+                ("chest", 19, 9, {"item": "gems", "amount": 50, "reveal": ""}), ("z", 18, 5, {}), ("z", 17, 9, {})]
+    make_room(rooms, "d6_east", 2, 1, {"w": ("locked", "d6_hall_east", "")}, east)
+
+    def boss(g):
+        for x, y, amber in ((5, 4, True), (18, 4, False), (5, 9, False), (18, 9, True)):
+            g.set(x, y, "u" if amber else "n")
+        return [("t", 11, 5, {})]
+    make_room(rooms, "d6_boss", 1, 0, {"s": ("boss", "d6_boss_door", D6["boss_flag"])}, boss,
+              {"boss_flag": D6["boss_flag"]})
+    return rooms
+
+
+DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms), (D4, d4_rooms), (D5, d5_rooms),
+            (D6, d6_rooms)]
 DUNGEON_STRIDE = 200                     # tiles between two dungeons' room grids
 
 
@@ -1128,11 +1214,13 @@ DARK_EDITS = {
                                g.rect(22, 0, 25, 5, "#")),     # ...and the trees part north, toward Umbra
     "el_pueblo": lambda g: (g.piece(8, 17, "K"), g.piece(11, 17, "K")),   # the Shade Market's stall
     "east_lake": lambda g: g.rect(20, 12, 23, 15, "#"),                   # the shore path runs on east, to Ignis
+    "south_road": lambda g: g.rect(0, 8, 1, 11, "#"),                     # the road's west end opens, to Tempus
 }
 # Dark World-only areas (the dimensions' lands): no Light World twin, so the Moon Mirror does nothing there.
 DARK_ONLY = [
     ("dw_umbra_vale", "Umbral Vale", (0, -1), (2, 1), build_umbra_vale),
     ("dw_cinder_barrens", "Cinder Barrens", (3, 1), (1, 2), build_cinder_barrens),
+    ("dw_clockwork_wastes", "Clockwork Wastes", (-1, 3), (1, 2), build_clockwork_wastes),
 ]
 DARK_EXTRA = {                            # Dark World enemies added on top of the Light World's
     "el_pueblo": [(10, 20, "A"), (36, 9, "Z"), (40, 21, "G")],
@@ -1152,6 +1240,7 @@ SIGNS.update({
     "dw_south_fields": [(21, 3, "dw_sign_fields")],
     "dw_umbra_vale": [(20, 7, "dw_sign_sanctum")],
     "dw_cinder_barrens": [(13, 6, "dw_sign_forge")],
+    "dw_clockwork_wastes": [(18, 13, "dw_sign_clockyard")],
 })
 
 

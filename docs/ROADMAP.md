@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-22
-Version: 1.9.0
+Last edit date: 2026-10-23
+Version: 1.10.0
 -->
 
 # Roadmap
@@ -26,7 +26,8 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 8 | Dark World + Moon Mirror | Dark World palette pass and transformation, the mirror warp between worlds, Dark World hub (Act 2 starts where Act 1's save left Joe) | Done (28 Dark World checks pass) |
 | 9 | Umbra | The Umbral Vale, the Umbra Sanctum (dark rooms), the Grapple and hook posts, lurkers, the Gloom Moth, the first dimension crystal, the Shade Market | Done (45 Umbra checks pass) |
 | 10 | Ignis | The Cinder Barrens and lava, the Ice Rod (frozen enemies, lava crust), cinders, the Ignis Forge, the Magma Wyrm, the second crystal | Done (36 Ignis checks pass) |
-| 11–12 | Tempus, Silva | One region + dungeon + boss each, with their key items (hammer, flippers...) | Next (Tempus) |
+| 11 | Tempus | The Clockwork Wastes and tick blocks, the Hammer and pegs, cogbugs, the Tempus Clocktower, the Clock Warden, the third crystal | Done (32 Tempus checks pass) |
+| 12 | Silva | The last region + dungeon + boss, with its key item (flippers?) and the fourth crystal | Next |
 | 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
 | 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
 | 15 | Release | Credits, icon, export preset, performance baseline, store material | Planned |
@@ -130,3 +131,11 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] The Ignis Forge (5 rooms), cinders and their flames, the Magma Wyrm, the Crystal of Ignis
 - [x] `tests/test_ignis.gd`: 36 checks; `tools/capture_ignis.gd`
 - [ ] Owner playtest: crust time, lava damage, the wyrm's difficulty, names (barrens, forge, wyrm)
+
+
+## Phase 11 detail
+- [x] `tools/gen_tempus.py`; three sounds; tick blocks and the World's clock; pegs; the Hammer (`HammerBlow`)
+- [x] The Clockwork Wastes (Dark World-only, west of the Broken Road; ice-gated molten time; the pegged piece of heart)
+- [x] The Tempus Clocktower (5 rooms), cogbugs, the Clock Warden (gears, time stop, cracked armour), the Crystal of Tempus
+- [x] `tests/test_tempus.gd`: 32 checks; `tools/capture_tempus.gd`
+- [ ] Owner playtest: tick speed, the time stop, the warden's difficulty, names (wastes, clocktower, warden)

@@ -4,8 +4,8 @@ Description: Internal scripting API of the main classes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-22
-Version: 2.6.0
+Last edit date: 2026-10-23
+Version: 2.7.0
 -->
 
 # API
@@ -69,6 +69,10 @@ The game has no network API; this is the internal API other scripts and tests re
   `BaseEnemy._iced() -> bool`, `ICE_ELEMENT`, `ICE_TIME`, `ICE_TINT`. `Cinder` (`flames_left`), `GroundFlame`
   (group `ground_flame`, `hit_box`), `MagmaWyrm` (`state`, `is_frozen()`, `is_up()`, `spots`, `surfacings`,
   `freezes`, `shots_fired`).
+- `Peg` (group `peg`; `pound() -> bool`, `is_down`), `TickBlock` (group `tick_block`; `setup(amber)`,
+  `set_raised(on)`, `amber`, `raised`, `pending`), `HammerBlow` (group `hammer_blow`; `pounded`). `World.tick_phase`,
+  `ticks`, `TICK_TIME`. `Cogbug` (`flipped`, `flips`, `FLIP_TIME`), `ClockWarden` (`state`, `is_cracked()`, `ticks`,
+  `time_stops`, `cracks`, `shots_fired`).
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 

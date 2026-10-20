@@ -23,6 +23,7 @@
   "dw_south_fields",
   "dw_umbra_vale",
   "dw_cinder_barrens",
+  "dw_clockwork_wastes",
   "d1_entrance",
   "d1_hub",
   "d1_west",
@@ -55,7 +56,12 @@
   "d5_hall",
   "d5_west",
   "d5_east",
-  "d5_boss"
+  "d5_boss",
+  "d6_entrance",
+  "d6_hall",
+  "d6_west",
+  "d6_east",
+  "d6_boss"
  ],
  "act2_spawn": {
   "area": "dw_el_pueblo",
@@ -107,6 +113,13 @@
    "entrance": "d5_entrance",
    "boss_room": "d5_boss",
    "boss_flag": "boss:d5"
+  },
+  "d6": {
+   "name": "Tempus Clocktower",
+   "crystal": 2,
+   "entrance": "d6_entrance",
+   "boss_room": "d6_boss",
+   "boss_flag": "boss:d6"
   }
  }
 }

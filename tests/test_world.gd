@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 1.1.6
+# Last edit date: 2026-10-23
+# Version: 1.1.7
 # Run:  Godot_console --headless --fixed-fps 60 --path . -s tests/test_world.gd   (must end "0 failed")
 extends SceneTree
 
@@ -84,14 +84,14 @@ func _cell_of(area: String) -> Vector2i:
 # --- tests -------------------------------------------------------------------
 
 func _t_data() -> void:
-	_check("51 areas load (6 + 8 Dark World overworld, 4 houses, 33 dungeon rooms)", _w.areas.size() == 51, str(_w.areas.size()))
+	_check("57 areas load (6 + 9 Dark World overworld, 4 houses, 38 dungeon rooms)", _w.areas.size() == 57, str(_w.areas.size()))
 	var doors := 0
 	var ok := true
 	for aid in _w.areas:
 		for d in _w.areas[aid]["doors"]:
 			doors += 1
 			ok = ok and _w.areas.has(String(d["to"]))
-	_check("eleven doors (houses, five dungeons, the keep's gateway), all leading somewhere", doors == 11 and ok, str(doors))
+	_check("twelve doors (houses, six dungeons, the keep's gateway), all leading somewhere", doors == 12 and ok, str(doors))
 	_check("start area is Joe's house", _w.start_area == "joe_house")
 
 

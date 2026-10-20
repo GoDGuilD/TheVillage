@@ -1,0 +1,79 @@
+{
+ "id": "dw_clockwork_wastes",
+ "name": "Clockwork Wastes",
+ "kind": "overworld",
+ "world": "dark",
+ "size_screens": [
+  1,
+  2
+ ],
+ "origin_tiles": [
+  -24,
+  42
+ ],
+ "rows": [
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "Tx..Exxxx....,!!!..,..Tx",
+  "xx..xxxxx.,...!!!.....xx",
+  "Tx..xxxxx.....!!!..G..Tx",
+  "xx...###,,....!!!.....xx",
+  "Tx...###......!!!..,..Tx",
+  "xx...###,.....!!!.....xx",
+  "Tx.,..........!!!.######",
+  "xx............!!!.######",
+  "Txunununununun!!!,######",
+  "xx............!!!.######",
+  "Tx........A...!!!.....Tx",
+  "xx.B..........!!!.S...xx",
+  "Tx....G.......!!!.....Tx",
+  "xx..........B.!!!.....xx",
+  "Tx............!!!.....Tx",
+  "xx.......,....!!!.....xx",
+  "Txppppppppppp.!!!.....Tx",
+  "xx...........R!!!.....xx",
+  "Tx...........R!!!.....Tx",
+  "xx...z.......R!!!....,xx",
+  "Tx.,.......z.R!!!.....Tx",
+  "xx.....h.,...R!!!.....xx",
+  "Tx...........R!!!.....Tx",
+  "xx...........R!!!.....xx",
+  "TxTxTxTxTxTxTxTxTxTxTxTx",
+  "xxxxxxxxxxxxxxxxxxxxxxxx"
+ ],
+ "doors": [
+  {
+   "cell": [
+    6,
+    4
+   ],
+   "to": "d6_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  }
+ ],
+ "exits": [],
+ "npcs": [],
+ "signs": [
+  {
+   "cell": [
+    18,
+    13
+   ],
+   "text": "dw_sign_clockyard"
+  }
+ ],
+ "objects": [
+  {
+   "kind": "heart_piece",
+   "cell": [
+    7,
+    23
+   ]
+  }
+ ],
+ "wares": []
+}

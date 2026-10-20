@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-22
-Version: 1.9.0
+Last edit date: 2026-10-23
+Version: 1.10.0
 -->
 
 # Known issues
@@ -50,3 +50,6 @@ Version: 1.9.0
 - Lava crust gives no warning before it melts, and lava is not animated. Enemies may walk onto crust and are left
   standing in lava when it melts. Lava burns like a pit (one heart, back to the entry).
 - The Magma Wyrm rises at any lava cell of its room (not only pool centres), so it can sit at a pool's edge.
+- Tick blocks rise under enemies (only Joe is waited for). The clock keeps one phase for the whole game, so an
+  area's blocks may be in either state on entry. The hammer swing has no Joe animation of its own (the throw pose).
+- The Clock Warden's time stop cannot be avoided; gears are not blockable by the shield.

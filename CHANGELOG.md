@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-22
-Version: 5.7.0
+Last edit date: 2026-10-23
+Version: 5.8.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,34 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.5.0] - 2026-10-23 — Phase 11: Tempus
+
+### Added
+- **The Clockwork Wastes** (`dw_clockwork_wastes`, Dark World only): the Broken Road's west end opens onto it. A
+  band of molten time (lava) only the ice rod crosses guards it, so Ignis comes first; a fence of tick blocks, the
+  Tempus Clocktower in the north-west, and a row of pegs guarding a piece of heart in the south-west.
+- **Tick blocks** (`TickBlock`, glyphs `u` amber / `n` teal): the World's broken clock ticks every 2 s while an
+  area has them, and the raised colour swaps (sound `tick`). A block never rises under Joe: it waits until he
+  steps off. The clock stops while the tree is paused.
+- **The Hammer** (Y-item; `HammerBlow`): a heavy swing one tile ahead (4 damage, element `hammer`, sound `pound`)
+  that pounds **pegs** (`Peg`, glyph `p`) flat; pegs stand up again when the area is rebuilt.
+- **Cogbugs** (`Cogbug`, glyph `z`): clockwork beetles whose shell turns the sword; the hammer flips them on
+  their backs for 3.5 s, and only then can they be hurt.
+- **The Tempus Clocktower** (dungeon 6, 5 rooms, the third dimension crystal): tick-block fences and a ring
+  around the big key, the Hammer in the big chest behind the locked door, a wall of pegs, and two pegs barring
+  the hall's north doorway to the boss.
+- **The Clock Warden** (boss, glyph `t`): plods toward Joe, throws four gears on every tick (cardinal and diagonal
+  in turn) and **stops time** on every third (Joe frozen 0.7 s, sound `time_stop`); the hammer cracks its armour
+  for a few seconds of sword hits.
+- `tools/gen_tempus.py` (hammer, swing, pegs, tick blocks, gear shot, cogbug and warden packs); sounds `pound`,
+  `tick`, `time_stop` (59 effects). `gen_areas.py` v8: `build_clockwork_wastes`, `D6`/`d6_rooms()`, `tick_row` /
+  `tick_col`, pegs as openable, lint for pegs or a warden without a hammer. `tests/test_tempus.gd` (32 checks),
+  `tools/capture_tempus.gd`.
+
+### Changed
+- The Tempus sign on the Broken Road points west. `test_world.gd` knows the new area and door.
+- 509 checks in 11 suites, all passing.
 
 ## [7.4.0] - 2026-10-22 — Phase 10: Ignis
 

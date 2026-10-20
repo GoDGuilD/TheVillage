@@ -4,8 +4,8 @@ Description: Game design document for The Village - the top-down, A Link to the 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-22
-Version: 2.9.0
+Last edit date: 2026-10-23
+Version: 2.10.0
 -->
 
 # Game Design Document — The Village
@@ -143,6 +143,13 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
   that opens the way to the boss. Enemies: **cinders** that leave flames where they land. Boss: the **Magma Wyrm**
   - it rises from the lava pools, spits embers and sinks; only an ice bolt holds it up, frozen, for the sword.
   Reward: a heart container, then the **Crystal of Ignis**.
+  **Implemented in Phase 11 - Tempus** (names are placeholders): the Broken Road runs west into the **Clockwork
+  Wastes** (Dark World only) across a band of molten time the ice rod freezes - so Ignis comes first. Its
+  **tick blocks** rise and sink with a broken clock (every 2 s, one colour up); **pegs** need the hammer. The
+  **Tempus Clocktower** (5 rooms): tick-block fences, the big key inside a ring of them, the **Hammer** in the big
+  chest, a wall of pegs and two pegs before the boss. Enemies: **cogbugs**, armoured beetles the hammer flips over.
+  Boss: the **Clock Warden** - throws gears on every tick and stops Joe in time on every third; the hammer cracks
+  its armour for the sword. Reward: a heart container, then the **Crystal of Tempus**.
 
 ## 7. Items (ALttP equivalents in brackets)
 
@@ -163,6 +170,7 @@ Defeated enemies and broken pots roll the drop table: nothing 50%, recovery hear
 | Grapple | the Umbra Sanctum's big chest | 7-tile chain over pits and water: bites hook posts and pulls Joe across; stuns enemies |
 | Magic refill | the Shade Market, 40 gems | fills the magic meter |
 | Ice Rod | the Ignis Forge's big chest | ice bolts for 4 magic: freeze enemies 3 s; freeze lava into a 6-s crust |
+| Hammer | the Tempus Clocktower's big chest | a heavy blow (4 damage): pounds pegs flat, flips cogbugs, cracks armour |
 
 Bags: 10 bombs, 30 arrows. Arrows: Boni, 10 for 15 gems. The Shade Market (Hollow Pueblo): bombs 5 for 30,
 arrows 10 for 25, magic refill 40.

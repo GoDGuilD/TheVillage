@@ -4,8 +4,8 @@ Description: Code architecture of The Village: folders, autoloads, contracts, pl
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-22
-Version: 5.7.0
+Last edit date: 2026-10-23
+Version: 5.8.0
 -->
 
 # Architecture
@@ -20,23 +20,23 @@ src/
              DialogueData (dialogue.json reader), GameState / Audio / Juice (autoloads)
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
-  enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, Cinder, EnemyRock, EnemyShot, bosses: GrandSlime,
-             IronRam, FrostWraith, CaverShade (+ CaverOrb), GloomMoth, MagmaWyrm
-  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball, Grapple, IceBolt
+  enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, Cinder, Cogbug, EnemyRock, EnemyShot, bosses:
+             GrandSlime, IronRam, FrostWraith, CaverShade (+ CaverOrb), GloomMoth, MagmaWyrm, ClockWarden
+  items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball, Grapple, IceBolt, HammerBlow
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
              tiles + actors), TestField (test arenas), Npc, SignPost, Chest, BigChest, Torch, CrackedRock, KeyBlock,
-             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Rift, HookPost, GroundFlame, Bush, Pot,
-             Thrown, Pickup
+             ShopItem, Door, FloorSwitch, PushBlock, HeavyRock, Rubble, SealGate, Rift, HookPost, GroundFlame, Peg, TickBlock,
+             Bush, Pot, Thrown, Pickup
     areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
   ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, MapScreen, GameOver, EndCard, MenuList,
              PixelText,
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_tempus.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd, capture_tempus.gd
 tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
-             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd
+             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd, test_tempus.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -119,6 +119,11 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   collision) and a timer per cell puts the lava piece back; each freeze bumps a per-cell generation so only the
   newest timer thaws it. Element `ice` freezes ordinary enemies (`freeze` + a blue `self_modulate`) unless
   `_iced()` handles it - the Magma Wyrm turns it into its `frozen` state.
+- **Tempus's clock.** Tick blocks and pegs are made by AreaBuilder from their glyphs (like bushes and pots), so they
+  reset whenever an area is rebuilt. While the current area has tick blocks, `World._run_clock` counts down
+  `TICK_TIME` and flips `tick_phase`; `_apply_ticks` raises the matching colour. A block asked to rise while Joe
+  stands in its cell stays `pending` and rises once he leaves. Sunk blocks and flat pegs move their node up a few
+  pixels so the y-sorted actors draw over them (a negative z_index would hide them under the ground).
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 

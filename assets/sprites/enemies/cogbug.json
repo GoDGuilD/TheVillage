@@ -1,0 +1,20 @@
+{
+  "frame_size": [
+    24,
+    24
+  ],
+  "feet": [
+    12,
+    20
+  ],
+  "anims": {
+    "walk": {
+      "fps": 8.0,
+      "loop": true
+    },
+    "flipped": {
+      "fps": 6.0,
+      "loop": true
+    }
+  }
+}

@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-22
-Version: 2.9.0
+Last edit date: 2026-10-23
+Version: 2.10.0
 -->
 
 # The Village
@@ -86,3 +86,8 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   freezes it via `AreaBuilder.freeze_at` (crust, timers per cell generation) and the lint follows it (`ice_hops`).
   Element `ice` -> `BaseEnemy._iced()`. Ten suites (477 checks; `test_ignis.gd` 36). Tests reach AreaBuilder only
   through `load()` and read enemy constants through an instance (`slime.ICE_TINT`, never `BaseEnemy.ICE_TINT`).
+- Phase 11 (Tempus): AreaBuilder turns glyphs `u`/`n` into `TickBlock`s and `p` into `Peg`s (not OBJECTS: they
+  reset on rebuild); the World's clock (`_run_clock`, `tick_phase`) swaps them every `TICK_TIME`. Floor-level props
+  that must be drawn under actors move their node up (`SUNK_LIFT`/`FLAT_LIFT`) instead of a negative z. Eleven
+  suites (509 checks; `test_tempus.gd` 32). After a scroll test, wait for `World.transitioning` to clear before
+  `_enter` (the scroll's end resets Joe's entry point).

@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals; Ignis: lava.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals; Ignis: lava; Tempus: the tick clock, pegs.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-22
-# Version: 6.1.2
+# Last edit date: 2026-10-23
+# Version: 6.2.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -40,6 +40,7 @@ const SEAL_DROP := Vector2(0, -24)       # the seal appears above it (not under 
 const DARK_SMALL := preload("res://assets/sprites/world/darkness_small.png")      # dark rooms without the lantern
 const DARK_LANTERN := preload("res://assets/sprites/world/darkness_lantern.png")  # ...and with it
 const DARK_Z := 100                      # the darkness covers every actor (the HUD and boxes are CanvasLayers)
+const TICK_TIME := 2.0                   # s between two ticks of Tempus's broken clock (tick blocks swap)
 const GATE_FLAG := "keep:gate"           # the seal gate of Caver's keep is open
 const ACT1_FLAG := "act1:done"
 const ENDING_DELAY := 1.5                # s between the shade's fall and Caver's last words
@@ -77,6 +78,9 @@ var act2_spawn: Dictionary = {}          # {area, cell}: where Caver's spell dro
 var dungeons: Dictionary = {}            # dungeon id -> {name, seal, entrance, boss_room, boss_flag}
 var falls := 0                           # pit falls (tests)
 var darkness: Sprite2D                   # the night around Joe in a dark room (gen_umbra.py masks)
+var tick_phase := 0                      # 0: amber tick blocks up, teal down; 1: the other way round
+var ticks := 0                           # clock ticks so far (tests)
+var _tick_left := TICK_TIME
 var talking: Node2D = null               # the villager or sign in the current conversation
 var item_gets := 0                       # item-get sequences run (tests)
 var _after_dialogue := Callable()        # runs once the current box closes (gift hand-over, end of item-get)
@@ -308,7 +312,9 @@ func _build(area_id: String) -> Dictionary:
 		item.position = origin + (Vector2(float(w["cell"][0]), float(w["cell"][1])) + Vector2(0.5, 0.5)) * TILE
 		actors.add_child(item)
 	var rec := {"id": area_id, "data": data, "tiles": built["tiles"], "actors": actors, "rect": rect_of(area_id),
-			"bushes": built["bushes"], "pots": built["pots"], "enemies": built["enemies"]}
+			"bushes": built["bushes"], "pots": built["pots"], "enemies": built["enemies"],
+			"tick_blocks": built["tick_blocks"], "pegs": built["pegs"]}
+	_apply_ticks(rec)
 	if boss_flag != "" and GameState.has_flag(boss_flag):
 		_spawn_boss_reward(rec)                           # came back before taking the reward
 	return rec
@@ -476,7 +482,8 @@ func _all_torches_lit() -> bool:
 
 # --- edges and doors ---------------------------------------------------------------------------
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	_run_clock(delta)
 	if transitioning or current.is_empty() or player.is_dead() or player.is_hopping():
 		return
 	var feet := player.global_position
@@ -498,6 +505,27 @@ func _physics_process(_delta: float) -> void:
 			if cell == Vector2i(int(c[0]), int(c[1])) and player.facing == Vector2i.DOWN:
 				_warp(String(e["to"]), cell_feet(String(e["to"]), e["spawn_cell"]), FACINGS[String(e["facing"])])
 				return
+
+
+# Tempus's broken clock: while the area has tick blocks, every TICK_TIME s the raised colour swaps. It stops
+# whenever the tree is paused (boxes, menus) and during scrolls.
+func _run_clock(delta: float) -> void:
+	if transitioning or current.is_empty() or current.get("tick_blocks", []).is_empty():
+		return
+	_tick_left -= delta
+	if _tick_left > 0.0:
+		return
+	_tick_left = TICK_TIME
+	tick_phase = 1 - tick_phase
+	ticks += 1
+	Audio.sfx("tick")
+	_apply_ticks(current)
+
+
+func _apply_ticks(rec: Dictionary) -> void:
+	for b in rec.get("tick_blocks", []):
+		if is_instance_valid(b):
+			b.set_raised(b.amber == (tick_phase == 0))
 
 
 # ALttP screen scroll: freeze everything, build the neighbour, slide the camera while Joe steps in.
@@ -666,7 +694,7 @@ func grant(kind: String, amount: int = 1) -> bool:
 			return true
 		"map", "compass", "big_key":
 			GameState.give_dungeon_item(dungeon_of(current_id()), kind)
-		"glove", "boots", "fire_rod", "moon_mirror", "grapple", "ice_rod":
+		"glove", "boots", "fire_rod", "moon_mirror", "grapple", "ice_rod", "hammer":
 			GameState.give_item(kind)
 		"magic":
 			GameState.add_magic(amount)
