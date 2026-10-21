@@ -67,13 +67,27 @@
   "d7_hall",
   "d7_west",
   "d7_east",
-  "d7_boss"
+  "d7_boss",
+  "d8_entrance",
+  "d8_umbra",
+  "d8_ignis",
+  "d8_tempus",
+  "d8_silva",
+  "d8_ante",
+  "d8_boss"
  ],
  "act2_spawn": {
   "area": "dw_el_pueblo",
   "cell": [
    23,
    14
+  ]
+ },
+ "final_spawn": {
+  "area": "dw_south_fields",
+  "cell": [
+   15,
+   8
   ]
  },
  "dungeons": {
@@ -133,6 +147,14 @@
    "entrance": "d7_entrance",
    "boss_room": "d7_boss",
    "boss_flag": "boss:d7"
+  },
+  "d8": {
+   "name": "Caver's Tower",
+   "seal": -1,
+   "entrance": "d8_entrance",
+   "boss_room": "d8_boss",
+   "boss_flag": "boss:d8",
+   "ending": "final"
   }
  }
 }

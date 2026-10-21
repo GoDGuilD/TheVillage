@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.11.0
+Version: 1.12.0
 -->
 
 # Roadmap
@@ -28,7 +28,7 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 10 | Ignis | The Cinder Barrens and lava, the Ice Rod (frozen enemies, lava crust), cinders, the Ignis Forge, the Magma Wyrm, the second crystal | Done (36 Ignis checks pass) |
 | 11 | Tempus | The Clockwork Wastes and tick blocks, the Hammer and pegs, cogbugs, the Tempus Clocktower, the Clock Warden, the third crystal | Done (32 Tempus checks pass) |
 | 12 | Silva | The Silva Tangle and swimming, the Flippers, snapvines, the Silva Grove, the Thornheart, the fourth crystal | Done (35 Silva checks pass) |
-| 13 | Caver's tower | Final dungeon, Caver fight, ending that leads into Chapel of Dreams | Planned |
+| 13 | Caver's tower | The crystal gate, the tower's four dimension floors, Caver, the final ending that leads into Chapel of Dreams | Done (51 tower checks pass) |
 | 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
 | 15 | Release | Credits, icon, export preset, performance baseline, store material | Planned |
 
@@ -148,3 +148,14 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] The Silva Grove (5 rooms, grove pools), snapvines, the Thornheart (seeds, fire opens it), the Crystal of Silva
 - [x] `tests/test_silva.gd`: 35 checks; `tools/capture_silva.gd`
 - [ ] Owner playtest: swim speed, the snapvine's reach, the Thornheart's difficulty, names (tangle, grove, thornheart)
+
+
+## Phase 13 detail
+- [x] `tools/gen_tower.py` (crystal gate + sockets, dimension bolts, Caver's mortal form), three sounds
+- [x] The crystal gate on the Dark World's keep (four crystals); Dark World doors
+- [x] Caver's tower (7 rooms): Umbra, Ignis, Tempus and Silva floors, each gated by its item
+- [x] Caver (`CaverLord`): orbs to bat back, a knock-down for the sword, bolt volleys, wings and bats; he sinks
+- [x] The final ending (last words, the card, the save before the tower); boss rooms' opening words
+- [x] The map fits tall grids; a boss's shots vanish with it
+- [x] `tests/test_tower.gd`: 51 checks; `tools/capture_tower.gd`
+- [ ] Owner playtest: the tower's length, Caver's difficulty, the ending's words, names (tower, Caver's lines)

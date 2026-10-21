@@ -1,10 +1,10 @@
 # File: gen_sfx.py
-# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1, world warps, the grapple, Ignis, Tempus) as 16-bit mono WAVs and self-checks their levels.
+# Description: Synthesises The Village's chiptune sound effects (sword, spin, hits, bush/pot, pickups, shield, ledges, doors, menus, dialogue, saves, game over, items, chests, shop, dungeons, act 1, world warps, the grapple, Ignis, Tempus, Silva, Caver's tower) as 16-bit mono WAVs and self-checks their levels.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-20
-# Version: 3.7.0
+# Version: 3.8.0
 #
 # Run:  python -I tools/gen_sfx.py   (deterministic; writes assets/audio/sfx/*.wav and tmp/sfx_waveforms.png)
 # Synthesis toolbox ported from Chapel of Dreams' gen_audio.py (pulse/triangle/noise oscillators,
@@ -560,6 +560,39 @@ def bloom():
     return s * np.minimum(1.0, t * 6) * decay(n, 0.35)
 
 
+# --- Phase 13: Caver's tower ----------------------------------------------------------------
+
+def daze():
+    # A batted orb knocking Caver out of the air: a bright crack and a wobbling, falling tone.
+    t = tt(0.5)
+    n = len(t)
+    crack = crush(noise(n), 3) * decay(n, 0.02)
+    f = 900 * np.exp(-t * 3) * (1 + 0.06 * np.sin(2 * np.pi * 9 * t))
+    return 0.7 * crack + 0.6 * pulse(f, 0.5) * decay(n, 0.25)
+
+
+def sink():
+    # Caver sinking through the floor: a long low slide down with a breathy hiss on top.
+    t = tt(1.2)
+    n = len(t)
+    f = 220 * np.exp(-t * 1.6) + 40
+    drone = tri(f) + 0.5 * np.sin(2 * np.pi * np.cumsum(f * 0.5) / SR)
+    hiss = bandpass(noise(n), np.full(n, 2400.0), 1.0) * 0.4
+    return (drone + hiss) * np.minimum(1.0, t * 5) * decay(n, 0.6)
+
+
+def crystal_gate():
+    # The four crystals waking in the tower gate: four rising chimes, then a low rumble as the barrier falls.
+    parts = []
+    for f in (660, 880, 1100, 1320):
+        n = int(0.14 * SR)
+        parts.append((tri(np.full(n, float(f))) + 0.4 * tri(np.full(n, f * 2.0))) * decay(n, 0.1))
+    chimes = np.concatenate(parts)
+    n = int(0.5 * SR)
+    rumble = crush(noise(n), 4) * decay(n, 0.3) * 0.8
+    return np.concatenate([chimes, rumble])
+
+
 # name -> (generator, peak dB)
 SFX = {
     "sword_slash": (sword_slash, -5.0), "sword_spin": (sword_spin, -4.0), "charge_ready": (charge_ready, -6.0),
@@ -583,6 +616,7 @@ SFX = {
     "freeze": (freeze, -6.0), "lava_burst": (lava_burst, -5.0), "sizzle": (sizzle, -8.0),
     "pound": (pound, -4.0), "tick": (tick, -10.0), "time_stop": (time_stop, -8.0),
     "splash": (splash, -6.0), "snap": (snap, -6.5), "bloom": (bloom, -6.5),
+    "daze": (daze, -5.5), "sink": (sink, -5.0), "crystal_gate": (crystal_gate, -5.5),
 }
 
 

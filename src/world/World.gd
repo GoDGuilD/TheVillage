@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals; Ignis: lava; Tempus: the tick clock, pegs.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals; Ignis: lava; Tempus: the tick clock, pegs; Caver's tower: the crystal gate, the boss's opening words, the final ending.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-20
-# Version: 6.3.0
+# Version: 7.0.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -42,6 +42,11 @@ const DARK_LANTERN := preload("res://assets/sprites/world/darkness_lantern.png")
 const DARK_Z := 100                      # the darkness covers every actor (the HUD and boxes are CanvasLayers)
 const TICK_TIME := 2.0                   # s between two ticks of Tempus's broken clock (tick blocks swap)
 const GATE_FLAG := "keep:gate"           # the seal gate of Caver's keep is open
+const TOWER_FLAG := "tower:gate"         # the crystal gate of Caver's tower (Dark World) is open
+const INTRO_FLAG := "intro:%s"           # a boss room's opening words were said (per room)
+# Each ending: the villain's last words, then the end card's dialogue entry (its name is the card's title).
+const ENDINGS := {"act1": {"words": "caver_banish", "card": "act1_card"},
+		"final": {"words": "caver_fall", "card": "final_card"}}
 const ACT1_FLAG := "act1:done"
 const ENDING_DELAY := 1.5                # s between the shade's fall and Caver's last words
 const ACT2_FLAG := "act2:started"        # the Act 2 intro was shown
@@ -75,6 +80,8 @@ var endings := 0                         # act endings played (tests)
 var world_warps := 0                     # mirror and rift warps done (tests)
 var mirror_bounces := 0                  # mirror warps thrown back by a solid spot (tests)
 var act2_spawn: Dictionary = {}          # {area, cell}: where Caver's spell drops Joe
+var final_spawn: Dictionary = {}         # {area, cell}: where Joe is saved after the final ending
+var ending := ""                         # the ending being played ("act1" / "final"), until its card closes
 var dungeons: Dictionary = {}            # dungeon id -> {name, seal, entrance, boss_room, boss_flag}
 var falls := 0                           # pit falls (tests)
 var darkness: Sprite2D                   # the night around Joe in a dark room (gen_umbra.py masks)
@@ -205,6 +212,7 @@ func _load_index() -> void:
 	start_area = String(index["start"])
 	dungeons = index.get("dungeons", {})
 	act2_spawn = index.get("act2_spawn", {})
+	final_spawn = index.get("final_spawn", {})
 	for aid in index["areas"]:
 		areas[aid] = JSON.parse_string(FileAccess.get_file_as_string(AREA_DIR + String(aid) + ".json"))
 
@@ -379,6 +387,12 @@ func _build_object(area_id: String, o: Dictionary, actors: Node2D) -> void:
 			at += Vector2(TILE / 2.0, TILE / 2.0)            # centred on its 2x2 gateway
 			node = gate
 			gate.ready.connect(func() -> void: gate.refresh(GameState.seal_count()))
+		"crystal_gate":
+			var cgate := SealGate.new()
+			cgate.setup(TOWER_FLAG, GameState.has_flag(TOWER_FLAG), true)
+			at += Vector2(TILE / 2.0, TILE / 2.0)            # centred on its 2x2 gateway
+			node = cgate
+			cgate.ready.connect(func() -> void: cgate.refresh(0, GameState.crystals))
 		"torch":
 			var torch := Torch.new()
 			torch.lit_up.connect(_on_torch_lit)
@@ -594,7 +608,10 @@ func _on_talk_requested(target: Node2D) -> void:
 		_open_door(target)
 		return
 	if target is SealGate:
-		_try_seal_gate(target)
+		if target.crystal:
+			_try_crystal_gate(target)
+		else:
+			_try_seal_gate(target)
 		return
 	if target is KeyBlock:
 		_use_key(target)
@@ -836,6 +853,11 @@ func _on_area_entered(aid: String) -> void:
 		for n in current["actors"].get_children():
 			if n is Door and n.type == "boss":
 				n.close_door()
+		# A boss with something to say says it the first time Joe walks in (the tree pauses while he speaks).
+		var intro := String(areas[aid].get("intro", ""))
+		if intro != "" and not GameState.has_flag(INTRO_FLAG % aid):
+			GameState.set_flag(INTRO_FLAG % aid)
+			say.call_deferred(intro)
 
 
 # Rooms with a clear flag remember being emptied of enemies (their shutters open, now and later).
@@ -880,6 +902,8 @@ func _on_boss_defeated(room: String) -> void:
 		if e is BaseEnemy and not e.is_dead() and not e.get("is_boss"):
 			Juice.play_fx("poof", e.global_position, current["actors"])
 			e.queue_free()                                    # the boss's brood dies with it
+		elif e.is_in_group("enemy_shot") or e.is_in_group("orb"):
+			e.queue_free()                                    # ...and so do its shots still in the air
 	_open_doors_when(flag)
 	var info: Dictionary = dungeons.get(dungeon_of(room), {})
 	if String(info.get("ending", "")) != "":
@@ -931,25 +955,41 @@ func _try_seal_gate(gate: SealGate) -> void:
 	say("seal_gate_open")
 
 
+# The tower's gate: it opens for good once all four dimension crystals are Joe's.
+func _try_crystal_gate(gate: SealGate) -> void:
+	gate.refresh(0, GameState.crystals)
+	if GameState.crystal_count() < GameState.CRYSTAL_COUNT:
+		say("crystal_gate")
+		return
+	GameState.set_flag(TOWER_FLAG)
+	gate.open_gate()
+	Juice.shake(4.0, 0.8)
+	say("crystal_gate_open")
+
+
 # The end of an act: the villain's last words, then the end card; then save (outside the dungeon) and go back to
-# the title. Act 1 ends when Caver's shade falls.
+# the title. Act 1 ends when Caver's shade falls; the game ("final") when his mortal form sinks in the tower.
 func play_ending(act: String) -> void:
 	endings += 1
+	ending = act
 	GameState.set_flag(ACT1_FLAG if act == "act1" else act + ":done")
+	var keys: Dictionary = ENDINGS.get(act, ENDINGS["act1"])
 	_after_dialogue = func() -> void:
-		var card: Array = DialogueData.pages_for("act1_card", GameState)
-		end_card.open(DialogueData.speaker("act1_card"), card)
+		var card: Array = DialogueData.pages_for(String(keys["card"]), GameState)
+		end_card.open(DialogueData.speaker(String(keys["card"])), card)
 	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
-	dialogue.open(DialogueData.pages_for("caver_banish", GameState), DialogueData.speaker("caver_banish"),
+	dialogue.open(DialogueData.pages_for(String(keys["words"]), GameState), DialogueData.speaker(String(keys["words"])),
 			box_at_top(on_screen))
 
 
-# After the end card: Caver's spell has thrown Joe into the Dark World. He is saved where he lands (Act 2 opens
-# there on the next Continue), then the title.
+# After the end card, Joe is saved where the story leaves him, then the title. Act 1: Caver's spell has thrown him
+# into the Dark World (Act 2 opens there on the next Continue). The final ending: in front of the fallen tower.
 func _on_end_card_finished() -> void:
-	if not act2_spawn.is_empty() and areas.has(String(act2_spawn["area"])):
-		var aid := String(act2_spawn["area"])
-		_enter(aid, cell_feet(aid, act2_spawn["cell"]), Vector2i.DOWN)
+	var spawn: Dictionary = final_spawn if ending == "final" else act2_spawn
+	ending = ""
+	if not spawn.is_empty() and areas.has(String(spawn["area"])):
+		var aid := String(spawn["area"])
+		_enter(aid, cell_feet(aid, spawn["cell"]), Vector2i.DOWN)
 	save_game()
 	quit_to_title()
 

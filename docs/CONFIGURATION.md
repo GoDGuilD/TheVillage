@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.11.0
+Version: 1.12.0
 -->
 
 # Configuration
@@ -40,6 +40,9 @@ Version: 1.11.0
 | `src/player/PlayerTuning.gd` (`SWIM_SPEED`, `WATER_PROBE`) | Swimming speed; the point that must be over deep water |
 | `src/enemies/Snapvine.gd`, `Thornheart.gd` | The snapvine's reach, lunge and timing; the Thornheart's seeds, ring, open time |
 | `tools/gen_areas.py` (`D7`, `d7_rooms()`, `build_silva_tangle`) | Silva's places |
+| `src/enemies/CaverLord.gd` | Caver's health, spots, cast timing, volleys, knock-down time, bats, sinking |
+| `tools/gen_areas.py` (`D8`, `d8_rooms()`, `DARK_DOORS`, `FINAL_SPAWN`) | Caver's tower, its gateway, the save after the ending |
+| `src/world/World.gd` (`ENDINGS`) | Which words and card each ending plays |
 | `src/ui/UiTheme.gd` | UI colours, overlay tints, CanvasLayer order |
 | `src/ui/DialogueBox.gd` | Text speed, blip rate, box size and positions |
 | `assets/data/dialogue.json` | Every villager line and sign text |

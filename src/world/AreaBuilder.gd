@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-20
-# Version: 2.5.0
+# Version: 2.6.0
 class_name AreaBuilder
 extends RefCounted
 ## Glyphs (outdoors):  . , *  grass / tufts / flowers   #  dirt path   ~  water   v  ledge (hop down south)
@@ -34,7 +34,7 @@ const ENEMY_SCRIPTS := {"Z": "res://src/enemies/Slime.gd", "G": "res://src/enemi
 		"X": "res://src/enemies/Lurker.gd", "m": "res://src/enemies/GloomMoth.gd",
 		"c": "res://src/enemies/Cinder.gd", "I": "res://src/enemies/MagmaWyrm.gd",
 		"z": "res://src/enemies/Cogbug.gd", "t": "res://src/enemies/ClockWarden.gd",
-		"j": "res://src/enemies/Snapvine.gd", "e": "res://src/enemies/Thornheart.gd"}
+		"j": "res://src/enemies/Snapvine.gd", "e": "res://src/enemies/Thornheart.gd", "y": "res://src/enemies/CaverLord.gd"}
 const GRASS := {".": "grass_a", ",": "grass_b", "*": "flowers"}
 const SIMPLE := {"R": "rock", "f": "fence", "S": "sign", "_": "floor", "M": "mat", "=": "dfloor", ";": "dfloor_b",
 		"+": "pillar", "s": "dstairs"}
@@ -266,11 +266,15 @@ static func freeze_at(tree: SceneTree, world_pos: Vector2, seconds: float) -> bo
 			continue
 		var gen := int(_crust_gen.get(key, 0)) + 1
 		_crust_gen[key] = gen
+		# A weak reference: Joe may leave (and the area's tiles be freed) before the crust thaws, and a lambda that
+		# captured a freed object errors when called.
+		var tiles_ref: WeakRef = weakref(tiles)
 		tree.create_timer(seconds, false, true).timeout.connect(func() -> void:
 			if int(_crust_gen.get(key, 0)) != gen:
 				return                                    # frozen again since: a later timer thaws it
-			if is_instance_valid(tiles) and tiles.get_cell_atlas_coords(cell) == _cells["crust"]:
-				tiles.set_cell(cell, 0, _crust_under[key])
+			var layer: TileMapLayer = tiles_ref.get_ref() as TileMapLayer
+			if layer != null and layer.get_cell_atlas_coords(cell) == _cells["crust"]:
+				layer.set_cell(cell, 0, _crust_under[key])
 			_crust_under.erase(key)
 			_crust_gen.erase(key))
 		return true

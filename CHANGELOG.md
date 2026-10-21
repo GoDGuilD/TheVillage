@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-20
-Version: 5.9.0
+Version: 5.10.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,49 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [7.7.0] - 2026-10-20 — Phase 13: Caver's tower
+
+### Added
+- **The crystal gate**: in the Dark World, Caver's tower stands where the keep stands in the Light World
+  (`dw_south_fields`). Its gate has four sockets, lit in each dimension's colour for the crystals Joe holds, and
+  opens for good with all four (flag `tower:gate`). It is the seal gate's crystal variant (`SealGate.crystal`).
+  Dark World areas can now have doors (`DARK_DOORS` in `gen_areas.py`).
+- **Caver's tower** (dungeon 8, 7 rooms, `ending: "final"`), one floor per dimension, each needing that dimension's
+  item: the entrance (map); the Umbra floor, dark, with the small key under its torches and a chasm only the
+  grapple crosses; the Ignis floor, a lava band the ice rod freezes; the Tempus floor, pegs before the big door and
+  a fence of tick blocks; the Silva floor to the west, the big key on an islet in a deep pool; the antechamber's
+  pots; then Caver.
+- **Caver** (`CaverLord`, glyph `y`), the final boss: he fades from spot to spot casting magic orbs and, every
+  third cast, a fan of dimension bolts (Umbra, Ignis, Tempus, Silva in turn) that only the shield stops. Only a
+  batted orb touches him: it wounds him and knocks him down for 2.6 s, when the sword (and everything else) lands.
+  Below half health his cape spreads into bat wings, he casts faster, every second cast is a full ring of bolts,
+  and he calls up to two bats. When he falls he sinks through the floor.
+- **Opening words**: a boss room can carry `intro` (a dialogue key) said the first time Joe walks in
+  (flag `intro:<room>`). Caver uses it.
+- **The final ending**: Caver's last words, then the end card ("THE END": his shadow slips beneath the old chapel,
+  the story continues in *Chapel of Dreams*); the flag `final:done`; Joe is saved in front of the tower
+  (`final_spawn` in `index.json`) and the title comes back. `World.ENDINGS` maps each ending to its words and card.
+- Art: `tools/gen_tower.py` (the crystal gate and its four sockets, the four dimension bolts, the `caver_lord`
+  pack: float, cast, dazed, rage, rage_cast). Sounds: `daze`, `sink`, `crystal_gate` (65 effects).
+- Dialogue 1.9.0: `crystal_gate`, `crystal_gate_open`, `caver_tower_intro`, `caver_fall`, `final_card`; the Dead
+  Fields' sign now points at the tower.
+- The lint: a crystal gate needs a dungeon that ends the game and crystals 0-3; Caver must wait in such a dungeon;
+  the cell Joe is saved on after the ending must be reachable.
+- `tests/test_tower.gd` (51 checks) and `tools/capture_tower.gd`.
+
+### Changed
+- The map shrinks its boxes to fit the panel (width and height separately) and wraps an area name that does not
+  fit its box onto two lines.
+- When a boss falls, its shots and orbs still in the air vanish with its brood.
+- `test_world.gd` knows the seven new rooms and the tower's two gateway doors; `test_umbra.gd` counts only the
+  sanctum's dark rooms (the tower has one too). 595 checks in 13 suites, all passing.
+
+### Fixed
+- The Dark World map ran off the bottom of its panel (seven screens tall since the Umbral Vale), and its area names
+  overlapped in the one-screen-wide boxes.
+- Leaving a room less than 6 s after freezing its lava printed "Lambda capture ... was freed" errors when the crust
+  timers fired: the thaw callback held the room's freed tile layer. It now holds a weak reference.
 
 ## [7.6.0] - 2026-10-20 — Phase 12: Silva
 

@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.11.0
+Version: 1.12.0
 -->
 
 # Data model
@@ -25,13 +25,16 @@ objects: [{kind: chest|big_chest|torch|cracked_rock|key_block|heart_piece|door|s
 item?, amount?, reveal? ("" | "torches" | "switch"), flag? (switch flag), heavy?, dir?, type?, id?, when?}],
 wares: [{ware, cell}]}`; dungeon rooms add `dungeon`, `grid`, `clear_flag?`, `boss_flag?`.
 `index.json` adds `dungeons: {<id>: {name, seal | crystal, entrance, boss_room, boss_flag, ending?}}` (d1, d2, d3,
-keep; d4, d5, d6 and d7 hold crystals 0, 1, 2 and 3) and `act2_spawn: {area, cell}`. Dark World areas carry `world: "dark"` (the Umbral Vale
+keep; d4, d5, d6 and d7 hold crystals 0, 1, 2 and 3; d8, Caver's tower, has `ending: "final"`),
+`act2_spawn: {area, cell}` and `final_spawn: {area, cell}` (where Joe is saved after the final ending). A boss room
+may carry `intro` (a dialogue key). Dark World areas carry `world: "dark"` (the Umbral Vale
 has no Light World twin); objects may carry `via_mirror`; dungeon rooms may carry `dark: true`.
 
 ## World flags (`GameState.flags`)
 Story: `met_tato`, `met_boni`, `met_janga`, `got_boomerang`. Dungeons: `door:<id>` (opened locked/big door),
 `cleared:<room>`, `switch:<room>`, `boss:<dungeon>`, `heart_container:<boss room>`. Act 1: `rubble:...` (broken),
-`keep:gate` (the seal gate opened), `act1:done`. Act 2: `act2:started` (intro shown), `got_moon_mirror`; `switch:d4_east`, `boss:d4`, `switch:d5_east`, `boss:d5`, `boss:d6`, `boss:d7`. Pegs and tick blocks have no saved state. The flippers are an item (`items.flippers`). Objects: `chest:<area>:<x>,<y>` (opened),
+`keep:gate` (the seal gate opened), `act1:done`. Act 2: `act2:started` (intro shown), `got_moon_mirror`; `switch:d4_east`, `boss:d4`, `switch:d5_east`, `boss:d5`, `boss:d6`, `boss:d7`. The end: `tower:gate` (the crystal gate opened), `intro:<room>` (a boss's opening words
+said), `boss:d8`, `final:done` (the game finished). Pegs and tick blocks have no saved state. The flippers are an item (`items.flippers`). Objects: `chest:<area>:<x>,<y>` (opened),
 `cracked_rock:...` (broken), `key_block:...` (opened), `heart_piece:...` (taken), `ware:<id>` (sold out).
 Glyphs are listed in `src/world/AreaBuilder.gd` and `docs/LEVEL_DESIGN.md`.
 

@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-21
-# Last edit date: 2026-10-21
-# Version: 1.0.0
+# Last edit date: 2026-10-20
+# Version: 1.1.0
 # Run:  Godot_console --headless --fixed-fps 60 --path . -s tests/test_umbra.gd   (must end "0 failed")
 extends SceneTree
 
@@ -179,7 +179,7 @@ func _t_data() -> void:
 			str(vale.get("origin_tiles", [])))
 	var dark: Array = []
 	for aid in _w.areas:
-		if bool(_w.areas[aid].get("dark", false)):
+		if bool(_w.areas[aid].get("dark", false)) and _w.dungeon_of(aid) == "d4":
 			dark.append(aid)
 	dark.sort()
 	_check("two of the sanctum's rooms are dark", dark == ["d4_hall", "d4_west"], str(dark))

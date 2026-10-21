@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 2.8.0
+Version: 2.9.0
 -->
 
 # API
@@ -76,6 +76,11 @@ The game has no network API; this is the internal API other scripts and tests re
 - `Player.solid_mask() -> int`, `in_water() -> bool`, `is_swimming() -> bool` (state `swim`). `World._solid_at(feet)`
   (deep water counts unless Joe has the flippers). `Snapvine` (`state`: wait/wind/lunge/hold/back, `head`, `lunges`,
   `REACH`, `LUNGE_DIST`), `Thornheart` (`state`, `is_open()`, `volleys`, `blooms`, `shots_fired`, `OPEN_TIME`).
+- `SealGate`: `setup(flag, starts_open, crystal = false)`, `crystal`, `refresh(seals_held, which = [])`,
+  `lit_sockets()`, `open_gate()`. `World`: `ENDINGS`, `ending`, `final_spawn`, `TOWER_FLAG`, `play_ending(act)`.
+  `CaverLord` (`phase`: show/after/fade_out/fade_in/dazed/sinking, `is_dazed()`, `is_angry()`, `cast()`,
+  `throw_orb()`, `volley()`, `call_bat()`, `casts`, `orbs_thrown`, `volleys`, `shots_fired`, `dazes`,
+  `bats_called`, `DAZE_TIME`, `VOLLEY_EVERY`, `RING_BOLTS`, `MAX_BATS`).
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 

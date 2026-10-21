@@ -1,10 +1,10 @@
 # File: gen_areas.py
-# Description: Builds every overworld area, house interior and dungeon room as ASCII rows with their villagers, signs, chests, torches, rocks, key blocks, heart pieces, wares, doors, switches and blocks, lints them (sizes, pieces, openings, reachability, ledges, doors, dialogue keys, item kinds, keys vs locks, big keys) and writes src/world/areas/*.json plus previews.
+# Description: Builds every overworld area, house interior and dungeon room as ASCII rows with their villagers, signs, chests, torches, rocks, key blocks, heart pieces, wares, doors, switches, blocks and the two gates, lints them (sizes, pieces, openings, reachability, ledges, doors, dialogue keys, item kinds, keys vs locks, big keys) and writes src/world/areas/*.json plus previews.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-20
-# Version: 5.4.0
+# Version: 6.0.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -44,14 +44,14 @@ SHRINE_DOOR = (2, 2)
 # Solid: N villager, C chest, L torch, k cracked rock, l key block, % dungeon wall, + pillar, o pit (Joe falls),
 # [ door, & push block, r heavy rock (all solid bodies or impassable cells).
 SOLID = set("R~v^fSTHJWwKDNCLkl%+o[&rb|!p")  # ... b rubble (dash boots), | hook post, ! lava, p peg (hammer)
-ACTORS = set("BOZGQPhYAUFVXmcIztje")  # h heart piece; A bat; X lurker; c cinder; z cogbug; j snapvine; bosses:
-                                       # Y Grand Slime, U Iron Ram, F Frost Wraith, V Caver, m Gloom Moth, I Magma
-                                       # Wyrm, t Clock Warden, e Thornheart
+ACTORS = set("BOZGQPhYAUFVXmcIztjey")  # h heart piece; A bat; X lurker; c cinder; z cogbug; j snapvine; bosses:
+                                        # Y Grand Slime, U Iron Ram, F Frost Wraith, V Caver's shade, m Gloom Moth,
+                                        # I Magma Wyrm, t Clock Warden, e Thornheart, y Caver (his tower)
 OPENABLE = set("kl[&rbp")          # solid until a bomb / key / push / glove / dash / hammer opens them (reachability: open)
 GROUND = set(".,*#_M=;@sanug")     # = ; dungeon floor, @ floor switch, s exit stairs, a ash (Ignis), u n tick blocks
                                    # (amber / teal: one colour is always down, so they count as ground), g jungle (Silva)
 VALID = SOLID | ACTORS | GROUND | {"x"} | set(MULTI)
-ENEMIES = set("ZGQYAUFVXmcIztje")
+ENEMIES = set("ZGQYAUFVXmcIztjey")
 LOW = set("o~!")                  # pits, water and lava: the grapple's chain flies over them
 WATER = "~"                       # deep water: the flippers swim it (reachability: a step like any ground)
 ICE_REACH = 8                     # tiles an ice bolt flies (IceBolt.MAX_DISTANCE): it freezes every lava cell on the way
@@ -66,7 +66,8 @@ WARE_IDS = {"bombs", "arrows", "heart_piece", "dw_bombs", "dw_arrows", "dw_magic
 OBJECT_GLYPHS = {"chest": "C", "torch": "L", "cracked_rock": "k", "key_block": "l", "heart_piece": "h", "door": "[",
                  "switch": "@", "push_block": "&", "big_chest": "$", "heavy_rock": "r", "rubble": "b",
                  "hook_post": "|"}
-GLYPHLESS = {"seal_gate", "rift"}  # objects drawn over plain cells (no glyph of their own)
+GLYPHLESS = {"seal_gate", "crystal_gate", "rift"}  # objects drawn over plain cells (no glyph of their own)
+GATES = {"seal_gate", "crystal_gate"}                # 2x2 gates in a wall (the keep's, the tower's)
 DOORWAYS = {"n": (11, 0), "s": (11, 12), "w": (0, 6), "e": (22, 6)}   # top-left cell of each 2x2 dungeon doorway
 OPEN_LO, OPEN_HI = 10, 14         # edge openings are 4 tiles wide, centred on each side of a screen pair
 # Openings: north/south at columns 22..25 of a 2-screen-wide area, east/west at rows 12..15 of a 2-screen-tall one.
@@ -657,6 +658,8 @@ def lint_world(areas, problems):
                 problems.append("%s: rift at (%d,%d) is unreachable" % (a["id"], x, y))
     if ACT2_SPAWN[0] not in by_id or tuple(ACT2_SPAWN[1]) not in seen_by.get(ACT2_SPAWN[0], set()):
         problems.append("world: the Act 2 arrival cell is not reachable")
+    if FINAL_SPAWN[0] not in by_id or tuple(FINAL_SPAWN[1]) not in seen_by.get(FINAL_SPAWN[0], set()):
+        problems.append("world: the cell Joe is saved on after the final ending is not reachable")
     # Keys per pool (overworld = None, else the dungeon id): small keys >= key blocks + distinct locked doors;
     # a big key wherever there is a big door or a big chest; the glove somewhere if a heavy rock exists.
     pools = {}
@@ -703,6 +706,13 @@ def lint_world(areas, problems):
         problems.append("world: the dungeons hold seals %s (need 0, 1, 2)" % seals)
     if any(o["kind"] == "seal_gate" for o in every) and not any(info.get("ending") for info, _ in DUNGEONS):
         problems.append("world: a seal gate but no dungeon behind it ends the act")
+    if any(o["kind"] == "crystal_gate" for o in every):
+        if not any(info.get("ending") == "final" for info, _ in DUNGEONS):
+            problems.append("world: a crystal gate but no dungeon behind it ends the game")
+        if crystals != [0, 1, 2, 3]:
+            problems.append("world: a crystal gate needs crystals 0-3, the dungeons hold %s" % crystals)
+    if any("y" in r for a in areas for r in a["rows"]) and not any(info.get("ending") == "final" for info, _ in DUNGEONS):
+        problems.append("world: Caver waits in a dungeon that does not end the game")
 
 
 def lint_objects(a, seen, problems):
@@ -715,7 +725,7 @@ def lint_objects(a, seen, problems):
             x, y = o["cell"]
             covered |= {(x + dx, y + dy) for dx in (0, 1) for dy in (0, 1)}
     for o in a.get("objects", []):
-        if o["kind"] == "seal_gate":                              # the gate covers a 2x2 gateway
+        if o["kind"] in GATES:                                    # a gate covers a 2x2 gateway
             x, y = o["cell"]
             covered |= {(x + dx, y + dy) for dx in (0, 1) for dy in (0, 1)}
     for y, r in enumerate(rows):
@@ -851,6 +861,8 @@ OBJECTS = {
     "dw_cinder_barrens": [("hook_post", 10, 13, {}), ("hook_post", 2, 10, {}), ("heart_piece", 15, 20, {})],
     "dw_clockwork_wastes": [("heart_piece", 7, 23, {})],
     "dw_silva_tangle": [("heart_piece", 4, 14, {})],             # across the river: the flippers
+    # Caver's tower stands where the keep stands in the Light World; four crystals open its gate.
+    "dw_south_fields": [("crystal_gate", 15, 5, {})],
 }
 # Boni's wares on her counter (table cells): area -> [(x, y, ware id)].
 WARES = {"boni_shop": [(5, 4, "bombs"), (9, 4, "arrows"), (11, 4, "heart_piece")],
@@ -973,7 +985,7 @@ def d1_rooms():
     return rooms
 
 
-ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "c", "I", "z", "t", "j", "e", "O", "B", "+", "o",
+ROOM_GLYPHS = ("Z", "G", "Q", "Y", "A", "U", "F", "V", "X", "m", "c", "I", "z", "t", "j", "e", "y", "O", "B", "+", "o",
                "!", ";", "u", "n", "p", "~")
 
 
@@ -1268,8 +1280,59 @@ def d7_rooms():
     return rooms
 
 
+# Caver's tower (the final dungeon, Dark World): behind the crystal gate; one floor per dimension, each needing that
+# dimension's item, then Caver himself. Beating him ends the game ("ending": "final"); like the keep, no reward.
+D8 = {"id": "d8", "name": "Caver's Tower", "seal": -1, "entrance": "d8_entrance", "boss_room": "d8_boss",
+      "boss_flag": "boss:d8", "ending": "final"}
+
+
+def d8_rooms():
+    """Caver's tower, climbed floor by floor (north = up): the entrance (map); the Umbra floor, dark, its torches
+    hiding the small key and a chasm only the grapple crosses to the locked door; the Ignis floor, a lava band the
+    ice rod freezes; the Tempus floor, pegs (the hammer) before the big door and tick blocks, with the Silva floor
+    to the west where the big key sits on an islet (the flippers); the antechamber's pots; then Caver."""
+    rooms = []
+    make_room(rooms, "d8_entrance", 1, 5, {"n": ("open",), "s": ("stairs",)}, lambda g: [
+        ("chest", 4, 10, {"item": "map", "amount": 1, "reveal": ""}), ("+", 6, 4, {}), ("+", 17, 4, {}),
+        ("+", 6, 9, {}), ("+", 17, 9, {}), ("G", 9, 6, {}), ("G", 14, 6, {}), ("A", 12, 9, {}), ("O", 3, 3, {}),
+        ("O", 20, 3, {})])
+
+    def umbra(g):
+        g.rect(2, 5, 21, 7, "o")                                   # a chasm across the floor
+        return [("hook_post", 8, 3, {}), ("hook_post", 15, 9, {}), ("torch", 5, 10, {}), ("torch", 18, 10, {}),
+                ("chest", 11, 9, {"item": "small_key", "amount": 1, "reveal": "torches"}),
+                ("X", 6, 9, {}), ("X", 17, 3, {}), ("A", 12, 3, {})]
+    make_room(rooms, "d8_umbra", 1, 4, {"s": ("open",), "n": ("locked", "d8_umbra_north", "")}, umbra, {"dark": True})
+
+    def ignis(g):
+        g.rect(2, 4, 21, 8, "!")                                   # a band of lava
+        return [("chest", 19, 10, {"item": "compass", "amount": 1, "reveal": ""}), ("c", 6, 3, {}), ("c", 17, 3, {}),
+                ("c", 8, 10, {})]
+    make_room(rooms, "d8_ignis", 1, 3, {"s": ("locked", "d8_umbra_north", ""), "n": ("open",)}, ignis)
+
+    def tempus(g):
+        g.rect(2, 3, 21, 3, "p")                                   # pegs before the big door
+        tick_row(g, 2, 21, 9)                                      # and a fence of tick blocks
+        return [("z", 6, 6, {}), ("z", 17, 6, {}), ("A", 12, 5, {})]
+    make_room(rooms, "d8_tempus", 1, 2, {"s": ("open",), "w": ("open",), "n": ("big", "d8_tempus_north", "")}, tempus)
+
+    def silva(g):
+        g.rect(3, 3, 17, 10, "~")                                  # a deep pool...
+        g.rect(9, 6, 11, 7, "=")                                   # ...and the big key's islet
+        return [("chest", 10, 6, {"item": "big_key", "amount": 1, "reveal": ""}), ("j", 19, 3, {}), ("j", 19, 10, {})]
+    make_room(rooms, "d8_silva", 0, 2, {"e": ("open",)}, silva)
+
+    make_room(rooms, "d8_ante", 1, 1, {"s": ("big", "d8_tempus_north", ""), "n": ("open",)}, lambda g: [
+        ("+", 5, 4, {}), ("+", 18, 4, {}), ("+", 5, 9, {}), ("+", 18, 9, {}), ("O", 3, 3, {}), ("O", 20, 3, {}),
+        ("O", 3, 10, {}), ("O", 20, 10, {}), ("G", 8, 6, {}), ("G", 15, 6, {})])
+    make_room(rooms, "d8_boss", 1, 0, {"s": ("boss", "d8_boss_door", D8["boss_flag"])}, lambda g: [
+        ("+", 4, 3, {}), ("+", 19, 3, {}), ("+", 4, 10, {}), ("+", 19, 10, {}), ("y", 11, 5, {})],
+        {"boss_flag": D8["boss_flag"], "intro": "caver_tower_intro"})
+    return rooms
+
+
 DUNGEONS = [(D1, d1_rooms), (D2, d2_rooms), (D3, d3_rooms), (KEEP, keep_rooms), (D4, d4_rooms), (D5, d5_rooms),
-            (D6, d6_rooms), (D7, d7_rooms)]
+            (D6, d6_rooms), (D7, d7_rooms), (D8, d8_rooms)]
 DUNGEON_STRIDE = 200                     # tiles between two dungeons' room grids
 
 
@@ -1281,6 +1344,10 @@ DARK_NAMES = {"el_pueblo": "Hollow Pueblo", "meadow_north": "Withered Meadow", "
               "east_lake": "Ash Lake", "south_road": "Broken Road", "south_fields": "Dead Fields"}
 STRIP = set("NSClkhrbL")                  # Light World-only cells become plain ground in the Dark World
 ACT2_SPAWN = ("dw_el_pueblo", (23, 14))   # where Caver's spell drops Joe
+FINAL_SPAWN = ("dw_south_fields", (15, 8))  # where Joe is saved after the final ending: before the fallen tower
+DARK_DOORS = {                            # Dark World doors (twins have none of the Light World's): Caver's tower
+    "south_fields": [{"cell": [15, 6], "to": "d8_entrance"}, {"cell": [16, 6], "to": "d8_entrance"}],
+}
 DARK_EDITS = {
     # The meadow's pond is dry in the Dark World: walk to the island's twin and mirror back onto it.
     "meadow_north": lambda g: ([g.set(x, y, ",") for y in range(2, 6) for x in range(30, 38) if g.get(x, y) == "~"],
@@ -1345,8 +1412,8 @@ def dark_twin(a):
     did = DARK_PREFIX + a["id"]
     extras = add_people_and_signs(g, did)
     return {"id": did, "name": DARK_NAMES[a["id"]], "kind": "overworld", "world": "dark",
-            "size_screens": a["size_screens"], "origin_tiles": a["origin_tiles"], "rows": g.rows(), "doors": [],
-            "exits": [], **extras}
+            "size_screens": a["size_screens"], "origin_tiles": a["origin_tiles"], "rows": g.rows(),
+            "doors": [dict(d) for d in DARK_DOORS.get(a["id"], [])], "exits": [], **extras}
 
 
 def add_people_and_signs(g, aid):
@@ -1432,6 +1499,7 @@ def write(areas):
             json.dump(a, fh, indent=1)
     index = {"screen": list(SCREEN), "start": START_AREA, "areas": [a["id"] for a in areas],
              "act2_spawn": {"area": ACT2_SPAWN[0], "cell": list(ACT2_SPAWN[1])},
+             "final_spawn": {"area": FINAL_SPAWN[0], "cell": list(FINAL_SPAWN[1])},
              "dungeons": {info["id"]: {k: v for k, v in info.items() if k != "id"} for info, _ in DUNGEONS}}
     with open(os.path.join(OUT_DIR, "index.json"), "w", encoding="utf-8", newline="\n") as fh:
         json.dump(index, fh, indent=1)

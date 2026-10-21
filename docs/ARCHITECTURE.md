@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-20
-Version: 5.9.0
+Version: 5.10.0
 -->
 
 # Architecture
@@ -22,7 +22,7 @@ src/
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
   enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, Cinder, Cogbug, EnemyRock, EnemyShot, bosses:
              GrandSlime, IronRam, FrostWraith, CaverShade (+ CaverOrb), GloomMoth, MagmaWyrm, ClockWarden,
-             Thornheart; Snapvine (rooted)
+             Thornheart, CaverLord (the final boss); Snapvine (rooted)
   items/     ItemDB (catalogue + wares), ItemUse (item button), Boomerang, Arrow, Bomb, Fireball, Grapple, IceBolt, HammerBlow
   world/     World (areas, camera, scrolls, doors, HUD, dialogue, menus, Game Over, saving), AreaBuilder (ASCII rows ->
              tiles + actors), TestField (test arenas), Npc, SignPost, Chest, BigChest, Torch, CrackedRock, KeyBlock,
@@ -34,10 +34,10 @@ src/
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_tempus.py, gen_silva.py (+ silva_art.py), gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd, capture_tempus.gd, capture_silva.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_tempus.py, gen_silva.py (+ silva_art.py), gen_tower.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd, capture_tempus.gd, capture_silva.gd, capture_tower.gd
 tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
-             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd, test_tempus.gd, test_silva.gd
+             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd, test_tempus.gd, test_silva.gd, test_tower.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -131,6 +131,12 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   flippers. Enemies and push blocks always mask it; projectiles and thrown objects mask only the world layer, so
   they fly over water as they fly over pits. When Joe's feet are over a `water` cell he enters state `swim`
   (slower, no sword or items). `World._solid_at` treats water as solid for a mirror landing unless he can swim.
+- **Gates and endings.** `SealGate` is both the keep's seal gate and, with `crystal = true`, the tower's crystal
+  gate (four sockets, one colour per dimension); the World opens it from `_try_seal_gate` / `_try_crystal_gate`.
+  Dark World twins get doors from `DARK_DOORS`. A dungeon with `ending` plays `World.play_ending` when its boss
+  falls: `ENDINGS[act]` names the villain's last words and the end card; after the card Joe is saved where the
+  story leaves him (`act2_spawn` after Act 1, `final_spawn` after the final ending) and the title returns. When any
+  boss falls, its brood and its shots and orbs in the air are freed.
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 

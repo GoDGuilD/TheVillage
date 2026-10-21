@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
 Last edit date: 2026-10-20
-Version: 2.11.0
+Version: 2.12.0
 -->
 
 # The Village
@@ -96,3 +96,8 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   fly over it. Swimming is Player state `swim`. `~` in a dungeon paints the grove pools. Twelve suites (544 checks;
   `test_silva.gd` 35). `gen_joe.py` redraws the sword strips slightly differently from the committed PNGs (old
   drift): after running it keep only the strips you meant to change.
+- Phase 13 (Caver's tower): the crystal gate is `SealGate` with `crystal = true`; Dark World doors come from
+  `DARK_DOORS`. Endings are `World.ENDINGS` (`act1`, `final`); the final one saves Joe at `final_spawn`. A boss room's
+  `intro` is said once on entry. `CaverLord` (glyph `y`) is hurt only by batted orbs until knocked down. Thirteen
+  suites (595 checks; `test_tower.gd` 51). A lambda that outlives its area must hold a `WeakRef` (typed:
+  `var r: WeakRef = weakref(x)`), never the node itself.

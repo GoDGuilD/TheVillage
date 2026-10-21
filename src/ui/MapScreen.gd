@@ -4,17 +4,23 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-16
 # Last edit date: 2026-10-20
-# Version: 1.1.0
+# Version: 1.2.0
 class_name MapScreen
 extends CanvasLayer
 ## Rooms and areas are drawn as boxes on their screen grid (one box per screen). The World passes its area data in;
-## the map reads GameState for what Joe has seen and found. Pauses the world while open.
+## the map reads GameState for what Joe has seen and found. Pauses the world while open. A grid too big for the
+## panel (Caver's six-floor tower, the Dark World) is drawn with smaller boxes so it fits between title and footer
+## (width and height shrink separately: a schematic map); an area name wider than its box wraps onto two lines.
 
 signal closed
 
 const PANEL_POS := Vector2(32, 18)
 const PANEL_SIZE := Vector2(320, 180)
-const CELL := Vector2(40, 24)            # one screen on the map
+const CELL := Vector2(40, 24)            # one screen on the map (at most: big grids shrink it to fit)
+const GRID_BOTTOM := 150.0               # a dungeon grid ends above the footer (panel coordinates)
+const GRID_BOTTOM_OPEN := 172.0          # the world map has no footer: its grid may run lower
+const LABEL_PAD := 2.0                   # px kept free inside a box on each side of its area name
+const GRID_MARGIN := 12.0                # px kept free left and right of the grid
 const GAP := 3.0
 const TITLE_Y := 9.0
 const GRID_TOP := 26.0
@@ -33,6 +39,7 @@ var _root: Control
 var _content: Control
 var _here_box: ColorRect
 var _blink := 0.0
+var _cell := CELL                        # this drawing's box size (CELL, or smaller to fit the panel)
 
 
 func _ready() -> void:
@@ -103,7 +110,7 @@ func _draw_dungeon(areas: Dictionary, dungeon: String, info: Dictionary) -> void
 		var dot := ColorRect.new()
 		dot.color = UiTheme.MAP_BOSS
 		dot.size = Vector2(8, 8)
-		dot.position = origin + (r.position * (CELL + Vector2.ONE * GAP)) + CELL / 2.0 - dot.size / 2.0
+		dot.position = origin + (r.position * (_cell + Vector2.ONE * GAP)) + _cell / 2.0 - dot.size / 2.0
 		_content.add_child(dot)
 	# Footer: the dungeon items found here, and the small keys held.
 	var x := PANEL_POS.x + 16.0
@@ -130,7 +137,7 @@ func _draw_overworld(areas: Dictionary) -> void:
 		var o: Array = a["origin_tiles"]
 		var sz: Array = a["size_screens"]
 		cells[aid] = Rect2(Vector2(float(o[0]) / 24.0, float(o[1]) / 14.0), Vector2(float(sz[0]), float(sz[1])))
-	var origin := _grid_origin(cells)
+	var origin := _grid_origin(cells, GRID_BOTTOM_OPEN)
 	var where := here
 	if areas[here]["kind"] != "overworld":
 		where = ""                          # inside a house: no marker
@@ -141,9 +148,14 @@ func _draw_overworld(areas: Dictionary) -> void:
 		if not shown_rooms.has(aid):
 			shown_rooms.append(aid)
 		var r: Rect2 = cells[aid]
-		var centre := origin + r.position * (CELL + Vector2.ONE * GAP) + (r.size * (CELL + Vector2.ONE * GAP) - Vector2.ONE * GAP) / 2.0
-		_content.add_child(PixelText.make(String(areas[aid]["name"]).to_upper(), centre - Vector2(0, 3), UiTheme.TEXT,
-				PixelText.FONT_SMALL, PixelText.Align.CENTER))
+		var centre := origin + r.position * (_cell + Vector2.ONE * GAP) + (r.size * (_cell + Vector2.ONE * GAP) - Vector2.ONE * GAP) / 2.0
+		var width := int(r.size.x * (_cell.x + GAP) - GAP - 2.0 * LABEL_PAD)
+		var lines := PixelText.wrap(String(areas[aid]["name"]).to_upper(), width, PixelText.FONT_SMALL)
+		var lh := PixelText.line_height(PixelText.FONT_SMALL) + 1
+		for i in lines.size():
+			var y := centre.y - 3.0 + (i - (lines.size() - 1) / 2.0) * lh
+			_content.add_child(PixelText.make(lines[i], Vector2(centre.x, roundf(y)), UiTheme.TEXT,
+					PixelText.FONT_SMALL, PixelText.Align.CENTER))
 
 
 func _title(text: String) -> void:
@@ -151,8 +163,10 @@ func _title(text: String) -> void:
 			PixelText.FONT_LARGE, PixelText.Align.CENTER))
 
 
-# Top-left of the grid so the whole set of cells is centred in the panel.
-func _grid_origin(cells: Dictionary) -> Vector2:
+# Top-left of the grid so the whole set of cells is centred in the panel; also picks the box size (_cell): CELL,
+# narrower and/or shorter when the grid would not fit between the margins or between GRID_TOP and `bottom`.
+func _grid_origin(cells: Dictionary, bottom: float = GRID_BOTTOM) -> Vector2:
+	_cell = CELL
 	if cells.is_empty():
 		return PANEL_POS
 	var lo := Vector2(INF, INF)
@@ -160,14 +174,18 @@ func _grid_origin(cells: Dictionary) -> Vector2:
 	for r in cells.values():
 		lo = lo.min(r.position)
 		hi = hi.max(r.end)
-	var step := CELL + Vector2.ONE * GAP
+	var span := hi - lo
+	var room := Vector2(PANEL_SIZE.x - 2.0 * GRID_MARGIN, bottom - GRID_TOP) + Vector2.ONE * GAP
+	var fit := Vector2(minf(1.0, room.x / (span.x * (CELL.x + GAP))), minf(1.0, room.y / (span.y * (CELL.y + GAP))))
+	_cell = (CELL * fit).floor()
+	var step := _cell + Vector2.ONE * GAP
 	var size := (hi - lo) * step - Vector2.ONE * GAP
 	var top_left := PANEL_POS + Vector2((PANEL_SIZE.x - size.x) / 2.0, GRID_TOP)
 	return (top_left - lo * step).round()
 
 
 func _box(cell: Rect2, origin: Vector2, color: Color, aid: String) -> void:
-	var step := CELL + Vector2.ONE * GAP
+	var step := _cell + Vector2.ONE * GAP
 	var edge := ColorRect.new()
 	edge.color = UiTheme.MAP_EDGE
 	edge.position = origin + cell.position * step - Vector2.ONE

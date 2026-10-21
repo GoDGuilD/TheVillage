@@ -1,0 +1,91 @@
+{
+ "id": "d8_umbra",
+ "name": "Caver's Tower",
+ "kind": "dungeon",
+ "dungeon": "d8",
+ "size_screens": [
+  1,
+  1
+ ],
+ "origin_tiles": [
+  3624,
+  56
+ ],
+ "grid": [
+  1,
+  4
+ ],
+ "rows": [
+  "%%%%%%%%%%%[[%%%%%%%%%%%",
+  "%%%%%%%%%%%[[%%%%%%%%%%%",
+  "%%====================%%",
+  "%%======|===A====X====%%",
+  "%%====================%%",
+  "%%oooooooooooooooooooo%%",
+  "%%oooooooooooooooooooo%%",
+  "%%oooooooooooooooooooo%%",
+  "%%====================%%",
+  "%%====X====C===|======%%",
+  "%%===L============L===%%",
+  "%%====================%%",
+  "%%%%%%%%%%%==%%%%%%%%%%%",
+  "%%%%%%%%%%%==%%%%%%%%%%%"
+ ],
+ "doors": [],
+ "exits": [],
+ "npcs": [],
+ "signs": [],
+ "objects": [
+  {
+   "kind": "door",
+   "cell": [
+    11,
+    0
+   ],
+   "dir": "n",
+   "type": "locked",
+   "id": "d8_umbra_north",
+   "when": ""
+  },
+  {
+   "kind": "hook_post",
+   "cell": [
+    8,
+    3
+   ]
+  },
+  {
+   "kind": "hook_post",
+   "cell": [
+    15,
+    9
+   ]
+  },
+  {
+   "kind": "torch",
+   "cell": [
+    5,
+    10
+   ]
+  },
+  {
+   "kind": "torch",
+   "cell": [
+    18,
+    10
+   ]
+  },
+  {
+   "kind": "chest",
+   "cell": [
+    11,
+    9
+   ],
+   "item": "small_key",
+   "amount": 1,
+   "reveal": "torches"
+  }
+ ],
+ "wares": [],
+ "dark": true
+}

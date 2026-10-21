@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.9.0
+Version: 1.10.0
 -->
 
 # Level design
@@ -56,7 +56,7 @@ It also renders `tmp/world_preview.png` (the whole overworld from the real atlas
 | `u` `n` | tick blocks, amber / teal (Tempus) | `p` | peg (solid; the hammer pounds it flat) |
 | `z` | cogbug (the hammer flips it) | `t` | boss: the Clock Warden |
 | `g` | jungle ground (Silva) | `j` | snapvine (rooted, lunges) |
-| `e` | boss: the Thornheart (on an island: fire opens it) | | |
+| `e` | boss: the Thornheart (on an island: fire opens it) | `y` | boss: Caver (his tower; ends the game) |
 
 ## Villagers and signs
 Two tables at the top of the assembly section of `gen_areas.py` place them after the area builders run:
@@ -114,6 +114,10 @@ hammer somewhere. Note: a dungeon's exit spawn is an entry of its overworld area
 dungeon's door is not proven by the lint - test it in the game (`test_tempus.gd` does for the molten time).
 Deep water is a step for the lint (the flippers), so water gates are never proven by it either; a Thornheart needs
 flippers and a fire rod somewhere. The same blind spot covers edge openings: a scroll opening is an entry of its
-area, so the Thorn Woods' pegs in front of the Silva Tangle are tested in the game (`test_silva.gd`). Rooms can be `"dark": True`
+area, so the Thorn Woods' pegs in front of the Silva Tangle are tested in the game (`test_silva.gd`). For the
+same reason the lint cannot prove a gate across a dungeon room whose far side scrolls into the next room (the
+tower's chasm and lava band): `test_tower.gd` crosses them in the game. A crystal gate (object `crystal_gate`,
+drawn over a 2x2 gateway like the seal gate) needs a dungeon with `ending: "final"` and crystals 0-3. A boss room
+may carry `intro` (a dialogue key said the first time Joe walks in). Rooms can be `"dark": True`
 (give them torches). Dark World-only lands go in `DARK_ONLY` (they keep `world: "dark"` and have no twin). Adding an area: write a `build_<id>(rng)` function, add it to `OVERWORLD` (or `INTERIORS`), run
 the script, look at the preview, then run `tests/test_world.gd` (update its area/door counts).

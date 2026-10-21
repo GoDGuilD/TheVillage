@@ -41,7 +41,32 @@
   "TxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTxTx",
   "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
  ],
- "doors": [],
+ "doors": [
+  {
+   "cell": [
+    15,
+    6
+   ],
+   "to": "d8_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  },
+  {
+   "cell": [
+    16,
+    6
+   ],
+   "to": "d8_entrance",
+   "spawn_cell": [
+    11,
+    11
+   ],
+   "facing": "up"
+  }
+ ],
  "exits": [],
  "npcs": [],
  "signs": [
@@ -53,6 +78,14 @@
    "text": "dw_sign_fields"
   }
  ],
- "objects": [],
+ "objects": [
+  {
+   "kind": "crystal_gate",
+   "cell": [
+    15,
+    5
+   ]
+  }
+ ],
  "wares": []
 }

@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
 Last edit date: 2026-10-20
-Version: 2.11.0
+Version: 2.12.0
 -->
 
 # Game Design Document — The Village
@@ -39,6 +39,12 @@ mirror (the same land as Caver dreams it — rotten, inverted, full of his creat
   Magic Mirror) takes Joe from the Dark World back to the same spot in the Light World.
 - **Ending — the bridge to game 2.** Joe defeats Caver's mortal form at the top of his tower, but Caver does not
   die: he sinks beneath the old chapel, where the curse begins to grow the dream-castle of *Chapel of Dreams*.
+  **Implemented in Phase 13** (lines are drafts): in the Dark World the keep is **Caver's tower**; its gate opens
+  with the four crystals. Seven rooms climb through one floor per dimension - a dark chasm (grapple), a lava band
+  (ice rod), pegs and tick blocks (hammer), a deep pool (flippers) - to Caver. He fades from spot to spot casting
+  orbs and dimension bolts; an orb batted back knocks him down so the sword can land; below half health he spreads
+  bat wings and calls bats. Beaten, he sinks through the floor; his last words and the card "THE END" hand the
+  story to *Chapel of Dreams*.
 
 ## 3. Pillars
 1. **Faithful ALttP feel** — instant 8-way movement, the sweeping sword, corner nudging, bushes and pots,

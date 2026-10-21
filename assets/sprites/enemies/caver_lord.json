@@ -1,0 +1,32 @@
+{
+  "frame_size": [
+    40,
+    56
+  ],
+  "feet": [
+    20,
+    54
+  ],
+  "anims": {
+    "float": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "cast": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "dazed": {
+      "fps": 6.0,
+      "loop": true
+    },
+    "rage": {
+      "fps": 8.0,
+      "loop": true
+    },
+    "rage_cast": {
+      "fps": 8.0,
+      "loop": true
+    }
+  }
+}

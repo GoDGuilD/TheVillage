@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.10.0
+Version: 1.11.0
 -->
 
 # Bugs and gotchas
@@ -29,6 +29,10 @@ Version: 1.10.0
 - [External] **Static class names in a test compile before the autoloads** - Symptom: `test_act1.gd` failed with "Identifier not found: Audio" in Bush/IronRam and the whole World half-built. Root cause: `is IronRam` and `AreaBuilder.flag_at` in the test compile those classes (and their dependencies) before autoloads exist. Fix: compare `get_script().get_global_name()` and `load()` AreaBuilder. File: `tests/test_act1.gd`.
 
 - [Internal] **Floor switches (and rifts) were invisible** - Symptom: the Moss Shrine's floor switch never showed in screenshots; the first rift did not either. Root cause: they set `z_index = -1` to sit "under" actors, which also put them under the ground TileMapLayer. Fix: leave z at 0 and let the y-sorted actors node order them. File: `src/world/FloorSwitch.gd`, `src/world/Rift.gd`.
+- [Internal] **Crust timers errored after leaving the room** - Symptom: "Lambda capture at index 2 was freed" printed once per frozen lava cell when Joe left a room less than 6 s after using the ice rod. Root cause: the thaw callback of `AreaBuilder.freeze_at` captured the room's `TileMapLayer`, which is freed when Joe leaves; calling a lambda with a freed capture errors. Fix: the callback holds a `WeakRef` and skips a freed layer. File: `src/world/AreaBuilder.gd`.
+- [External] **`weakref()` cannot be type-inferred** - Symptom: "The variable type is being inferred from a Variant value" parse error (warnings are errors) on `var r := weakref(x)`, and on `var t := r.get_ref() as TileMapLayer`. Root cause: both return Variant in GDScript. Fix: declare the types (`var r: WeakRef = weakref(x)`, `var t: TileMapLayer = ...`). File: `src/world/AreaBuilder.gd`.
+- [Internal] **The Dark World map ran off its panel** - Symptom: the map's bottom rows fell outside the panel and area names overlapped in narrow boxes. Root cause: the map drew every screen at a fixed 40x24 box; the Dark World grew to seven screens tall (Umbral Vale), and Caver's tower is six rooms tall. Fix: boxes shrink (each axis separately) to fit; names wrap onto two lines. File: `src/ui/MapScreen.gd`.
+- [Internal] **A boss's shots outlived it** - Symptom: bolts kept flying after Caver fell and could hit Joe while the ending began. Root cause: only the boss's brood (enemies) was freed on its defeat. Fix: `_on_boss_defeated` also frees enemy shots and orbs. File: `src/world/World.gd`.
 - [Internal] **Dark World bosses got angry at a quarter of their health** - Symptom: the Gloom Moth, the Magma Wyrm and the Clock Warden only sped up near death in the Dark World. Root cause: their "below half health" test compared with `max_hp`, the stat before the World doubles Dark World health. Fix: compare with `health.max_health`. Files: `src/enemies/GloomMoth.gd`, `MagmaWyrm.gd`, `ClockWarden.gd`.
 - [Internal] **BOOTS overlapped HEART PIECES in the item menu** - Symptom: the boots' label ran into the heart pieces title. Root cause: the equipment list grew downward (row 4) into the bottom section. Fix: a second equipment column for the boots and the flippers. File: `src/ui/ItemMenu.gd`.
 - [External] **Regenerating Joe redraws the sword strips** - Symptom: running the unchanged `gen_joe.py` rewrites `joe_attack_*`, `joe_charge_*` and `joe_spin` with small pixel differences. Root cause: not confirmed; the generator has not changed since Phase 2, so the likely cause is a Pillow update changing how lines or polygons are rasterised. Workaround: after running it, restore the strips you did not mean to change (`git checkout`). File: `tools/gen_joe.py`.

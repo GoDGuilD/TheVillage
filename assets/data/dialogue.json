@@ -6,7 +6,7 @@
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
   "Last edit date": "2026-10-20",
-  "Version": "1.8.0",
+  "Version": "1.9.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -362,7 +362,7 @@
  },
  "dw_sign_fields": {
   "pages": [
-   "DEAD FIELDS\nThe keep is only a shadow here."
+   "DEAD FIELDS\nWhere the keep stands in the waking world, Caver's tower stands here. Four crystals open its gate."
   ]
  },
  "shade_merchant": {
@@ -485,6 +485,43 @@
   "pages": [
    "You got the Crystal of Silva! Inside it, a seed waits for spring.",
    "All four crystals shine together. Caver's tower can no longer hide."
+  ]
+ },
+ "crystal_gate": {
+  "pages": [
+   "Four hollow sockets glitter above the tower's sealed arch. Only the four dimension crystals can break Caver's will here."
+  ]
+ },
+ "crystal_gate_open": {
+  "pages": [
+   "The crystals of Umbra, Ignis, Tempus and Silva blaze in their sockets. The bars of Caver's will shatter. The tower stands open."
+  ]
+ },
+ "caver_tower_intro": {
+  "name": "Caver",
+  "pages": [
+   "So. The orphan climbs my tower with my own dreams in his pockets.",
+   "Darkness, fire, time, the wild... I bent them all. I will bend you too.",
+   "Come, boy. Let us finish what your father started."
+  ]
+ },
+ "caver_fall": {
+  "name": "Caver",
+  "pages": [
+   "No... This body was only a shell.",
+   "Beneath the old chapel the dream goes on. It will grow walls, and halls, and doors without end...",
+   "And one day, boy, you will have to walk into it."
+  ]
+ },
+ "final_card": {
+  "name": "THE END",
+  "pages": [
+   "Caver's mortal body crumbles to ash.",
+   "His shadow slips beneath the old chapel,",
+   "where the curse dreams on - and a castle grows.",
+   "",
+   "Joe's story continues in",
+   "CHAPEL OF DREAMS."
   ]
  }
 }

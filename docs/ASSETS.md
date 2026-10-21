@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.11.0
+Version: 1.12.0
 -->
 
 # Assets
@@ -34,6 +34,7 @@ Version: 1.11.0
 | `assets/sprites/npcs/shade_merchant_*` | the Shade Market's merchant | `tools/gen_npcs.py` |
 | atlas cells `lava_*`, `crust`, `ash`, `ash_b` | Ignis ground (kept as-is in the Dark World atlas) | `tools/ignis_art.py` via `tools/gen_tiles.py` |
 | `assets/ui/items/ice_rod.png`, `assets/sprites/items/{ice_bolt,ember_shot,ground_flame}.png`, enemy packs `cinder`, `magma_wyrm` | Ignis (Phase 10) | `tools/gen_ignis.py` |
+| `assets/sprites/dungeon/crystal_gate.png` + `crystal_socket_{0..3}.png`, `assets/sprites/items/caver_bolt_{0..3}.png`, enemy pack `caver_lord` (float, cast, dazed, rage, rage_cast); sounds `daze`, `sink`, `crystal_gate` (`gen_sfx.py`) | Caver's tower (Phase 13) | `tools/gen_tower.py` |
 | `assets/ui/items/flippers.png`, `assets/sprites/items/{seed_shot,snapvine_root}.png`, `assets/sprites/vfx/splash.png` (+ `vfx_silva.json`), enemy packs `snapvine`, `thornheart`; atlas cells `jungle`, `jungle_b`, `dwater_*` (`silva_art.py`); Joe's `swim_*` strips (`gen_joe.py`) | Silva (Phase 12) | `tools/gen_silva.py` |
 | `assets/ui/items/hammer.png`, `assets/sprites/items/{hammer_swing,gear_shot}.png`, `assets/sprites/dungeon/{peg,peg_down,tick_a_up,tick_a_down,tick_b_up,tick_b_down}.png`, enemy packs `cogbug`, `clock_warden` | Tempus (Phase 11) | `tools/gen_tempus.py` |
 | `assets/sprites/npcs/tato_echo_*` | Tato's echo (Dark World) | `tools/gen_npcs.py` |

@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.11.0
+Version: 1.12.0
 -->
 
 # Testing
@@ -24,8 +24,9 @@ F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 6
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_ignis.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_tempus.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_silva.gd
+F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_tower.gd
 ```
-Each must end `RESULT: N passed, 0 failed`. Current count: **544 checks** in 12 suites (36 + 56 + 32 + 61 + 67 + 62 + 54 + 28 + 45 + 36 + 32 + 35).
+Each must end `RESULT: N passed, 0 failed`. Current count: **595 checks** in 13 suites (36 + 56 + 32 + 61 + 67 + 62 + 54 + 28 + 45 + 36 + 32 + 35 + 51).
 Run them with a `timeout` wrapper: a script that fails to compile (e.g. a new `class_name` before `--import`)
 makes Godot wait forever instead of failing.
 

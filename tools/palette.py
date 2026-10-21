@@ -4,7 +4,7 @@
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
 # Last edit date: 2026-10-20
-# Version: 1.12.0
+# Version: 1.13.0
 #
 # The look follows A Link to the Past: bright, saturated Light World greens and earth tones with a
 # dark outline on characters, and a Dark World that re-uses the same shapes in sick purples/olives.
@@ -430,3 +430,17 @@ THORN          = _hex("#e8dca0")
 SEED_DARK      = _hex("#5c3c10")
 SEED_MID       = _hex("#a87828")
 RIPPLE         = _hex("#d8f0ff")    # rings around Joe while he swims
+
+# --- Caver's tower (Phase 13): Caver's mortal form, the crystal gate, the dimension bolts -----------------------------
+CAVER_LINING   = _hex("#a01830")    # the inside of Caver's high-collared cape
+CAVER_HAIR     = _hex("#18101c")
+CAVER_WING_D   = _hex("#1c0c24")    # his cape spread into bat wings (below half health)
+CAVER_WING_M   = _hex("#3c1c48")
+UMBRA_GEM      = _hex("#9468e0")    # one colour per dimension: crystal-gate sockets and Caver's bolts
+UMBRA_GEM_L    = _hex("#d8c8ff")
+IGNIS_GEM      = _hex("#f05828")
+IGNIS_GEM_L    = _hex("#ffd8a0")
+TEMPUS_GEM     = _hex("#e8b830")
+TEMPUS_GEM_L   = _hex("#fff0b0")
+SILVA_GEM      = _hex("#48c060")
+SILVA_GEM_L    = _hex("#c8f8c0")

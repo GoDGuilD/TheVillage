@@ -5,7 +5,7 @@ Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
 Last edit date: 2026-10-20
-Version: 1.11.0
+Version: 1.12.0
 -->
 
 # Known issues
@@ -57,3 +57,8 @@ Version: 1.11.0
   whole body. The snapvine's vine is a straight line.
 - The lint cannot prove water gates (deep water is always a step for it) or the pegs in front of the Silva Tangle
   (an edge opening is an entry); `test_silva.gd` checks both in the game.
+- Nor can it prove the tower's chasm and lava band (each room's far side scrolls into the next room, which counts
+  as an entry); `test_tower.gd` crosses them in the game.
+- After the final ending the game goes on from in front of the tower; there are no credits yet (Phase 15) and the
+  title screen does not mark a finished game. On the world map the blinking "you are here" box can cover part of
+  the area's name.
