@@ -4,8 +4,8 @@ Description: Code architecture of The Village: folders, autoloads, contracts, pl
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-20
-Version: 5.10.0
+Last edit date: 2026-10-21
+Version: 5.11.0
 -->
 
 # Architecture
@@ -17,7 +17,8 @@ prototype (EventBus/GameManager/SceneManager/InputHandler) is in git history up 
 ```
 src/
   core/      StateMachine, SpriteStrips (PNG strips -> SpriteFrames), HitFlash, SaveGame (JSON save file),
-             DialogueData (dialogue.json reader), GameState / Audio / Juice (autoloads)
+             DialogueData (dialogue.json reader + translation overlay), Loc (translation tables), InputHints
+             (keyboard or gamepad, for hints), GameState / Audio (SFX, music, settings) / Juice (autoloads)
   combat/    HitBox (deals damage; `blockable`), HurtBox (receives it, emits `hurt`), HealthComponent
   player/    Player.gd/.tscn (children built in code), PlayerTuning (every feel constant)
   enemies/   BaseEnemy, Slime, Guard, Spitter, Bat, Lurker, Cinder, Cogbug, EnemyRock, EnemyShot, bosses:
@@ -30,14 +31,15 @@ src/
              Bush, Pot, Thrown, Pickup
     areas/   generated area JSON (index.json + one file per area) - written by tools/gen_areas.py
   ui/        TitleScreen (main scene), Hud, DialogueBox, PauseMenu, ItemMenu, MapScreen, GameOver, EndCard, MenuList,
-             PixelText,
+             PixelText (translates what it draws), OptionsMenu,
              UiTheme (colours, layers, box helpers)
 assets/data/ dialogue.json (every villager line and sign text)
+localization/ es.json (UI text), dialogue_es.json (dialogue text), README.md
 tools/       palette.py, sprite_lib.py, terrain_art.py, dungeon_art.py, font_glyphs.py, gen_joe.py, gen_tiles.py, gen_enemies.py,
-             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_tempus.py, gen_silva.py (+ silva_art.py), gen_tower.py, gen_sfx.py, gen_areas.py (areas + lint + preview),
-             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd, capture_tempus.gd, capture_silva.gd, capture_tower.gd
+             gen_props.py, gen_ui.py, gen_npcs.py, gen_items.py, gen_dungeon.py, gen_act1.py, gen_dark.py, gen_umbra.py, gen_ignis.py (+ ignis_art.py), gen_tempus.py, gen_silva.py (+ silva_art.py), gen_tower.py, gen_sfx.py, gen_music.py, balance_sfx.py, extract_strings.py, gen_areas.py (areas + lint + preview),
+             capture_field.gd, capture_world.gd, capture_ui.gd, capture_items.gd, capture_dungeon.gd, capture_act1.gd, capture_dark.gd, capture_umbra.gd, capture_ignis.gd, capture_tempus.gd, capture_silva.gd, capture_tower.gd, capture_polish.gd
 tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_items.gd, test_dungeon.gd,
-             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd, test_tempus.gd, test_silva.gd, test_tower.gd
+             test_act1.gd, test_dark.gd, test_umbra.gd, test_ignis.gd, test_tempus.gd, test_silva.gd, test_tower.gd, test_polish.gd
 ```
 
 ## Autoloads (order in project.godot)
@@ -137,6 +139,16 @@ tests/       test_player.gd, test_combat.gd, test_world.gd, test_ui.gd, test_ite
   falls: `ENDINGS[act]` names the villain's last words and the end card; after the card Joe is saved where the
   story leaves him (`act2_spawn` after Act 1, `final_spawn` after the final ending) and the title returns. When any
   boss falls, its brood and its shots and orbs in the air are freed.
+- **Audio and settings.** `Audio` (autoload, always processing) plays effects from a pool on the "SFX" bus with the
+  loudness trims of `sfx_trim.json`, and music on the "Music" bus with two players that crossfade. It also keeps the
+  player's settings (volumes as levels 0-10 on the buses, language, fullscreen, vibration) in a ConfigFile; a `-s`
+  script never reads it. The World asks `music_for(area)` on every area change.
+- **Localization.** `PixelText` keeps the English `source` and draws `Loc.t(source)`; every PixelText is in the
+  `loc_text` group, so `Loc.refresh` re-translates open screens after a language change. Dialogue is translated as
+  whole pages by `DialogueData` (an overlay of `dialogue_<lang>.json`), so dialogue lines switch `translate` off.
+- **Input hints and rumble.** `Juice` hosts an `InputHints` node (always processing) that notes the last device and
+  the gamepad's family; hints are built from it (`menu_hint`, `press_hint`). `Juice.rumble` vibrates every connected
+  pad unless vibration is off.
 - **Pits** are a TileSet flag (`pit`) Joe checks under his feet (state `fall`) and a second physics layer (9, Pits)
   that only enemies and push blocks collide with.
 

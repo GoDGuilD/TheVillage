@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 6.0.0
+# Last edit date: 2026-10-21
+# Version: 6.1.0
 #
 # Run:  python -I tools/gen_areas.py      (must print "0 lint problems"; never hand-edit the JSON it writes)
 #
@@ -71,6 +71,10 @@ GATES = {"seal_gate", "crystal_gate"}                # 2x2 gates in a wall (the 
 DOORWAYS = {"n": (11, 0), "s": (11, 12), "w": (0, 6), "e": (22, 6)}   # top-left cell of each 2x2 dungeon doorway
 OPEN_LO, OPEN_HI = 10, 14         # edge openings are 4 tiles wide, centred on each side of a screen pair
 # Openings: north/south at columns 22..25 of a 2-screen-wide area, east/west at rows 12..15 of a 2-screen-tall one.
+
+
+MUSIC_TRACKS = {"title", "valley", "house", "shrine", "dark_world", "dimension", "tower", "boss", "caver", "ending"}
+# ^ tools/gen_music.py; every dungeon names its "music" (and may name a "boss_music" instead of "boss")
 
 
 # --------------------------------------------------------------------------- building helpers
@@ -688,6 +692,12 @@ def lint_world(areas, problems):
         problems.append("world: rubble but no dash boots anywhere")
     if any("F" in r for a in areas for r in a["rows"]) and "fire_rod" not in held:
         problems.append("world: a Frost Wraith but no fire rod anywhere")
+    for info, _ in DUNGEONS:
+        for key in ("music", "boss_music"):
+            if key == "music" and key not in info:
+                problems.append("%s: no music" % info["id"])
+            if key in info and info[key] not in MUSIC_TRACKS:
+                problems.append("%s: unknown %s %r" % (info["id"], key, info[key]))
     seals = sorted(info["seal"] for info, _ in DUNGEONS if info.get("seal", -1) >= 0)
     crystals = sorted(info["crystal"] for info, _ in DUNGEONS if "crystal" in info)
     if crystals != list(range(len(crystals))):
@@ -886,7 +896,7 @@ SIGNS = {
 # behind Joe until the boss falls), "stairs" (the way out). A door shared by two rooms appears in both with the
 # same id, so it blocks from either side.
 D1 = {"id": "d1", "name": "Moss Shrine", "seal": 0, "entrance": "d1_entrance", "boss_room": "d1_boss",
-      "boss_flag": "boss:d1"}
+      "boss_flag": "boss:d1", "music": "shrine"}
 
 
 def room_grid(doors):
@@ -1005,11 +1015,11 @@ def make_room(rooms, aid, gx, gy, doors, fill, extra=None):
 
 
 D2 = {"id": "d2", "name": "Ram's Hollow", "seal": 1, "entrance": "d2_entrance", "boss_room": "d2_boss",
-      "boss_flag": "boss:d2"}
+      "boss_flag": "boss:d2", "music": "shrine"}
 D3 = {"id": "d3", "name": "Frost Vault", "seal": 2, "entrance": "d3_entrance", "boss_room": "d3_boss",
-      "boss_flag": "boss:d3"}
+      "boss_flag": "boss:d3", "music": "shrine"}
 KEEP = {"id": "keep", "name": "Caver's Keep", "seal": -1, "entrance": "keep_entrance", "boss_room": "keep_throne",
-        "boss_flag": "boss:keep", "ending": "act1"}
+        "boss_flag": "boss:keep", "ending": "act1", "music": "shrine"}
 
 
 def d2_rooms():
@@ -1093,7 +1103,7 @@ def keep_rooms():
 # The Umbra Sanctum (Dark World dungeon 1): the first dimension crystal. Dark rooms ("dark": True) are black but
 # for Joe's light until their torches burn.
 D4 = {"id": "d4", "name": "Umbra Sanctum", "crystal": 0, "entrance": "d4_entrance", "boss_room": "d4_boss",
-      "boss_flag": "boss:d4"}
+      "boss_flag": "boss:d4", "music": "dimension"}
 
 
 def d4_rooms():
@@ -1138,7 +1148,7 @@ def d4_rooms():
 
 # The Ignis Forge (Dark World dungeon 2): the second dimension crystal.
 D5 = {"id": "d5", "name": "Ignis Forge", "crystal": 1, "entrance": "d5_entrance", "boss_room": "d5_boss",
-      "boss_flag": "boss:d5"}
+      "boss_flag": "boss:d5", "music": "dimension"}
 
 
 def d5_rooms():
@@ -1187,7 +1197,7 @@ def d5_rooms():
 
 # The Tempus Clocktower (Dark World dungeon 3): the third dimension crystal.
 D6 = {"id": "d6", "name": "Tempus Clocktower", "crystal": 2, "entrance": "d6_entrance", "boss_room": "d6_boss",
-      "boss_flag": "boss:d6"}
+      "boss_flag": "boss:d6", "music": "dimension"}
 
 
 def d6_rooms():
@@ -1234,7 +1244,7 @@ def d6_rooms():
 
 # The Silva Grove (Dark World dungeon 4): the fourth and last dimension crystal.
 D7 = {"id": "d7", "name": "Silva Grove", "crystal": 3, "entrance": "d7_entrance", "boss_room": "d7_boss",
-      "boss_flag": "boss:d7"}
+      "boss_flag": "boss:d7", "music": "dimension"}
 
 
 def d7_rooms():
@@ -1283,7 +1293,7 @@ def d7_rooms():
 # Caver's tower (the final dungeon, Dark World): behind the crystal gate; one floor per dimension, each needing that
 # dimension's item, then Caver himself. Beating him ends the game ("ending": "final"); like the keep, no reward.
 D8 = {"id": "d8", "name": "Caver's Tower", "seal": -1, "entrance": "d8_entrance", "boss_room": "d8_boss",
-      "boss_flag": "boss:d8", "ending": "final"}
+      "boss_flag": "boss:d8", "ending": "final", "music": "tower", "boss_music": "caver"}
 
 
 def d8_rooms():

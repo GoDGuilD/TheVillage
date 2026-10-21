@@ -4,15 +4,15 @@ Description: Development backlog for The Village, organized on the phase numberi
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-20
-Version: 3.12.0
+Last edit date: 2026-10-21
+Version: 3.13.0
 -->
 
 # TODO — The Village
 
 Phase numbers match `ROADMAP.md` (the plan and status of record).
 
-## Open from Phases 1-13
+## Open from Phases 1-14
 - [ ] Owner playtest: walking, slash, spin, throws, enemies, scroll speed, village layout, text speed, menus
 - [ ] Audition the 50 sound effects and set a mix
 - [ ] Owner playtest of Act 1 end to end (dungeons 2-3, bosses, the ending) and names for the places and bosses
@@ -27,10 +27,11 @@ Phase numbers match `ROADMAP.md` (the plan and status of record).
 - [ ] Owner playtest of Silva: swim speed, the snapvine's reach, the Thornheart, names (placeholders)
 - [ ] Owner playtest of Caver's tower: its length, Caver's difficulty, the ending's words (drafts)
 - [ ] Owner to decide what the title screen shows after the game is finished
+- [ ] Owner: audition the ten music tracks; a native read-through of the Spanish text
 - [ ] Dark World interiors (none yet)
 
-## Phase 14 — Polish, audio, localization (next)
-- [ ] Music per area, SFX balance, Spanish, options, gamepad polish
+## Phase 15 — Release (next)
+- [ ] Credits, icon, export preset (including localization/ and the music), performance baseline, store material
 
 ## Later phases
 See `ROADMAP.md` phases 5-15.

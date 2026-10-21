@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 2.6.0
+# Last edit date: 2026-10-21
+# Version: 2.6.1
 class_name PlayerTuning
 extends RefCounted
 
@@ -96,4 +96,6 @@ const HURT_KNOCKBACK_SPEED := 160.0   # px/s pushed away from the attacker durin
 const IFRAMES := 1.0                  # invincibility (with blinking) after taking a hit
 const BLINK_HZ := 15.0                # blink rate while invincible
 const HURT_SHAKE := Vector2(2.0, 0.2) # (pixels, seconds) of camera shake when Joe is hit
+const HURT_RUMBLE := Vector3(0.3, 0.6, 0.2)   # gamepad rumble when Joe is hit: (weak motor, strong motor, seconds)
+const DEATH_RUMBLE := Vector3(0.6, 1.0, 0.6)  # ...and when he falls
 const HEART_HEAL := 2                 # a recovery heart restores one full heart

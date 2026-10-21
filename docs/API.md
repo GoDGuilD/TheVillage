@@ -4,8 +4,8 @@ Description: Internal scripting API of the main classes.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 2.9.0
+Last edit date: 2026-10-21
+Version: 2.10.0
 -->
 
 # API
@@ -81,6 +81,16 @@ The game has no network API; this is the internal API other scripts and tests re
   `CaverLord` (`phase`: show/after/fade_out/fade_in/dazed/sinking, `is_dazed()`, `is_angry()`, `cast()`,
   `throw_orb()`, `volley()`, `call_bat()`, `casts`, `orbs_thrown`, `volleys`, `shots_fired`, `dazes`,
   `bats_called`, `DAZE_TIME`, `VOLLEY_EVERY`, `RING_BOLTS`, `MAX_BATS`).
+- `Audio`: `play_music(track)` (crossfade; "" fades out), `stop_music()`, `is_music_playing()`, `music_name`,
+  `set_music_level(n)`, `set_sound_level(n)`, `set_language(code)`, `set_fullscreen(on)`, `vibration`,
+  `save_settings() -> bool`, `load_settings()`, `reset_settings()`, `settings_path`, `sfx_trim`, `bus_db(bus)`,
+  `bus_muted(bus)`. `World.music_for(area) -> String`.
+- `Loc` (static): `set_language(code) -> String`, `next_language(code)`, `t(text)`, `refresh(tree)`, `language`,
+  `LANGUAGES`, `LABELS`. `PixelText`: `source`, `translate`, `retranslate()`. `DialogueData` follows `Loc.language`.
+- `OptionsMenu`: `open()`, `close()`, signal `closed`, `adjust(row, step)`, `value_text(row)`, `ROW_*`.
+- `InputHints` (static answers): `device`, `family`, `confirm_label()`, `press_hint()`, `menu_hint()`, `family_of(name)`;
+  the instance under `Juice.hints` has `note(device, pad_name)` and signal `device_changed`. `Juice.rumble(weak, strong,
+  seconds)`, `Juice.rumbles`.
 - `Bush`: signal `cut(at)`, `is_cut()`, liftable. `Pot`: liftable. Liftable contract: `can_lift()`, `lift()`.
 - `Thrown`: signal `broke(at)`; `kind`, `direction`, `travel`, `damage`. `Pickup`: `kind`, signal `collected(kind)`.
 

@@ -2,18 +2,18 @@
  "font_5x7.png": {
   "size": [
    96,
-   48
+   112
   ],
   "frames": 1,
-  "notes": "Bitmap font, white glyphs, 16 columns from ASCII 32."
+  "notes": "Bitmap font, white glyphs, 16 columns from codepoint 32 (ASCII + the Spanish Latin-1 letters)."
  },
  "font_3x5.png": {
   "size": [
    64,
-   36
+   84
   ],
   "frames": 1,
-  "notes": "Bitmap font, white glyphs, 16 columns from ASCII 32."
+  "notes": "Bitmap font, white glyphs, 16 columns from codepoint 32 (ASCII + the Spanish Latin-1 letters)."
  },
  "hud/magic_frame.png": {
   "size": [

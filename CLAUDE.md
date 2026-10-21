@@ -4,8 +4,8 @@ Description: Project-specific guidance for AI-assisted development on The Villag
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-06-01
-Last edit date: 2026-10-20
-Version: 2.12.0
+Last edit date: 2026-10-21
+Version: 2.13.0
 -->
 
 # The Village
@@ -101,3 +101,11 @@ ported from it** — read its CLAUDE.md for the long list of Godot gotchas alrea
   `intro` is said once on entry. `CaverLord` (glyph `y`) is hurt only by batted orbs until knocked down. Thirteen
   suites (595 checks; `test_tower.gd` 51). A lambda that outlives its area must hold a `WeakRef` (typed:
   `var r: WeakRef = weakref(x)`), never the node itself.
+- Phase 14 (polish): every player-visible text goes through `PixelText` (translated by `Loc`, tables in
+  `localization/`); dialogue lines and names set `translate = false` (DialogueData already returns the reader's
+  language); translate *before* measuring or wrapping, and translate the parts of composed labels. Run
+  `python -I tools/extract_strings.py` (0 missing) after adding text, `tools/balance_sfx.py` after adding sounds,
+  `tools/gen_music.py` for music. `Audio` keeps the settings (`settings_path`); under `-s` it never reads the
+  player's file. In a `-s` script the autoloads' `_ready` runs after `_initialize`: await a frame before using
+  them. Fourteen suites (656 checks; `test_polish.gd` 61). `gen_ui.py` redraws `icon_sword.png` slightly (Pillow
+  drift, like `gen_joe.py`): restore it after running.

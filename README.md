@@ -4,13 +4,13 @@ Description: Project overview, status, and getting-started guide for The Village
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-20
-Version: 5.7.0
+Last edit date: 2026-10-21
+Version: 5.8.0
 -->
 
 # The Village
 
-**Version 7.7.0** (project-wide; see `CHANGELOG.md`)
+**Version 8.0.0** (project-wide; see `CHANGELOG.md`)
 
 A top-down action-adventure in the style of *The Legend of Zelda: A Link to the Past*, built with Godot 4.7.2.
 It is the **first game (prequel) of The Village trilogy**; game 2 is *The Village — Chapel of Dreams*
@@ -18,7 +18,7 @@ It is the **first game (prequel) of The Village trilogy**; game 2 is *The Villag
 vampire-sorcerer Caver, across a Light World and its Dark World mirror.
 
 ## Status
-Rebuilt on 2026-10-15 on Chapel of Dreams' architecture. **Phases 0–13 are done**: Joe walks in 8 directions with
+Rebuilt on 2026-10-15 on Chapel of Dreams' architecture. **Phases 0–14 are done**: Joe walks in 8 directions with
 ALttP facing rules and corner nudging, slashes, charges a spin attack, blocks rocks with his shield, lifts and throws
 pots and bushes, and fights slimes, Caver's guards and rock-spitters that drop hearts and gems, in a
 hearts/gems HUD and generated sound effects. The game starts in Joe's house in El Pueblo; four neighbouring areas
@@ -37,15 +37,18 @@ freezes enemies and lava, cinders, the Ignis Forge, the Magma Wyrm and the secon
 Clockwork Wastes' tick blocks, the Hammer and its pegs, cogbugs, the Tempus Clocktower, the Clock Warden and the
 third crystal; then Silva: the Silva Tangle's river, the Flippers and swimming, snapvines, the Silva Grove, the
 Thornheart and the fourth crystal. **The game can be finished**: the four crystals open Caver's tower, whose floors
-test every Dark World item, and Caver's defeat plays the ending that leads into *Chapel of Dreams*. 595 automated
-checks pass.
+test every Dark World item, and Caver's defeat plays the ending that leads into *Chapel of Dreams*. The polish pass
+added music for every place, a Spanish translation, an options screen (volumes, language, fullscreen, vibration),
+balanced sound effects and gamepad hints and rumble. 656 automated checks pass.
 Plan: `docs/ROADMAP.md`. Design: `docs/GDD.md`.
 
 ## Run it
 1. Open `F:\Software\Godot\Godot_v4.7.2-stable_win64.exe` → Import → this folder → F5.
 2. Controls: WASD/arrows move; J or Space slashes (hold to charge, release to spin); E or Enter talks, reads,
    lifts, throws and opens chests; K uses the equipped item; L or Shift dashes (with the boots); Tab shows the map; Esc pauses (save here); I opens the item menu
-   (gamepad: D-pad/stick, A = sword, B = talk/lift, Y = item, Start = pause, left shoulder = items).
+   (gamepad, SNES layout: D-pad/stick, bottom = sword, right = talk/lift/confirm, left = item, top = map,
+   shoulders = dash, Start = pause, Select = items; in menus the bottom button goes back).
+3. Options (title screen or pause menu): music and sound volume, ENGLISH / ESPAÑOL, fullscreen, vibration.
 
 ## Develop
 - Regenerate art and sound: `python -I tools/gen_joe.py`, `gen_tiles.py`, `gen_enemies.py`, `gen_props.py`,

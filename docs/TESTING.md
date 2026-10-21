@@ -4,8 +4,8 @@ Description: How the game is tested.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.12.0
+Last edit date: 2026-10-21
+Version: 1.13.0
 -->
 
 # Testing
@@ -25,8 +25,12 @@ F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 6
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_tempus.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_silva.gd
 F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_tower.gd
+F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --fixed-fps 60 --path . -s tests/test_polish.gd
+python -I tools/extract_strings.py          (translations: must end "0 missing, 0 other problems")
 ```
-Each must end `RESULT: N passed, 0 failed`. Current count: **595 checks** in 13 suites (36 + 56 + 32 + 61 + 67 + 62 + 54 + 28 + 45 + 36 + 32 + 35 + 51).
+Each must end `RESULT: N passed, 0 failed`. Current count: **656 checks** in 14 suites (36 + 56 + 32 + 61 + 67 + 62 + 54 + 28 + 45 + 36 + 32 + 35 + 51 + 61).
+Suites never read the player's settings file (always English, default volumes); a suite that changes settings
+points `Audio.settings_path` at a throw-away file first.
 Run them with a `timeout` wrapper: a script that fails to compile (e.g. a new `class_name` before `--import`)
 makes Godot wait forever instead of failing.
 

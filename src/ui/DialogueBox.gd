@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.1.0
+# Last edit date: 2026-10-21
+# Version: 1.2.0
 class_name DialogueBox
 extends CanvasLayer
 ## open(pages, speaker, at_top) shows the text; confirm (interact / attack / ui_accept) first completes the page
@@ -84,12 +84,16 @@ func _build(speaker: String, y: float) -> void:
 	_root.add_child(UiTheme.box(pos, BOX_SIZE))
 	for i in LINES:
 		var t := PixelText.make("", pos + PAD + Vector2(0, i * LINE_STEP), UiTheme.TEXT)
+		t.translate = false                  # pages come from DialogueData already in the reader's language
 		_root.add_child(t)
 		_lines.append(t)
 	if speaker != "":
 		var plate_size := Vector2(PixelText.measure(speaker), PixelText.line_height()) + NAME_PAD * 2.0
 		_root.add_child(UiTheme.box(pos + NAME_OFFSET, plate_size, UiTheme.CAPTION_TEXTURE, UiTheme.CAPTION_BORDER))
-		_root.add_child(PixelText.make(speaker, pos + NAME_OFFSET + NAME_PAD, UiTheme.GOLD))
+		var plate := PixelText.make("", pos + NAME_OFFSET + NAME_PAD, UiTheme.GOLD)
+		plate.translate = false              # names come from DialogueData too
+		plate.text = speaker
+		_root.add_child(plate)
 	var frames := SpriteStrips.new_frames()
 	SpriteStrips.add_strip(frames, "bob", MORE_TEX, MORE_FRAME, MORE_FPS, true)
 	_more = AnimatedSprite2D.new()

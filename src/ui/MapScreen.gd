@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-16
-# Last edit date: 2026-10-20
-# Version: 1.2.0
+# Last edit date: 2026-10-21
+# Version: 1.2.1
 class_name MapScreen
 extends CanvasLayer
 ## Rooms and areas are drawn as boxes on their screen grid (one box per screen). The World passes its area data in;
@@ -150,7 +150,7 @@ func _draw_overworld(areas: Dictionary) -> void:
 		var r: Rect2 = cells[aid]
 		var centre := origin + r.position * (_cell + Vector2.ONE * GAP) + (r.size * (_cell + Vector2.ONE * GAP) - Vector2.ONE * GAP) / 2.0
 		var width := int(r.size.x * (_cell.x + GAP) - GAP - 2.0 * LABEL_PAD)
-		var lines := PixelText.wrap(String(areas[aid]["name"]).to_upper(), width, PixelText.FONT_SMALL)
+		var lines := PixelText.wrap(Loc.t(String(areas[aid]["name"]).to_upper()), width, PixelText.FONT_SMALL)
 		var lh := PixelText.line_height(PixelText.FONT_SMALL) + 1
 		for i in lines.size():
 			var y := centre.y - 3.0 + (i - (lines.size() - 1) / 2.0) * lh

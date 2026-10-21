@@ -5,8 +5,8 @@
   "Author": "Jose-Jorge HERNANDEZ",
   "Company": "Parlee Conseiller, Inc.",
   "Date": "2026-10-15",
-  "Last edit date": "2026-10-20",
-  "Version": "1.9.0",
+  "Last edit date": "2026-10-21",
+  "Version": "1.10.0",
   "Format": "entry = {name?, pages: [...], once?: [...], flag?, gift?: {item, amount?, flag, pages}}. A gift is handed over on the talk after the first meeting. 'once' is said the first time (then 'flag' is set in GameState.flags); afterwards 'pages'. A page wraps itself to the box; '\\n' forces a line break; a page longer than the box continues on the next box. Story lines are a DRAFT until the owner confirms the plot (docs/GDD.md section 2)."
  },
  "tato": {
@@ -103,7 +103,7 @@
  },
  "get_boomerang": {
   "pages": [
-   "You got the Boomerang! Equip it in the item menu (I) and throw it with the item button (K)."
+   "You got the Boomerang! Equip it in the item menu (I, or Select) and throw it with the item button (K, or the left face button)."
   ]
  },
  "get_bow": {
@@ -184,7 +184,7 @@
  },
  "get_map": {
   "pages": [
-   "You got the Map! Press Tab to see every room of this place."
+   "You got the Map! Press Tab (or the top face button) to see every room of this place."
   ]
  },
  "get_compass": {
@@ -250,7 +250,7 @@
  },
  "get_boots": {
   "pages": [
-   "You got the Dash Boots! Press Shift (or the right stick) to dash. Rubble won't stand in your way."
+   "You got the Dash Boots! Press Shift (or a shoulder button) to dash. Rubble won't stand in your way."
   ]
  },
  "get_fire_rod": {

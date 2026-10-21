@@ -4,8 +4,8 @@ Description: Phased production roadmap for The Village, from the rebuild scaffol
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.12.0
+Last edit date: 2026-10-21
+Version: 1.13.0
 -->
 
 # Roadmap
@@ -29,7 +29,7 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 | 11 | Tempus | The Clockwork Wastes and tick blocks, the Hammer and pegs, cogbugs, the Tempus Clocktower, the Clock Warden, the third crystal | Done (32 Tempus checks pass) |
 | 12 | Silva | The Silva Tangle and swimming, the Flippers, snapvines, the Silva Grove, the Thornheart, the fourth crystal | Done (35 Silva checks pass) |
 | 13 | Caver's tower | The crystal gate, the tower's four dimension floors, Caver, the final ending that leads into Chapel of Dreams | Done (51 tower checks pass) |
-| 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Planned |
+| 14 | Polish, audio, localization | Music per area, SFX balance, Spanish, options, gamepad polish | Done (61 polish checks pass) |
 | 15 | Release | Credits, icon, export preset, performance baseline, store material | Planned |
 
 ## Phase 1 detail
@@ -159,3 +159,13 @@ behaviour (`docs/TESTING.md`) and windowed screenshot captures for visuals. Same
 - [x] The map fits tall grids; a boss's shots vanish with it
 - [x] `tests/test_tower.gd`: 51 checks; `tools/capture_tower.gd`
 - [ ] Owner playtest: the tower's length, Caver's difficulty, the ending's words, names (tower, Caver's lines)
+
+
+## Phase 14 detail
+- [x] `tools/gen_music.py`: ten looping tracks; `Audio` music bus, crossfades; music per area, boss, ending
+- [x] `Loc` + `localization/es.json` + `dialogue_es.json`; Spanish letters in both fonts; `tools/extract_strings.py`
+- [x] `OptionsMenu`: volumes, language, fullscreen, vibration; settings file
+- [x] `tools/balance_sfx.py` loudness trims
+- [x] Gamepad: menu confirm/back buttons, dash on both shoulders, device-aware hints, rumble
+- [x] `tests/test_polish.gd`: 61 checks; `tools/capture_polish.gd`
+- [ ] Owner: audition the ten tracks and the trims; review the Spanish draft (a native read-through)

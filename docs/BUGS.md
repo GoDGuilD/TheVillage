@@ -4,8 +4,8 @@ Description: Log of every gotcha met, internal or external.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.11.0
+Last edit date: 2026-10-21
+Version: 1.12.0
 -->
 
 # Bugs and gotchas
@@ -29,6 +29,13 @@ Version: 1.11.0
 - [External] **Static class names in a test compile before the autoloads** - Symptom: `test_act1.gd` failed with "Identifier not found: Audio" in Bush/IronRam and the whole World half-built. Root cause: `is IronRam` and `AreaBuilder.flag_at` in the test compile those classes (and their dependencies) before autoloads exist. Fix: compare `get_script().get_global_name()` and `load()` AreaBuilder. File: `tests/test_act1.gd`.
 
 - [Internal] **Floor switches (and rifts) were invisible** - Symptom: the Moss Shrine's floor switch never showed in screenshots; the first rift did not either. Root cause: they set `z_index = -1` to sit "under" actors, which also put them under the ground TileMapLayer. Fix: leave z at 0 and let the y-sorted actors node order them. File: `src/world/FloorSwitch.gd`, `src/world/Rift.gd`.
+- [Internal] **Accents on capitals could not be seen** - Symptom: MÚSICA, ESPAÑOL read as MUSICA, ESPANOL in game. Root cause: the 5x7 capitals fill 7 of the cell's 8 rows, so the mark sat on row 0 touching the shortened letter and vanished at 1x. Fix: a free row between mark and letter; the accented capital sits one pixel lower. File: `tools/gen_ui.py`.
+- [External] **Autoloads are not ready in a `-s` script's `_initialize`** - Symptom: the Music and SFX buses were missing and `Audio`'s players array was empty in `test_polish.gd`. Root cause: in a `-s` run the autoloads enter the tree (and run `_ready`) after `_initialize` starts. Fix: `await process_frame` before using them. File: `tests/test_polish.gd`.
+- [External] **A resting gamepad trigger claimed "gamepad"** - Symptom: in a windowed capture the end card said PULSA B although the keyboard was in use. Root cause: some pads report a trigger axis at full deflection when idle, which passed the "stick moved" test. Fix: only the four stick axes count. File: `src/core/InputHints.gd`.
+- [Internal] **The music composer read "b7" as a seventh** - Symptom: `ValueError` on "b7" chords. Root cause: a "7" suffix meant "seventh chord", so the degree itself was stripped; borrowed chords were also built from the mode's own degree. Fix: no seventh suffix; borrowed chords are fixed offsets from the major scale, and the melody's chord tones may be chromatic. File: `tools/gen_music.py`.
+- [Internal] **No gamepad button backed out of menus; two buttons were documented wrong** - Symptom: menus could be confirmed with a pad (interact) but not left; the controls table said inventory = left shoulder and dash = right stick. Root cause: `ui_cancel` had no joypad event; the table predated the input map. Fix: East confirms, South goes back (`ui_accept`/`ui_cancel`), dash on both shoulders, table corrected. Files: `project.godot`, `docs/GDD.md`.
+- [Internal] **Player settings would leak into test runs** - Symptom (prevented): a player who chose Spanish or muted the music would make every suite run that way. Fix: `Audio` reads the settings file only when the main loop has no script (never under `-s`). File: `src/core/Audio.gd`.
+- [External] **`gen_ui.py` redraws `icon_sword.png`** - Symptom: running the unchanged UI generator changes the sword icon's pixels. Root cause: the same Pillow rasterisation drift as `gen_joe.py`. Workaround: restore it with `git checkout` after running. File: `tools/gen_ui.py`.
 - [Internal] **Crust timers errored after leaving the room** - Symptom: "Lambda capture at index 2 was freed" printed once per frozen lava cell when Joe left a room less than 6 s after using the ice rod. Root cause: the thaw callback of `AreaBuilder.freeze_at` captured the room's `TileMapLayer`, which is freed when Joe leaves; calling a lambda with a freed capture errors. Fix: the callback holds a `WeakRef` and skips a freed layer. File: `src/world/AreaBuilder.gd`.
 - [External] **`weakref()` cannot be type-inferred** - Symptom: "The variable type is being inferred from a Variant value" parse error (warnings are errors) on `var r := weakref(x)`, and on `var t := r.get_ref() as TileMapLayer`. Root cause: both return Variant in GDScript. Fix: declare the types (`var r: WeakRef = weakref(x)`, `var t: TileMapLayer = ...`). File: `src/world/AreaBuilder.gd`.
 - [Internal] **The Dark World map ran off its panel** - Symptom: the map's bottom rows fell outside the panel and area names overlapped in narrow boxes. Root cause: the map drew every screen at a fixed 40x24 box; the Dark World grew to seven screens tall (Umbral Vale), and Caver's tower is six rooms tall. Fix: boxes shrink (each axis separately) to fit; names wrap onto two lines. File: `src/ui/MapScreen.gd`.

@@ -4,8 +4,8 @@ Description: Known open issues.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.12.0
+Last edit date: 2026-10-21
+Version: 1.13.0
 -->
 
 # Known issues
@@ -19,10 +19,14 @@ Version: 1.12.0
 - The boomerang only stuns; in ALttP it also defeats a few weak enemies.
 - Torches go out when the area is left, so both meadow torches must be lit on one visit.
 - After the item-get pose Joe faces down (as in ALttP), so a second purchase needs a tap toward the counter.
-- One save slot only (ALttP had three); text is English only until Phase 14.
+- One save slot only (ALttP had three).
 - Enemies and cut bushes come back every time an area is re-entered (ALttP does the same for most screens).
 - The leaf burst reads as small rings; nicer leaves in the polish pass.
-- No music; the 37 sound effects have never been auditioned by ear.
+- The ten music tracks and the 65 sound effects (and their loudness trims) have not been auditioned by ear; the
+  music is generated placeholder chiptune. Accented capitals sit one pixel below the others.
+- The Spanish text is a draft by a non-native pass: it needs a native read-through. Captions of the longest
+  Spanish names are wide; the 3x5 font's accents are tiny.
+- The game's export must include `localization/*.json` and the music (non-resource files): Phase 15's export preset.
 - The 2024 audio in `assets/audio/` has unverified licences.
 - Nothing has been playtested by the owner yet (feel numbers are first guesses).
 - "Moss Shrine", its rooms and the Grand Slime are first drafts (names and layout await the owner); the shrine

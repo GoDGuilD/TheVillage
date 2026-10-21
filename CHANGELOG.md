@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-20
-Version: 5.10.0
+Last edit date: 2026-10-21
+Version: 5.11.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,44 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [8.0.0] - 2026-10-21 — Phase 14: polish, audio, localization
+
+### Added
+- **Music**: ten generated chiptune loops (`tools/gen_music.py`, `assets/audio/music/`): title, the valley (Light
+  World), houses, Light World dungeons, the Dark World, the dimension dungeons, Caver's tower, bosses, Caver, the
+  ending. A small composer writes each lead from a spec (tempo, key, mode, chords); notes are mixed circularly so every
+  loop is seamless. `Audio.play_music` crossfades (0.8 s, two players) on its own "Music" bus; the World picks the
+  track per area (`World.music_for`: houses, each world's overworld, the dungeon's `music`, the boss track while a
+  boss lives, Caver's own `boss_music`), the title plays its theme, the villain's last words are silent and the end
+  card plays the ending.
+- **Spanish**: `src/core/Loc.gd` (ported from Chapel of Dreams) translates what `PixelText` draws through
+  `localization/es.json` (exact strings and patterns like `KEYS %d`; text captured by `%s` is translated too), and
+  `DialogueData` lays `localization/dialogue_es.json` over the dialogue (text only - flags, gifts and items stay in
+  the English file). A language change re-translates every open screen (`Loc.refresh`). The fonts gained Á É Í Ó Ú
+  Ñ Ü (both cases), ¡ and ¿. `tools/extract_strings.py` checks the tables (0 missing). `localization/README.md`.
+- **Options** (`OptionsMenu`, from the title screen and the pause menu): music and sound volume bars (0-10), language,
+  fullscreen, gamepad vibration; every change applies at once and is saved to `user://village_settings.cfg`.
+- **SFX balance**: `tools/balance_sfx.py` (ported) measures every effect's loudness and writes
+  `assets/audio/sfx_trim.json`; `Audio` applies the trims (44 effects within ±3 dB of the median).
+- **Gamepad polish**: menus confirm with the right face button and go back with the bottom one (SNES A/B); dash is on
+  both shoulders; hints name the keys or the gamepad's buttons - B on Xbox, A on Nintendo, CIRCLE on PlayStation -
+  and switch live (`InputHints`); rumble when Joe is hit or falls, a bomb goes off or a boss falls
+  (`Juice.rumble`, off in the options).
+- `tests/test_polish.gd` (61 checks) and `tools/capture_polish.gd`.
+
+### Changed
+- The title screen has OPTIONS (rows CONTINUE, NEW GAME, OPTIONS, QUIT); the pause menu has OPTIONS before SAVE AND
+  QUIT. Each dungeon in `gen_areas.py` names its music (lint-checked).
+- Three item texts name the gamepad too (the boomerang, the map, the boots - which also said "right stick" for the
+  dash, wrongly).
+- A `-s` script (tests, captures) never reads the player's settings file: it always starts in English at default
+  volumes.
+- 656 checks in 14 suites, all passing.
+
+### Fixed
+- The controls table had two gamepad buttons wrong (inventory is Select, dash a shoulder button).
+- No gamepad button backed out of a menu.
 
 ## [7.7.0] - 2026-10-20 — Phase 13: Caver's tower
 

@@ -96,21 +96,24 @@
    "seal": 0,
    "entrance": "d1_entrance",
    "boss_room": "d1_boss",
-   "boss_flag": "boss:d1"
+   "boss_flag": "boss:d1",
+   "music": "shrine"
   },
   "d2": {
    "name": "Ram's Hollow",
    "seal": 1,
    "entrance": "d2_entrance",
    "boss_room": "d2_boss",
-   "boss_flag": "boss:d2"
+   "boss_flag": "boss:d2",
+   "music": "shrine"
   },
   "d3": {
    "name": "Frost Vault",
    "seal": 2,
    "entrance": "d3_entrance",
    "boss_room": "d3_boss",
-   "boss_flag": "boss:d3"
+   "boss_flag": "boss:d3",
+   "music": "shrine"
   },
   "keep": {
    "name": "Caver's Keep",
@@ -118,35 +121,40 @@
    "entrance": "keep_entrance",
    "boss_room": "keep_throne",
    "boss_flag": "boss:keep",
-   "ending": "act1"
+   "ending": "act1",
+   "music": "shrine"
   },
   "d4": {
    "name": "Umbra Sanctum",
    "crystal": 0,
    "entrance": "d4_entrance",
    "boss_room": "d4_boss",
-   "boss_flag": "boss:d4"
+   "boss_flag": "boss:d4",
+   "music": "dimension"
   },
   "d5": {
    "name": "Ignis Forge",
    "crystal": 1,
    "entrance": "d5_entrance",
    "boss_room": "d5_boss",
-   "boss_flag": "boss:d5"
+   "boss_flag": "boss:d5",
+   "music": "dimension"
   },
   "d6": {
    "name": "Tempus Clocktower",
    "crystal": 2,
    "entrance": "d6_entrance",
    "boss_room": "d6_boss",
-   "boss_flag": "boss:d6"
+   "boss_flag": "boss:d6",
+   "music": "dimension"
   },
   "d7": {
    "name": "Silva Grove",
    "crystal": 3,
    "entrance": "d7_entrance",
    "boss_room": "d7_boss",
-   "boss_flag": "boss:d7"
+   "boss_flag": "boss:d7",
+   "music": "dimension"
   },
   "d8": {
    "name": "Caver's Tower",
@@ -154,7 +162,9 @@
    "entrance": "d8_entrance",
    "boss_room": "d8_boss",
    "boss_flag": "boss:d8",
-   "ending": "final"
+   "ending": "final",
+   "music": "tower",
+   "boss_music": "caver"
   }
  }
 }

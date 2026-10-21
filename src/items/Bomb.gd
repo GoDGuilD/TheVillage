@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.0
+# Last edit date: 2026-10-21
+# Version: 1.0.1
 extends Node2D
 ## Two hit boxes on the blast: one on the PlayerHitBox layer (enemies, bushes) and one on the EnemyHitBox layer
 ## (Joe - ALttP bombs hurt Link too; not blockable). Nodes in group "bombable" within BLAST_RADIUS get blast().
@@ -23,6 +23,7 @@ const ENEMY_DAMAGE := 4
 const JOE_DAMAGE := 2
 const KNOCKBACK := 180.0
 const SHAKE := Vector2(2.5, 0.25)
+const RUMBLE := Vector3(0.4, 0.7, 0.25)          # gamepad rumble of the blast: (weak, strong, seconds)
 const LAYER_PLAYER_HITBOX := 8
 const LAYER_ENEMY_HITBOX := 16
 
@@ -85,6 +86,7 @@ func explode() -> void:
 	Audio.sfx("explode")
 	Juice.play_fx("explosion", global_position + Vector2(0, -6), get_parent())
 	Juice.shake(SHAKE.x, SHAKE.y)
+	Juice.rumble(RUMBLE.x, RUMBLE.y, RUMBLE.z)
 	for n in get_tree().get_nodes_in_group("bombable"):
 		var node := n as Node2D
 		if node != null and node.global_position.distance_to(global_position) <= BLAST_RADIUS + 8.0:

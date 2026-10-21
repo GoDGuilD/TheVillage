@@ -1,0 +1,82 @@
+{
+ "title": {
+  "duration_s": 40.0,
+  "bpm": 96,
+  "bars": 16,
+  "peak_db": -4.0,
+  "rms_db": -16.89,
+  "loop": true
+ },
+ "valley": {
+  "duration_s": 30.0,
+  "bpm": 128,
+  "bars": 16,
+  "peak_db": -4.0,
+  "rms_db": -17.39,
+  "loop": true
+ },
+ "house": {
+  "duration_s": 22.857,
+  "bpm": 84,
+  "bars": 8,
+  "peak_db": -4.0,
+  "rms_db": -12.9,
+  "loop": true
+ },
+ "shrine": {
+  "duration_s": 38.4,
+  "bpm": 100,
+  "bars": 16,
+  "peak_db": -4.0,
+  "rms_db": -16.22,
+  "loop": true
+ },
+ "dark_world": {
+  "duration_s": 34.286,
+  "bpm": 112,
+  "bars": 16,
+  "peak_db": -4.0,
+  "rms_db": -16.68,
+  "loop": true
+ },
+ "dimension": {
+  "duration_s": 34.286,
+  "bpm": 112,
+  "bars": 16,
+  "peak_db": -4.0,
+  "rms_db": -17.2,
+  "loop": true
+ },
+ "tower": {
+  "duration_s": 28.235,
+  "bpm": 136,
+  "bars": 16,
+  "peak_db": -4.0,
+  "rms_db": -16.33,
+  "loop": true
+ },
+ "boss": {
+  "duration_s": 12.632,
+  "bpm": 152,
+  "bars": 8,
+  "peak_db": -4.0,
+  "rms_db": -15.71,
+  "loop": true
+ },
+ "caver": {
+  "duration_s": 12.0,
+  "bpm": 160,
+  "bars": 8,
+  "peak_db": -4.0,
+  "rms_db": -16.54,
+  "loop": true
+ },
+ "ending": {
+  "duration_s": 50.526,
+  "bpm": 76,
+  "bars": 16,
+  "peak_db": -4.0,
+  "rms_db": -13.73,
+  "loop": true
+ }
+}

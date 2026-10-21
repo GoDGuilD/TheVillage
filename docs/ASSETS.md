@@ -4,8 +4,8 @@ Description: Asset inventory.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-20
-Version: 1.12.0
+Last edit date: 2026-10-21
+Version: 1.13.0
 -->
 
 # Assets
@@ -44,4 +44,7 @@ Version: 1.12.0
 | `assets/shaders/` | `flash.gdshader` (white hit flash) | ported from Chapel |
 | `assets/branding/` | icon and splash from the 2024 UE5 prototype | recovered |
 | `assets/reference/joe/` | 2024 character sheet and pixel frames | recovered, reference only |
+| `assets/audio/music/{title,valley,house,shrine,dark_world,dimension,tower,boss,caver,ending}.wav` + `music_manifest.json` | Music (Phase 14): looping chiptune, 22 050 Hz mono, ~13 MB in all | `tools/gen_music.py` |
+| `assets/audio/sfx_trim.json` | Loudness trims of the sound effects | `tools/balance_sfx.py` |
+| `assets/ui/font_5x7.png`, `font_3x5.png` (+ `.json`) | Now also Á É Í Ó Ú Ñ Ü, both cases, ¡ ¿ (rows below the ASCII ones) | `tools/gen_ui.py` |
 | `assets/audio/*.wav/.mp3` (root) | 2024 music/SFX clips | recovered, **licences unverified - do not ship** |

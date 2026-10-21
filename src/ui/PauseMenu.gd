@@ -1,10 +1,10 @@
 # File: PauseMenu.gd
-# Description: Pause menu (Esc / Start) - CONTINUE, SAVE GAME, SAVE AND QUIT - over a dimmed, paused world; the World does the saving and quitting.
+# Description: Pause menu (Esc / Start) - CONTINUE, SAVE GAME, OPTIONS, SAVE AND QUIT - over a dimmed, paused world; the World does the saving and quitting, the options screen opens on top.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.0
+# Last edit date: 2026-10-21
+# Version: 1.1.0
 class_name PauseMenu
 extends CanvasLayer
 
@@ -14,14 +14,16 @@ signal closed
 
 const ITEM_CONTINUE := 0
 const ITEM_SAVE := 1
-const ITEM_SAVE_QUIT := 2
-const PANEL_SIZE := Vector2(150, 84)
+const ITEM_OPTIONS := 2
+const ITEM_SAVE_QUIT := 3
+const PANEL_SIZE := Vector2(150, 97)
 const TITLE_Y := 9.0
 const MENU_OFFSET := Vector2(28, 28)
-const NOTE_Y := 70.0
+const NOTE_Y := 83.0
 
 var is_open := false
 var menu: MenuList
+var options: OptionsMenu
 var note: PixelText                      # "GAME SAVED" feedback line
 
 var _root: Control
@@ -43,12 +45,15 @@ func _ready() -> void:
 	menu.position = pos + MENU_OFFSET
 	_root.add_child(menu)
 	menu.set_items([{"label": "CONTINUE", "enabled": true}, {"label": "SAVE GAME", "enabled": true},
-			{"label": "SAVE AND QUIT", "enabled": true}])
+			{"label": "OPTIONS", "enabled": true}, {"label": "SAVE AND QUIT", "enabled": true}])
 	menu.chosen.connect(_on_chosen)
 	menu.cancelled.connect(close)
 	note = PixelText.make("", pos + Vector2(PANEL_SIZE.x / 2.0, NOTE_Y), UiTheme.DIM_TEXT, PixelText.FONT_SMALL,
 			PixelText.Align.CENTER)
 	_root.add_child(note)
+	options = OptionsMenu.new()
+	add_child(options)
+	options.closed.connect(func() -> void: menu.active = true)
 
 
 func open() -> void:
@@ -81,11 +86,14 @@ func _on_chosen(index: int) -> void:
 			close()
 		ITEM_SAVE:
 			save_requested.emit()
+		ITEM_OPTIONS:
+			menu.active = false
+			options.open()
 		ITEM_SAVE_QUIT:
 			quit_requested.emit()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if is_open and event.is_action_pressed("pause") and not event.is_echo():
+	if is_open and not options.is_open and event.is_action_pressed("pause") and not event.is_echo():
 		get_viewport().set_input_as_handled()
 		close()

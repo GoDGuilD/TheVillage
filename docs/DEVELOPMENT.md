@@ -4,8 +4,8 @@ Description: Dev setup, ignore files, conventions.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-15
-Version: 1.2.0
+Last edit date: 2026-10-21
+Version: 1.3.0
 -->
 
 # Development
@@ -26,4 +26,5 @@ Version: 1.2.0
 5. Update `../CHANGELOG.md`, stale docs, `BUGS.md`, the technical memory notebook; bump headers and the README version.
 
 ## Folder layout
-`src/` game code, `tools/` generators and capture scripts, `tests/` suites, `assets/` art (generated) and recovered 2024 material, `docs/` documentation, `technical_memory/` decision log, `tmp/` scratch (git-ignored). The other bootstrap folders (`config/`, `database/`, `infrastructure/`, `integrations/`, `public/`, `samples/`, `scripts/`, `security/`, `templates/`, `licenses/`, `localization/`, `artifacts/`) are placeholders until a phase needs them.
+`src/` game code, `tools/` generators and capture scripts, `tests/` suites, `assets/` art (generated) and recovered 2024 material, `docs/` documentation, `technical_memory/` decision log, `tmp/` scratch (git-ignored). The other bootstrap folders (`config/`, `database/`, `infrastructure/`, `integrations/`, `public/`, `samples/`, `scripts/`, `security/`, `templates/`, `licenses/`, `artifacts/`) are placeholders until a phase needs them. `localization/` holds the Spanish tables (see its
+README); after adding player-visible text run `python -I tools/extract_strings.py`.

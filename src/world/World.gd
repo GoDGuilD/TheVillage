@@ -1,10 +1,10 @@
 # File: World.gd
-# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals; Ignis: lava; Tempus: the tick clock, pegs; Caver's tower: the crystal gate, the boss's opening words, the final ending.
+# Description: The game world: loads generated areas with their villagers and signs, follows Joe with a clamped camera, scrolls screen-to-screen at area edges (ALttP), fades through house doors, and hosts the HUD, dialogue box, pause/item menus, Game Over and saving; builds chests, torches, cracked rocks, key blocks, heart pieces and shop wares and runs the item-get, shop and key sequences; dungeons: room scrolling, doors, room clearing, switches, push blocks, pits, the boss and its reward, the map; Act 1: rubble, the keep's seal gate and the ending; Act 2: the Dark World twins, dream rifts and the Moon Mirror; Umbra: hook posts, dark rooms, dimension crystals; Ignis: lava; Tempus: the tick clock, pegs; Caver's tower: the crystal gate, the boss's opening words, the final ending; the music of each place.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 7.0.0
+# Last edit date: 2026-10-21
+# Version: 7.1.0
 class_name World
 extends Node2D
 ## Areas come from src/world/areas/*.json (written by tools/gen_areas.py - never edit them by hand).
@@ -35,6 +35,13 @@ const BOW_ARROWS := 10                   # the bow comes with a quiver
 const CONTAINER_HP := 2                  # half-heart units a heart container adds
 const DUNGEON_PUSH := 40.0               # px Joe walks into a dungeon room on a scroll (past the 2-tile wall)
 const BOSS_REWARD_DELAY := 1.2           # s after the boss falls before the heart container appears
+const BOSS_RUMBLE := Vector3(0.5, 0.9, 0.5)   # gamepad rumble when a boss falls: (weak, strong, seconds)
+# Music (tools/gen_music.py): by kind of place; dungeons name their own track (and may name a boss track).
+const MUSIC_INTERIOR := "house"
+const MUSIC_LIGHT := "valley"
+const MUSIC_DARK := "dark_world"
+const MUSIC_BOSS := "boss"
+const MUSIC_ENDING := "ending"
 const REWARD_DROP := Vector2(0, 8)       # heart container position relative to the room's centre
 const SEAL_DROP := Vector2(0, -24)       # the seal appears above it (not under Joe, who just took the heart)
 const DARK_SMALL := preload("res://assets/sprites/world/darkness_small.png")      # dark rooms without the lantern
@@ -270,6 +277,21 @@ func area_at(p: Vector2, group: String) -> String:
 
 func dungeon_of(area_id: String) -> String:
 	return String(areas[area_id].get("dungeon", ""))
+
+
+# The track for an area: houses, each world's overworld, a dungeon's own track - or, in a boss room whose boss
+# still lives, the boss track (the dungeon's `boss_music` if it has one).
+func music_for(area_id: String) -> String:
+	var a: Dictionary = areas[area_id]
+	if a["kind"] == "interior":
+		return MUSIC_INTERIOR
+	if a["kind"] == "overworld":
+		return MUSIC_DARK if is_dark(area_id) else MUSIC_LIGHT
+	var info: Dictionary = dungeons.get(dungeon_of(area_id), {})
+	var boss_flag := String(a.get("boss_flag", ""))
+	if boss_flag != "" and not GameState.has_flag(boss_flag):
+		return String(info.get("boss_music", MUSIC_BOSS))
+	return String(info.get("music", MUSIC_LIGHT))
 
 
 # --- building ----------------------------------------------------------------------------
@@ -840,6 +862,7 @@ func _reveal_chests(which: Callable) -> void:
 
 func _on_area_entered(aid: String) -> void:
 	GameState.visited[aid] = true
+	Audio.play_music(music_for(aid))
 	update_darkness()
 	var dungeon := dungeon_of(aid)
 	hud.show_zero_keys = dungeon != ""
@@ -898,6 +921,7 @@ func _on_boss_defeated(room: String) -> void:
 	GameState.set_flag(flag)
 	Audio.sfx("boss_die")
 	Juice.shake(4.0, 0.6)
+	Juice.rumble(BOSS_RUMBLE.x, BOSS_RUMBLE.y, BOSS_RUMBLE.z)
 	for e in current["actors"].get_children():
 		if e is BaseEnemy and not e.is_dead() and not e.get("is_boss"):
 			Juice.play_fx("poof", e.global_position, current["actors"])
@@ -906,6 +930,10 @@ func _on_boss_defeated(room: String) -> void:
 			e.queue_free()                                    # ...and so do its shots still in the air
 	_open_doors_when(flag)
 	var info: Dictionary = dungeons.get(dungeon_of(room), {})
+	if String(info.get("ending", "")) != "":
+		Audio.stop_music()                                # silence for the villain's last words
+	else:
+		Audio.play_music(music_for(room))                 # the boss's track gives way to the dungeon's
 	if String(info.get("ending", "")) != "":
 		await get_tree().create_timer(ENDING_DELAY).timeout
 		play_ending(String(info["ending"]))
@@ -976,6 +1004,7 @@ func play_ending(act: String) -> void:
 	var keys: Dictionary = ENDINGS.get(act, ENDINGS["act1"])
 	_after_dialogue = func() -> void:
 		var card: Array = DialogueData.pages_for(String(keys["card"]), GameState)
+		Audio.play_music(MUSIC_ENDING)
 		end_card.open(DialogueData.speaker(String(keys["card"])), card)
 	var on_screen := player.global_position - (camera.global_position - VIEW / 2.0)
 	dialogue.open(DialogueData.pages_for(String(keys["words"]), GameState), DialogueData.speaker(String(keys["words"])),

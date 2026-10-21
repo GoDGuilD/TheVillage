@@ -1,10 +1,10 @@
 # File: gen_ui.py
-# Description: Generates the UI art: the two bitmap fonts, the ALttP-style HUD pieces (magic meter, item box, key icon), dialogue/menu boxes, cursor, continue arrow, item-menu slots, seals, equipment icons and the title logo, plus a preview sheet.
+# Description: Generates the UI art: the two bitmap fonts (ASCII plus the Spanish Latin-1 letters), the ALttP-style HUD pieces (magic meter, item box, key icon), dialogue/menu boxes, cursor, continue arrow, item-menu slots, seals, equipment icons and the title logo, plus a preview sheet.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-15
-# Version: 1.0.0
+# Last edit date: 2026-10-21
+# Version: 2.0.0
 #
 # Run:  python -I tools/gen_ui.py
 # Writes assets/ui/ (font_5x7.png/.json, font_3x5.png/.json, hud/*, menu/*, title_logo.png, ui_manifest.json)
@@ -50,6 +50,56 @@ def save(img, folder, name, frames=1, notes=""):
 
 # --------------------------------------------------------------------------- fonts
 
+# Spanish needs Latin-1 glyphs (codepoint - 32 is still the atlas index, so the sheet only grows downward and every
+# ASCII glyph keeps its pixels). Shapes follow Chapel of Dreams' gen_font_latin1.py so the trilogy matches.
+FONT_FIRST, FONT_COLS = 32, 16
+# 5x7 capitals fill rows 0-6 of their 8-row cell. An accented one is redrawn one row shorter, the mark takes row 0,
+# row 1 stays empty (a mark touching the letter cannot be seen at 1x) and the letter sits on rows 2-7 - its baseline
+# drops one pixel, as in Chapel of Dreams' 3x5 font.
+SHORT_CAPS = {
+    "A": [".###.", "#...#", "#...#", "#####", "#...#", "#...#"],
+    "E": ["#####", "#....", "####.", "#....", "#....", "#####"],
+    "I": ["###", ".#.", ".#.", ".#.", ".#.", "###"],
+    "O": [".###.", "#...#", "#...#", "#...#", "#...#", ".###."],
+    "U": ["#...#", "#...#", "#...#", "#...#", "#...#", ".###."],
+    "N": ["#...#", "##..#", "#.#.#", "#..##", "#..##", "#...#"],
+}
+CAP_MARK = {("acute", 5): "...#.", ("acute", 3): "..#", ("dots", 5): ".#.#.", ("tilde", 5): ".##.#"}
+# 5x7 lowercase sits on rows 2-6, so its mark gets the two free rows above it.
+LOW_MARK = {"acute": ["...#.", "..#.."], "dots": [".#.#.", "....."], "tilde": [".##.#", "#..#."]}
+LOW_I_ACUTE = [".#", "..", "#.", "#.", "#.", "#.", "#."]     # a dotless stem with the accent above
+# 3x5 letters fill rows 0-4 of a 6-row cell: the accented letter moves down a row and the mark takes row 0.
+SMALL_MARK = {"acute": "..#", "dots": "#.#", "tilde": "##."}
+ACCENTED = [("Á", "A", "acute"), ("É", "E", "acute"), ("Í", "I", "acute"), ("Ñ", "N", "tilde"),
+            ("Ó", "O", "acute"), ("Ú", "U", "acute"), ("Ü", "U", "dots")]
+PUNCT_LARGE = {"¡": (0, ["#", ".", "#", "#", "#", "#", "#"]),
+               "¿": (0, ["..#..", ".....", "..#..", ".#...", "#....", "#...#", ".###."])}
+PUNCT_SMALL = {"¡": (0, ["#", ".", "#", "#", "#"]), "¿": (0, [".#.", "...", "##.", "#..", "###"])}
+
+
+def latin1_glyphs(glyphs, large):
+    """The Spanish letters and marks as {char: (y_offset, rows)} built from the font's own glyphs. The 3x5 font has
+    capitals only (lowercase input is drawn with them, like ASCII)."""
+    out = {}
+    for cap, base, kind in ACCENTED:
+        if large:
+            rows = SHORT_CAPS[base]
+            out[cap] = (0, [CAP_MARK[(kind, len(rows[0]))], "." * len(rows[0])] + rows)
+            low = cap.lower()
+            if base == "I":
+                out[low] = (0, LOW_I_ACUTE)
+            else:
+                yoff, lrows = glyphs[base.lower()]
+                assert yoff == 2, "lowercase %s is expected on rows 2-6" % base.lower()
+                out[low] = (0, LOW_MARK[kind] + lrows)
+        else:
+            _, rows = glyphs[base]
+            out[cap] = (0, [SMALL_MARK[kind]] + rows)
+    for ch, (yoff, rows) in (PUNCT_LARGE if large else PUNCT_SMALL).items():
+        out[ch] = (yoff, rows)
+    return out
+
+
 def parse_glyphs(text):
     """Parse the glyph source text into {char: (y_offset, [rows])}."""
     glyphs, cur = {}, None
@@ -67,10 +117,16 @@ def build_font(glyphs, cell, name, space_adv, lowercase_from_upper):
     """Lay glyphs out 16 per row in ASCII order (white, no outline; the engine tints them) and write PNG + JSON.
     Returns the sheet so the logo and preview can reuse it."""
     cw, ch = cell
-    cols, first = 16, 32
-    sheet = Canvas(cols * cw, ((128 - first) // cols) * ch)
+    cols, first = FONT_COLS, FONT_FIRST
+    glyphs = dict(glyphs, **latin1_glyphs(glyphs, not lowercase_from_upper))
+    extra = {ord(c) for c in glyphs if ord(c) > 127}
+    if lowercase_from_upper:                        # lowercase accented input draws the capital, as in ASCII
+        extra |= {ord(c.lower()) for c in glyphs if ord(c) > 127 and c.isupper()}
+    extra = sorted(extra)
+    rows_needed = (max(extra + [127]) - first) // cols + 1
+    sheet = Canvas(cols * cw, rows_needed * ch)
     advance = {" ": space_adv}
-    for code in range(first, 127):
+    for code in list(range(first, 127)) + extra:
         c = chr(code)
         src = c.upper() if (lowercase_from_upper and c.islower()) else c
         if src not in glyphs:
@@ -85,7 +141,8 @@ def build_font(glyphs, cell, name, space_adv, lowercase_from_upper):
                     sheet.set(ox + x, oy + yoff + y, WHITE)
         if width + 1 != cw:                             # only variable-width glyphs are listed
             advance[c] = width + 1
-    save(sheet, UI_DIR, "font_%s.png" % name, 1, "Bitmap font, white glyphs, 16 columns from ASCII 32.")
+    save(sheet, UI_DIR, "font_%s.png" % name, 1, "Bitmap font, white glyphs, 16 columns from codepoint 32 (ASCII + "
+         "the Spanish Latin-1 letters).")
     with open(os.path.join(UI_DIR, "font_%s.json" % name), "w", encoding="utf-8", newline="\n") as f:
         json.dump({"cell": [cw, ch], "columns": cols, "first_char": first, "advance": advance}, f, indent=1)
     return glyphs

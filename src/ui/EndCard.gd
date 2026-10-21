@@ -3,11 +3,11 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-19
-# Last edit date: 2026-10-19
-# Version: 1.0.0
+# Last edit date: 2026-10-21
+# Version: 1.1.0
 class_name EndCard
 extends CanvasLayer
-## Used for the end of Act 1 (Caver banishes Joe). Pauses the world; `finished` fires on the first confirm after
+## Used for the end of Act 1 (Caver banishes Joe) and the final ending. Pauses the world; `finished` fires on the first confirm after
 ## every line is shown (the World then saves and returns to the title).
 
 signal finished
@@ -60,8 +60,8 @@ func open(title: String, lines: Array) -> void:
 		_root.add_child(PixelText.make(String(lines[i]), Vector2(UiTheme.VIEW.x / 2.0, LINE_TOP + i * LINE_STEP),
 				UiTheme.TEXT, PixelText.FONT_LARGE, PixelText.Align.CENTER))
 		lines_shown += 1
-	_root.add_child(PixelText.make("PRESS ENTER", Vector2(UiTheme.VIEW.x / 2.0, HINT_Y), UiTheme.DIM_TEXT,
-			PixelText.FONT_SMALL, PixelText.Align.CENTER))
+	_root.add_child(PixelText.make(InputHints.press_hint(), Vector2(UiTheme.VIEW.x / 2.0, HINT_Y), UiTheme.DIM_TEXT,
+			PixelText.FONT_SMALL, PixelText.Align.CENTER))       # "PRESS ENTER" or the gamepad's confirm button
 	ready_to_close = true
 
 

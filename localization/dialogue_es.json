@@ -1,0 +1,516 @@
+{
+ "_header": {
+  "File": "dialogue_es.json",
+  "Description": "Spanish text of every dialogue entry of assets/data/dialogue.json (same keys; text fields only: name, once, pages, gift_pages). Read by src/core/DialogueData.gd when the language is Spanish; flags, gifts and items always come from the English file.",
+  "Author": "Jose-Jorge HERNANDEZ",
+  "Company": "Parlee Conseiller, Inc.",
+  "Date": "2026-10-21",
+  "Last edit date": "2026-10-21",
+  "Version": "1.0.0",
+  "Format": "Neutral Latin American Spanish. A DRAFT like the English story (docs/GDD.md section 2). Characters' names are kept; place names are placeholders. Only the letters the bitmap fonts carry: Á É Í Ó Ú Ñ Ü (both cases), ¡ ¿."
+ },
+ "tato": {
+  "name": "Tato",
+  "once": [
+   "Joe... ¿de verdad eres tú? Pasa, pasa. Estos viejos ojos esperaron mucho tiempo para ver esa cara.",
+   "Desde que te fuiste, Caver pasa las noches bajo la vieja capilla. Los perros no se acercan. Yo tampoco.",
+   "Descansa un rato y luego ve a ver a Boni en la tienda y a Janga al otro lado del camino. Los vas a necesitar a los dos."
+  ],
+  "pages": [
+   "Los guardias de Caver recorren el camino del sur. Las rocas los mantienen fuera... por ahora.",
+   "Si estás herido, corta la hierba y rompe las vasijas. El pueblo siempre ha cuidado de los suyos."
+  ]
+ },
+ "boni": {
+  "name": "Boni",
+  "once": [
+   "¡Joe! ¡Bienvenido a casa! Me temo que mis estantes están un poco vacíos estos días.",
+   "Los hombres de Caver se quedan con la mitad de cada carreta que sube por el camino. ¡Cuando los caminos vuelvan a ser seguros, también mi mercancía!"
+  ],
+  "pages": [
+   "¡Gemas, Joe! La verde vale una, la azul cinco y la roja veinte. El dinero de un héroe crece en cada arbusto."
+  ]
+ },
+ "janga": {
+  "name": "Janga",
+  "once": [
+   "¡Joe! Sabía que volverías. Mírate: todavía cargas ese viejo escudo de la familia.",
+   "Estoy trabajando en algo para ti en la fragua. Dame un poco de tiempo.",
+   "Mientras tanto, recuerda lo que nos enseñó tu padre: mantén la espada tras un golpe y suéltala para girar."
+  ],
+  "pages": [
+   "Camina hacia una cornisa para saltar abajo. No puedes volver a subir por ahí, así que busca una rampa.",
+   "Boni ya vende bombas. Algunas rocas por aquí se ven agrietadas... nomás digo."
+  ],
+  "gift_pages": [
+   "¡Listo! El viejo bumerán de tu padre: le arreglé el filo y lo volví a equilibrar.",
+   "Lánzalo con el botón de objeto. Aturde lo que golpea y trae de vuelta lo que toca."
+  ]
+ },
+ "villager_woman": {
+  "name": "Marta",
+  "pages": [
+   "Las flores volvieron esta primavera. Qué raro... las del camino de la capilla nacieron negras."
+  ]
+ },
+ "villager_boy": {
+  "name": "Pico",
+  "pages": [
+   "Señor, ¿puede levantar vasijas? Párese frente a una y pulse el botón de acción. ¡Yo todavía no tengo fuerza!"
+  ]
+ },
+ "sign_pueblo_cross": {
+  "pages": [
+   "EL PUEBLO\nNorte: el prado.  Oeste: el bosque.\nEste: el lago.  Sur: el camino viejo."
+  ]
+ },
+ "sign_pueblo_south": {
+  "pages": [
+   "Oeste: la tienda de Boni.\nEste: la casa de Janga."
+  ]
+ },
+ "sign_meadow": {
+  "pages": [
+   "PRADO NORTE\nCuidado con los limos. Saltan cuando te acercas."
+  ]
+ },
+ "sign_woods": {
+  "pages": [
+   "BOSQUE DEL OESTE\nLa cornisa solo va en un sentido."
+  ]
+ },
+ "sign_lake": {
+  "pages": [
+   "LAGO DEL ESTE\nProhibido nadar. No alimente a los escupepiedras."
+  ]
+ },
+ "sign_south_road": {
+  "pages": [
+   "CAMINO DEL SUR\nCerrado por orden de Caver.\nNinguna mano desnuda moverá esas rocas."
+  ]
+ },
+ "get_lantern": {
+  "pages": [
+   "¡Conseguiste la Linterna! Úsala para encender antorchas. Cada llama cuesta un poco de magia."
+  ]
+ },
+ "get_boomerang": {
+  "pages": [
+   "¡Conseguiste el Bumerán! Equípalo en el menú de objetos (I, o Select) y lánzalo con el botón de objeto (K, o el botón izquierdo del mando)."
+  ]
+ },
+ "get_bow": {
+  "pages": [
+   "¡Conseguiste el Arco y diez flechas! Dispara con el botón de objeto. Boni vende más flechas."
+  ]
+ },
+ "get_bombs": {
+  "pages": [
+   "¡Conseguiste Bombas! Coloca una con el botón de objeto y aléjate. Las rocas agrietadas no las detendrán."
+  ]
+ },
+ "get_arrows": {
+  "pages": [
+   "¡Conseguiste flechas!"
+  ]
+ },
+ "get_small_key": {
+  "pages": [
+   "¡Conseguiste una llave pequeña! Abre un bloque cerrado."
+  ]
+ },
+ "get_heart_piece": {
+  "pages": [
+   "¡Conseguiste un Trozo de Corazón! Reúne cuatro para formar un nuevo contenedor de corazón."
+  ]
+ },
+ "get_heart_container": {
+  "pages": [
+   "¡Tu vida creció un corazón!"
+  ]
+ },
+ "get_gems": {
+  "pages": [
+   "¡Encontraste gemas!"
+  ]
+ },
+ "locked": {
+  "pages": [
+   "Está cerrado. Una llave pequeña lo abriría."
+  ]
+ },
+ "shop_bombs": {
+  "name": "Boni",
+  "pages": [
+   "¡Bombas! Cinco por 20 gemas. ¿Las quieres?"
+  ]
+ },
+ "shop_arrows": {
+  "name": "Boni",
+  "pages": [
+   "Diez flechas por 15 gemas. ¿Las quieres?"
+  ]
+ },
+ "shop_heart_piece": {
+  "name": "Boni",
+  "pages": [
+   "Un Trozo de Corazón. Solo tengo este... 100 gemas. ¿Lo quieres?"
+  ]
+ },
+ "shop_thanks": {
+  "name": "Boni",
+  "pages": [
+   "¡Gracias, Joe!"
+  ]
+ },
+ "shop_no_gems": {
+  "name": "Boni",
+  "pages": [
+   "Ay... no tienes suficientes gemas para eso."
+  ]
+ },
+ "shop_full": {
+  "name": "Boni",
+  "pages": [
+   "¡Ya no puedes cargar más de esos!"
+  ]
+ },
+ "get_map": {
+  "pages": [
+   "¡Conseguiste el Mapa! Pulsa Tab (o el botón superior del mando) para ver cada sala de este lugar."
+  ]
+ },
+ "get_compass": {
+  "pages": [
+   "¡Conseguiste la Brújula! Ahora el mapa muestra dónde espera el amo de este lugar."
+  ]
+ },
+ "get_big_key": {
+  "pages": [
+   "¡Conseguiste la Llave Grande! Abre la puerta grande y el cofre grande de este lugar."
+  ]
+ },
+ "get_glove": {
+  "pages": [
+   "¡Conseguiste el Guante de Poder! Ahora puedes levantar rocas pesadas. Párate frente a una y pulsa el botón de acción."
+  ]
+ },
+ "get_seal": {
+  "pages": [
+   "¡Conseguiste el primer Sello Familiar! Su piedra violeta está tibia, como una mano en el hombro.",
+   "Otros dos sellos esperan en algún lugar del valle."
+  ]
+ },
+ "locked_door": {
+  "pages": [
+   "La puerta está cerrada. Una llave pequeña de este lugar la abriría."
+  ]
+ },
+ "big_door": {
+  "pages": [
+   "Un gran cerrojo cierra el paso. Necesita la Llave Grande de este lugar."
+  ]
+ },
+ "big_chest_locked": {
+  "pages": [
+   "El cofre grande está cerrado. Necesita la Llave Grande de este lugar."
+  ]
+ },
+ "sign_shrine": {
+  "pages": [
+   "SANTUARIO DEL MUSGO\nLos antiguos guardianes guardaban aquí un sello familiar."
+  ]
+ },
+ "sign_fields": {
+  "pages": [
+   "CAMPOS DEL SUR\nOeste: la Hondonada. Este: la Bóveda.\nNoroeste: la fortaleza. No pasar."
+  ]
+ },
+ "sign_rams_hollow": {
+  "pages": [
+   "HONDONADA DEL CARNERO\nAlgo grande da vueltas allá abajo."
+  ]
+ },
+ "sign_frost_vault": {
+  "pages": [
+   "BÓVEDA DE ESCARCHA\nLa cerca no está ahí por nada."
+  ]
+ },
+ "sign_keep": {
+  "pages": [
+   "FORTALEZA DE CAVER\nTres sellos abren lo que un hombre cerró."
+  ]
+ },
+ "get_boots": {
+  "pages": [
+   "¡Conseguiste las Botas de Carrera! Pulsa Shift (o un botón de hombro) para correr. Los escombros no te detendrán."
+  ]
+ },
+ "get_fire_rod": {
+  "pages": [
+   "¡Conseguiste la Vara de Fuego! Sus bolas de fuego queman lo que el hielo protege y encienden antorchas desde lejos."
+  ]
+ },
+ "get_seal_1": {
+  "pages": [
+   "¡Conseguiste el segundo Sello Familiar! Zumba cuando miras hacia el sur.",
+   "Queda un sello más."
+  ]
+ },
+ "get_seal_2": {
+  "pages": [
+   "¡Conseguiste el tercer Sello Familiar! Los tres están tibios ahora.",
+   "La fortaleza de Caver ya no puede cerrarte el paso."
+  ]
+ },
+ "seal_gate": {
+  "pages": [
+   "Hay tres huecos tallados en el portón. Solo se abrirá cuando los tres sellos familiares estén en ellos."
+  ]
+ },
+ "seal_gate_open": {
+  "pages": [
+   "Los tres sellos arden en sus huecos. Con un gemido, el portón de la fortaleza de Caver se abre."
+  ]
+ },
+ "caver_banish": {
+  "name": "Caver",
+  "pages": [
+   "Basta. Peleas como tu padre, muchacho. Él también perdió.",
+   "¿Quieres mi valle? Entonces míralo como yo lo sueño.",
+   "Vete. Vaga por mi mundo hasta que te trague."
+  ]
+ },
+ "act1_card": {
+  "name": "FIN DEL ACTO UNO",
+  "pages": [
+   "El hechizo de Caver parte el valle en dos.",
+   "Joe cae en la tierra que sueña su enemigo:",
+   "el Mundo Oscuro.",
+   "",
+   "Continuará."
+  ]
+ },
+ "act2_intro": {
+  "pages": [
+   "Joe despierta sobre el suelo frío. Los caminos son los de El Pueblo... pero las casas están huecas y el cielo tiene el color de un moretón.",
+   "Este es el valle tal como Caver lo sueña."
+  ]
+ },
+ "tato_echo": {
+  "name": "Eco de Tato",
+  "pages": [
+   "Usa el espejo donde los dos mundos se tocan. Lo que aquí está cerrado puede estar abierto allá.",
+   "Cuatro puertas llevan más adentro de este sueño: la oscuridad, el fuego, el tiempo y lo salvaje. La oscuridad está al norte, más allá del prado marchito. Lleva una luz."
+  ],
+  "gift_pages": [
+   "Joe. Aun aquí reconozco tu cara. Soy lo que queda de Tato en el sueño de Caver.",
+   "Toma esto. El Espejo Lunar muestra el mundo despierto. Mira en él y estarás allí, en el mismo lugar.",
+   "Cuando termines, vuelve por el destello que deja, o busca una grieta."
+  ]
+ },
+ "get_moon_mirror": {
+  "pages": [
+   "¡Conseguiste el Espejo Lunar! En el Mundo Oscuro, úsalo para pasar al Mundo de Luz en el mismo lugar."
+  ]
+ },
+ "mirror_light": {
+  "pages": [
+   "Aquí el espejo solo muestra tu propia cara."
+  ]
+ },
+ "mirror_blocked": {
+  "pages": [
+   "Algo sólido ocupa ese lugar en el mundo despierto. El espejo te devuelve."
+  ]
+ },
+ "dw_sign_pueblo": {
+  "pages": [
+   "PUEBLO HUECO\nAquí nada te recuerda."
+  ]
+ },
+ "dw_sign_umbra": {
+  "pages": [
+   "UMBRA\nNorte: el Valle Umbrío. Lleva una luz contigo."
+  ]
+ },
+ "dw_sign_silva": {
+  "pages": [
+   "SILVA\nOeste: la Maraña de Silva. Lo salvaje ha clavado estacas en su camino."
+  ]
+ },
+ "dw_sign_ignis": {
+  "pages": [
+   "IGNIS\nEste: el Yermo de Brasas. La lava es demasiado ancha para saltarla: busca cómo cruzar."
+  ]
+ },
+ "dw_sign_tempus": {
+  "pages": [
+   "TEMPUS\nOeste: el Páramo del Reloj. El camino cruza el tiempo derretido."
+  ]
+ },
+ "dw_sign_fields": {
+  "pages": [
+   "CAMPOS MUERTOS\nDonde en el mundo despierto se alza la fortaleza, aquí se alza la torre de Caver. Cuatro cristales abren su portón."
+  ]
+ },
+ "shade_merchant": {
+  "name": "Sombra",
+  "pages": [
+   "Las gemas valen lo mismo en un sueño, viajero. Aunque todo cuesta más. Aquí todo cuesta más.",
+   "La magia escasea en la oscuridad. Una botella mantiene honestas a las sombras."
+  ]
+ },
+ "dw_shop_bombs": {
+  "name": "Sombra",
+  "pages": [
+   "Cinco bombas. 30 gemas. ¿Las quieres?"
+  ]
+ },
+ "dw_shop_arrows": {
+  "name": "Sombra",
+  "pages": [
+   "Diez flechas. 25 gemas. ¿Las quieres?"
+  ]
+ },
+ "dw_shop_magic": {
+  "name": "Sombra",
+  "pages": [
+   "Una botella de magia: te llena hasta el borde. 40 gemas. ¿La quieres?"
+  ]
+ },
+ "dw_shop_thanks": {
+  "name": "Sombra",
+  "pages": [
+   "Un placer. Cuidado con la oscuridad."
+  ]
+ },
+ "dw_shop_no_gems": {
+  "name": "Sombra",
+  "pages": [
+   "Sin gemas no hay mercancía. Ni siquiera en un sueño."
+  ]
+ },
+ "dw_shop_full": {
+  "name": "Sombra",
+  "pages": [
+   "Ya vas lleno. Vuelve más vacío."
+  ]
+ },
+ "mirror_void": {
+  "pages": [
+   "El espejo solo muestra oscuridad. No hay mundo despierto detrás de este lugar."
+  ]
+ },
+ "dw_sign_sanctum": {
+  "pages": [
+   "SANTUARIO DE UMBRA\nLo que vive aquí odia la luz."
+  ]
+ },
+ "get_grapple": {
+  "pages": [
+   "¡Conseguiste el Garfio! Dispáralo con el botón de objeto: muerde los postes de gancho y te jala sobre abismos y agua. Aturde lo que golpea."
+  ]
+ },
+ "get_crystal": {
+  "pages": [
+   "¡Conseguiste un cristal de dimensión!"
+  ]
+ },
+ "get_crystal_0": {
+  "pages": [
+   "¡Conseguiste el Cristal de Umbra! Su luz fría hace retroceder un poco el sueño.",
+   "Otros tres cristales esperan en las demás tierras del Mundo Oscuro."
+  ]
+ },
+ "get_magic": {
+  "pages": [
+   "¡Tu magia está llena otra vez!"
+  ]
+ },
+ "dw_sign_forge": {
+  "pages": [
+   "FORJA DE IGNIS\nLo que arde aquí nunca se enfría. Trae algo más frío."
+  ]
+ },
+ "get_ice_rod": {
+  "pages": [
+   "¡Conseguiste la Vara de Hielo! Sus rayos (4 de magia) congelan a los enemigos y convierten la lava en una costra que puedes cruzar, por unos segundos."
+  ]
+ },
+ "get_crystal_1": {
+  "pages": [
+   "¡Conseguiste el Cristal de Ignis! Arde sin calor en tu mano.",
+   "Otros dos cristales esperan en el Mundo Oscuro."
+  ]
+ },
+ "dw_sign_clockyard": {
+  "pages": [
+   "PÁRAMO DEL RELOJ\nLos bloques suben y bajan con el reloj roto. Espera tu momento."
+  ]
+ },
+ "get_hammer": {
+  "pages": [
+   "¡Conseguiste el Martillo! Úsalo con el botón de objeto: aplana estacas, voltea a los bichos de relojería y rompe armaduras."
+  ]
+ },
+ "get_crystal_2": {
+  "pages": [
+   "¡Conseguiste el Cristal de Tempus! Dentro, un segundero avanza hacia atrás.",
+   "Queda un cristal."
+  ]
+ },
+ "dw_sign_grove": {
+  "pages": [
+   "MARAÑA DE SILVA\nLa Arboleda bebe del río. Cuidado con las flores que muerden."
+  ]
+ },
+ "get_flippers": {
+  "pages": [
+   "¡Conseguiste las Aletas! Entra en el agua honda para nadar. No hay espada mientras chapoteas, pero ya ningún río te detiene."
+  ]
+ },
+ "get_crystal_3": {
+  "pages": [
+   "¡Conseguiste el Cristal de Silva! Dentro, una semilla espera la primavera.",
+   "Los cuatro cristales brillan juntos. La torre de Caver ya no puede esconderse."
+  ]
+ },
+ "crystal_gate": {
+  "pages": [
+   "Cuatro huecos vacíos relucen sobre el arco sellado de la torre. Solo los cuatro cristales de dimensión pueden romper aquí la voluntad de Caver."
+  ]
+ },
+ "crystal_gate_open": {
+  "pages": [
+   "Los cristales de Umbra, Ignis, Tempus y Silva arden en sus huecos. Los barrotes de la voluntad de Caver se quiebran. La torre está abierta."
+  ]
+ },
+ "caver_tower_intro": {
+  "name": "Caver",
+  "pages": [
+   "Vaya. El huérfano sube a mi torre con mis propios sueños en los bolsillos.",
+   "Oscuridad, fuego, tiempo, lo salvaje... Los doblegué a todos. A ti también te doblegaré.",
+   "Ven, muchacho. Terminemos lo que tu padre empezó."
+  ]
+ },
+ "caver_fall": {
+  "name": "Caver",
+  "pages": [
+   "No... Este cuerpo solo era un cascarón.",
+   "Bajo la vieja capilla el sueño continúa. Le crecerán muros, y salones, y puertas sin fin...",
+   "Y un día, muchacho, tendrás que entrar en él."
+  ]
+ },
+ "final_card": {
+  "name": "FIN",
+  "pages": [
+   "El cuerpo mortal de Caver se deshace en ceniza.",
+   "Su sombra se desliza bajo la vieja capilla,",
+   "donde la maldición sigue soñando, y crece un castillo.",
+   "",
+   "La historia de Joe continúa en",
+   "CHAPEL OF DREAMS."
+  ]
+ }
+}

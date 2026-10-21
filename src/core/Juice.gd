@@ -1,16 +1,20 @@
 # File: Juice.gd
-# Description: Autoload for game-feel effects - camera shake, per-actor hit-stop and one-shot effect sprites (ported from Chapel of Dreams, trimmed for top-down).
+# Description: Autoload for game-feel effects - camera shake, per-actor hit-stop, one-shot effect sprites (ported from Chapel of Dreams, trimmed for top-down) and gamepad rumble; it also hosts the InputHints device watcher.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 1.1.2
+# Last edit date: 2026-10-21
+# Version: 1.2.0
 extends Node
 
 const FX_DIR := "res://assets/sprites/vfx/"
 const FX_MANIFESTS := ["vfx_manifest.json", "vfx_items.json", "vfx_act1.json", "vfx_silva.json"]   # gen_props /
 		# gen_items / gen_act1 / gen_silva
 const FX_Z := 60                          # effects draw over actors
+const RUMBLE_MAX_SECONDS := 1.0          # no rumble lasts longer than this
+
+var hints: InputHints                     # which device the player uses (static answers; this node listens)
+var rumbles := 0                          # rumbles asked for while vibration is on (tests; counted without a pad too)
 
 # Debug/test counters.
 var fx_count := 0
@@ -22,6 +26,22 @@ var _fx_index: Dictionary = {}            # effect name -> manifest entry
 var _fx_frames: Dictionary = {}           # effect name -> SpriteFrames
 var _shake_strength := 0.0
 var _shake_total := 0.0
+
+
+func _ready() -> void:
+	hints = InputHints.new()
+	hints.name = "InputHints"
+	add_child(hints)
+
+
+# Rumble every connected gamepad (`weak` and `strong` motors 0..1) unless vibration is off in the options.
+func rumble(weak: float, strong: float, seconds: float) -> void:
+	if not bool(get_node("/root/Audio").get("vibration")):
+		return
+	rumbles += 1
+	for pad in Input.get_connected_joypads():
+		Input.start_joy_vibration(pad, clampf(weak, 0.0, 1.0), clampf(strong, 0.0, 1.0),
+				minf(seconds, RUMBLE_MAX_SECONDS))
 
 
 # Shake the active camera by up to `strength` whole pixels, decaying over `seconds`.

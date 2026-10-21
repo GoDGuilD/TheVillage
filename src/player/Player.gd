@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 2.6.0
+# Last edit date: 2026-10-21
+# Version: 2.6.1
 class_name Player
 extends CharacterBody2D
 ## The node origin is Joe's feet. Only a small box around the feet collides with the world (as in ALttP),
@@ -936,6 +936,7 @@ func _on_hurt(damage: int, source_position: Vector2, _kb: Vector2) -> void:
 		return                               # _on_died takes over
 	Audio.sfx("hurt")
 	Juice.shake(PlayerTuning.HURT_SHAKE.x, PlayerTuning.HURT_SHAKE.y)
+	Juice.rumble(PlayerTuning.HURT_RUMBLE.x, PlayerTuning.HURT_RUMBLE.y, PlayerTuning.HURT_RUMBLE.z)
 	var away := (global_position + PlayerTuning.BODY_CENTER - source_position)
 	_knockback = (away.normalized() if away.length() > 0.01 else -Vector2(facing)) * PlayerTuning.HURT_KNOCKBACK_SPEED
 	_iframes_left = PlayerTuning.IFRAMES
@@ -946,6 +947,7 @@ func _on_hurt(damage: int, source_position: Vector2, _kb: Vector2) -> void:
 
 func _on_died() -> void:
 	Audio.sfx("player_die")
+	Juice.rumble(PlayerTuning.DEATH_RUMBLE.x, PlayerTuning.DEATH_RUMBLE.y, PlayerTuning.DEATH_RUMBLE.z)
 	fsm.transition_to("dead")
 	died.emit()
 

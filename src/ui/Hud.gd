@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-16
-# Version: 2.2.0
+# Last edit date: 2026-10-21
+# Version: 2.2.1
 class_name Hud
 extends CanvasLayer
 ## Reads GameState through its signals; the World feeds Joe's hearts (set_health) and area names (show_caption).
@@ -207,7 +207,7 @@ func show_caption(text: String) -> void:
 	caption_shown = text
 	for c in _caption.get_children():
 		c.queue_free()
-	var w := PixelText.measure(text) + CAPTION_PAD.x * 2.0
+	var w := PixelText.measure(Loc.t(text)) + CAPTION_PAD.x * 2.0       # the plate fits the translated name
 	var h := PixelText.line_height() + CAPTION_PAD.y * 2.0
 	var x := roundf((UiTheme.VIEW.x - w) / 2.0)
 	_caption.add_child(UiTheme.box(Vector2(x, CAPTION_Y), Vector2(w, h), UiTheme.CAPTION_TEXTURE, UiTheme.CAPTION_BORDER))

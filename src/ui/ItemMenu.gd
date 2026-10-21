@@ -3,8 +3,8 @@
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 1.5.0
+# Last edit date: 2026-10-21
+# Version: 1.5.1
 class_name ItemMenu
 extends CanvasLayer
 ## Slots follow GameState.ITEM_ORDER; an item shows once found (icons in assets/ui/items/, Phase 5).
@@ -171,7 +171,7 @@ func _refresh() -> void:
 func item_label(item_id: String) -> String:
 	if not GameState.has_item(item_id):
 		return "-"
-	var label := ItemDB.display_name(item_id)
+	var label := Loc.t(ItemDB.display_name(item_id))       # translate the name, then add the count
 	if item_id == "bombs":
 		label += " x%d" % GameState.bombs
 	elif item_id == "bow":

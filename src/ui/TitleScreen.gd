@@ -1,10 +1,10 @@
 # File: TitleScreen.gd
-# Description: Title screen - "THE VILLAGE" over a slow pan across El Pueblo, with CONTINUE (when a save exists), NEW GAME and QUIT.
+# Description: Title screen - "THE VILLAGE" over a slow pan across El Pueblo with its own music, and CONTINUE (when a save exists), NEW GAME, OPTIONS and QUIT; the hint under the menu names the keys or the gamepad buttons, whichever the player uses.
 # Author: Jose-Jorge HERNANDEZ
 # Company: Parlee Conseiller, Inc.
 # Date: 2026-10-15
-# Last edit date: 2026-10-20
-# Version: 1.1.0
+# Last edit date: 2026-10-21
+# Version: 1.2.0
 extends Node2D
 ## The backdrop is the real village, painted by AreaBuilder from its generated area (no enemies), so the title
 ## always matches the game. CONTINUE hands the save to the World through SaveGame.pending.
@@ -25,13 +25,17 @@ const SUBTITLE_Y := 76.0
 const SUBTITLE := "A STORY BEFORE THE CHAPEL"
 const MENU_POS := Vector2(160, 106)
 const HINT_Y := 202.0
+const MUSIC := "title"
 const PAN_SPEED := 6.0                   # px per second the backdrop drifts
 const PAN_START := Vector2(2, 1)         # tiles: top-left of the view at the start of the pan
 const ITEM_CONTINUE := 0
 const ITEM_NEW := 1
-const ITEM_QUIT := 2
+const ITEM_OPTIONS := 2
+const ITEM_QUIT := 3
 
 var menu: MenuList
+var options: OptionsMenu
+var hint: PixelText
 var started := ""                        # "continue" / "new" once a choice was made (tests)
 
 var _backdrop: Node2D
@@ -60,9 +64,25 @@ func _ready() -> void:
 	ui.add_child(menu)
 	menu.set_items(menu_items())
 	menu.chosen.connect(_on_chosen)
-	ui.add_child(PixelText.make("ARROWS + ENTER", Vector2(UiTheme.VIEW.x / 2.0, HINT_Y), UiTheme.DIM_TEXT,
-			PixelText.FONT_SMALL, PixelText.Align.CENTER))
+	hint = PixelText.make(InputHints.menu_hint(), Vector2(UiTheme.VIEW.x / 2.0, HINT_Y), UiTheme.DIM_TEXT,
+			PixelText.FONT_SMALL, PixelText.Align.CENTER)
+	ui.add_child(hint)
+	Juice.hints.device_changed.connect(_on_device_changed)
 	_add_studio_logo(ui)
+	options = OptionsMenu.new()
+	add_child(options)
+	options.closed.connect(func() -> void: menu.active = true)
+	Audio.play_music(MUSIC)
+
+
+func _exit_tree() -> void:
+	if Juice.hints.device_changed.is_connected(_on_device_changed):
+		Juice.hints.device_changed.disconnect(_on_device_changed)
+
+
+# Keyboard or gamepad: the hint follows whatever the player touched last.
+func _on_device_changed(_device: String) -> void:
+	hint.text = InputHints.menu_hint()
 
 
 # Bottom-right animated GoDGuilD logo (intro, idle, occasional glitch replay).
@@ -80,6 +100,7 @@ func menu_items() -> Array:
 	return [
 		{"label": "CONTINUE", "enabled": SaveGame.has_save()},
 		{"label": "NEW GAME", "enabled": true},
+		{"label": "OPTIONS", "enabled": true},
 		{"label": "QUIT", "enabled": true},
 	]
 
@@ -115,6 +136,9 @@ func _on_chosen(index: int) -> void:
 			start_game(true)
 		ITEM_NEW:
 			start_game(false)
+		ITEM_OPTIONS:
+			menu.active = false
+			options.open()
 		ITEM_QUIT:
 			get_tree().quit()
 
