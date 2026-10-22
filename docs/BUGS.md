@@ -4,8 +4,8 @@ Description: Log of every gotcha met, internal or external.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.12.0
+Last edit date: 2026-10-22
+Version: 1.13.0
 -->
 
 # Bugs and gotchas
@@ -50,3 +50,4 @@ Version: 1.12.0
 - [Internal] **Dialogue checks read a half-typed box** - Symptom: text checks failed with "The m" or "". Root cause: the box types its page; `visible_text()` right after opening shows only the first letters. Fix: the test waits ~2 s (`_text()`) before reading. File: `tests/test_umbra.gd`.
 - [Internal] **The moth's dust drew both frames side by side** - Symptom: the first dust shot preview was a 20-px strip. Root cause: `EnemyShot` draws a plain Sprite2D, not an animation; the generator wrote a 2-frame strip. Fix: `dust_shot.png` is one frame. File: `tools/gen_umbra.py`.
 - [Internal] **Tato's echo talked but gave nothing** - Symptom: the gift dialogue played, then no Moon Mirror. Root cause: `World.grant()` matches kinds explicitly and had no branch for `moon_mirror`. Fix: added it with the other passive/Y items. File: `src/world/World.gd`.
+- [External] **Excluding `addons/` breaks the exported EXE's autoloads** - Symptom: the first export, with `addons/*` excluded, logged "Failed to instantiate an autoload ... mcp_runtime_probe.gd" at start. Root cause: the enabled `godot_mcp` editor plugin registers a runtime-probe autoload in the project settings while the editor runs, so the export carries it even though `project.godot` has no such autoload. Workaround: keep `addons/` in the export (the probe does nothing without a debugger). File: `export_presets.cfg`.

@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-21
-Version: 5.11.0
+Last edit date: 2026-10-22
+Version: 5.12.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [8.1.0] - 2026-10-22 — First Windows beta build
+
+### Added
+- `export_presets.cfg`: a Windows Desktop preset like Chapel of Dreams' (single EXE with the PCK embedded, the
+  `assets/branding/thevillageicon.ico` icon, `*.json` include filter for the run-time data, tests/tools/docs left out).
+  It exports to `H:\PROJECTS\Exported Games\The Village.exe`.
+- The 8.0.0 game (Phases 0-14) is on the beta-testing VMs as "The Village".
 
 ## [8.0.0] - 2026-10-21 — Phase 14: polish, audio, localization
 

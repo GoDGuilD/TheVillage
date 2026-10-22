@@ -4,8 +4,8 @@ Description: How to build the game.
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-10-15
-Last edit date: 2026-10-21
-Version: 1.1.0
+Last edit date: 2026-10-22
+Version: 1.2.0
 -->
 
 # Build
@@ -14,4 +14,13 @@ No build step is needed to play from the editor (F5). Generated art must exist f
 
 When exporting, include the non-resource files the game reads at run time: `localization/*.json`,
 `assets/data/*.json`, `src/world/areas/*.json`, the sprite manifests and `assets/audio/sfx_trim.json` (export filter
-`*.json`). Windows exports arrive with the release phase (an `export_presets.cfg` like Chapel of Dreams'); until then use Project > Export in the editor with the Windows Desktop template for Godot 4.7.2.
+`*.json`). `export_presets.cfg` has a Windows Desktop preset that does this:
+
+```
+F:\Software\Godot\Godot_v4.7.2-stable_win64_console.exe --headless --path . --export-release "Windows Desktop"
+```
+
+It writes one EXE (PCK embedded, custom icon) to `H:\PROJECTS\Exported Games\The Village.exe`. Smoke test it with
+`"The Village.exe" --headless --quit-after 600` (exit code 0, no errors). Keep `addons/` in the export: the enabled
+`godot_mcp` editor plugin adds a runtime autoload at export time (inert without a debugger), and leaving the addon out
+makes the EXE log a failed autoload. Godot warns that the icon lacks some sizes; the EXE still gets the icon.

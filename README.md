@@ -4,13 +4,13 @@ Description: Project overview, status, and getting-started guide for The Village
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-21
-Version: 5.8.0
+Last edit date: 2026-10-22
+Version: 5.8.1
 -->
 
 # The Village
 
-**Version 8.0.0** (project-wide; see `CHANGELOG.md`)
+**Version 8.1.0** (project-wide; see `CHANGELOG.md`)
 
 A top-down action-adventure in the style of *The Legend of Zelda: A Link to the Past*, built with Godot 4.7.2.
 It is the **first game (prequel) of The Village trilogy**; game 2 is *The Village — Chapel of Dreams*
