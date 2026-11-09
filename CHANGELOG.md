@@ -4,8 +4,8 @@ Description: Dated record of all relevant changes to The Village, reconstructed 
 Author: Jose-Jorge HERNANDEZ
 Company: Parlee Conseiller, Inc.
 Date: 2026-05-26
-Last edit date: 2026-10-22
-Version: 5.12.0
+Last edit date: 2026-11-09
+Version: 5.13.0
 -->
 
 # Changelog — The Village
@@ -22,6 +22,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 > timeline and the reasoning behind this changelog's structure.
 
 ---
+
+## [8.1.1] - 2026-11-09 — Hide the Godot boot splash
+
+### Changed
+- Boot splash: the Godot logo no longer appears at start-up (`application/boot_splash/show_image=false`); the splash is now a plain screen in the game's background color (`boot_splash/bg_color=Color(0.094, 0.063, 0.125, 1)`). Godot's MIT license does not require the splash.
 
 ## [8.1.0] - 2026-10-22 — First Windows beta build
 
